@@ -165,11 +165,13 @@ http://192.168.56.23:8222
 
 ## **7. Kết luận**
 Sau khi hoàn tất demo, bạn đã chứng minh rằng:
+```
 ✅ Hệ thống sử dụng **Microservices** với Docker Swarm
 ✅ Các dịch vụ được phân bố và nhân rộng trên nhiều node
 ✅ NATS giúp các service giao tiếp hiệu quả
 ✅ Hệ thống có khả năng chịu lỗi và tự phục hồi
 ✅ Admin, Teacher và Student có thể tương tác với hệ thống theo vai trò của mình
+```
 
 Để dừng demo:
 ```bash
