@@ -1,0 +1,233 @@
+# Hướng dẫn chia nhỏ diagram "API Gateway Architecture"
+
+## Vấn đề
+Diagram API Gateway Architecture khá phức tạp với nhiều controller và service, khó đọc khi thu nhỏ để vừa trang Word.
+
+## Cách chia nhỏ chi tiết theo module
+
+### 1. Cấu trúc Auth và Client
+
+**Thành phần giữ lại:**
+- Actor "Client"
+- API Gateway và Auth-core
+- Kết nối giữa Client và Gateway
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml api-gateway-auth
+title API Gateway - Phần Auth và Client
+
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+skinparam actorFontSize 16
+
+skinparam rectangle {
+  BackgroundColor<<Auth>> #dddddd
+  BackgroundColor<<Service>> #ffcccc
+}
+
+actor "Client" as User
+
+rectangle "API Gateway\n(http://localhost:3100/api)" as Gateway #ff4444 {
+  rectangle "Auth-core" <<Auth>> {
+    [Guard]
+    [Decorators]
+    [Strategies JWT]
+  }
+}
+
+User --> Gateway
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào cấu trúc xác thực trong API Gateway. Nó cho thấy cách Client tương tác với API Gateway và cơ chế bảo mật được triển khai.
+
+### 2. Computer Service Controller
+
+**Thành phần giữ lại:**
+- API Gateway (đơn giản hóa)
+- Auth-core (đơn giản hóa)
+- Computer Service Controller và các service bên trong
+- NATS Server
+- Mối quan hệ giữa chúng
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml api-gateway-computer
+title API Gateway - Computer Service Controller
+
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+
+skinparam rectangle {
+  BackgroundColor<<Auth>> #dddddd
+  BackgroundColor<<Service>> #ffcccc
+  BackgroundColor<<NATS>> #ccffff
+}
+
+rectangle "API Gateway" as Gateway #ff4444 {
+  rectangle "Auth-core" <<Auth>> {
+    [Guard]
+  }
+
+  rectangle "/api/computer-service/\nComputer-service Controller" as ComputerCtrl <<Service>> {
+    [activity log computer service]
+    [computers service]
+    [file transfer service]
+    [computer-usage service]
+  }
+}
+
+rectangle "NATS SERVER" <<NATS>> as NATS
+
+[Guard] --> ComputerCtrl
+[activity log computer service] --> NATS
+[computers service] --> NATS
+[file transfer service] --> NATS
+[computer-usage service] --> NATS
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào Computer Service Controller trong API Gateway. Nó cho thấy các service nhỏ bên trong controller và cách chúng giao tiếp với NATS.
+
+### 3. User Service Controller
+
+**Thành phần giữ lại:**
+- API Gateway (đơn giản hóa)
+- Auth-core (đơn giản hóa)
+- User Service Controller và các service bên trong
+- NATS Server
+- Mối quan hệ giữa chúng
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml api-gateway-user
+title API Gateway - User Service Controller
+
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+
+skinparam rectangle {
+  BackgroundColor<<Auth>> #dddddd
+  BackgroundColor<<Service>> #ffcccc
+  BackgroundColor<<NATS>> #ccffff
+}
+
+rectangle "API Gateway" as Gateway #ff4444 {
+  rectangle "Auth-core" <<Auth>> {
+    [Guard]
+  }
+
+  rectangle "/api/user-service/\nUser-service Controller" as UserCtrl <<Service>> {
+    [activity log user service]
+    [auth service]
+    [profile service]
+    [users service]
+  }
+}
+
+rectangle "NATS SERVER" <<NATS>> as NATS
+
+[Guard] --> UserCtrl
+[activity log user service] --> NATS
+[auth service] --> NATS
+[profile service] --> NATS
+[users service] --> NATS
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào User Service Controller trong API Gateway. Nó cho thấy các service nhỏ bên trong controller và cách chúng giao tiếp với NATS.
+
+### 4. Room Service Controller
+
+**Thành phần giữ lại:**
+- API Gateway (đơn giản hóa)
+- Auth-core (đơn giản hóa)
+- Room Service Controller và các service bên trong
+- NATS Server
+- Mối quan hệ giữa chúng
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml api-gateway-room
+title API Gateway - Room Service Controller
+
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+
+skinparam rectangle {
+  BackgroundColor<<Auth>> #dddddd
+  BackgroundColor<<Service>> #ffcccc
+  BackgroundColor<<NATS>> #ccffff
+}
+
+rectangle "API Gateway" as Gateway #ff4444 {
+  rectangle "Auth-core" <<Auth>> {
+    [Guard]
+  }
+
+  rectangle "/api/room-service/\nRoom-service Controller" as RoomCtrl <<Service>> {
+    [activity log room service]
+    [room usage service]
+    [rooms service]
+    [schedule service]
+  }
+}
+
+rectangle "NATS SERVER" <<NATS>> as NATS
+
+[Guard] --> RoomCtrl
+[activity log room service] --> NATS
+[room usage service] --> NATS
+[rooms service] --> NATS
+[schedule service] --> NATS
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào Room Service Controller trong API Gateway. Nó cho thấy các service nhỏ bên trong controller và cách chúng giao tiếp với NATS.
+
+## Thiết lập để dễ đọc hơn
+Các thiết lập sau giúp cải thiện khả năng đọc của diagram:
+
+```plantuml
+' Thêm vào đầu file để cải thiện hiển thị
+skinparam defaultFontSize 14
+skinparam rectangleFontSize 15
+skinparam rectangleFontStyle bold
+skinparam actorFontSize 16
+skinparam rectangleBorderThickness 2
+skinparam linetype ortho
+```
+
+## Khi trình bày trong Word
+
+### Trình bày theo module
+1. **Tổng quan API Gateway**: Hiển thị diagram đơn giản hóa của toàn bộ API Gateway
+2. **Phần Auth và Client**: Sử dụng diagram #1 để giải thích cấu trúc xác thực
+3. **Computer Service Controller**: Sử dụng diagram #2 để giải thích chức năng quản lý máy tính
+4. **User Service Controller**: Sử dụng diagram #3 để giải thích chức năng quản lý người dùng
+5. **Room Service Controller**: Sử dụng diagram #4 để giải thích chức năng quản lý phòng
+
+### Bảng mô tả chi tiết
+Tạo bảng để giải thích chi tiết chức năng các thành phần:
+
+| Thành phần | Module | Chức năng |
+|------------|--------|-----------|
+| Guard | Auth | Bảo vệ API endpoints, xác thực JWT token |
+| Strategies JWT | Auth | Định nghĩa chiến lược xác thực |
+| auth service | User Service | Đăng nhập, đăng xuất, làm mới token |
+| computers service | Computer Service | CRUD cho máy tính |
+| room usage service | Room Service | Quản lý việc sử dụng phòng |
+| ... | ... | ... |

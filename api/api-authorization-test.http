@@ -1,0 +1,250 @@
+# Authorization Testing API
+
+@baseUrl = http://localhost:3000/api
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJyZW1lbWJlck1lIjp0cnVlLCJpYXQiOjE3NDM5MjcyMzUsImV4cCI6MTc0NjUxOTIzNX0.SaSYLAGyvYuXRC2dqQHckiztZWDoySiNS8sHjPjTEAY
+@teacherToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEzLCJyZW1lbWJlck1lIjp0cnVlLCJpYXQiOjE3NDM5MjcxMTAsImV4cCI6MTc0NjUxOTExMH0.JR9CxSYzVJsCLdXBJ4_uJWZCbbb9S0G4x29hysHM2kQ
+@studentToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE0LCJyZW1lbWJlck1lIjp0cnVlLCJpYXQiOjE3NDM5MjcxMTMsImV4cCI6MTc0NjUxOTExM30.ugJ0FDTTTj38uXdIQfnl0m754WrsuF3HTVbg0oLr5Xk
+
+### 1. Đăng ký các tài khoản với vai trò khác nhau
+
+### Register Admin
+# @name registerAdmin
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Password32!",
+  "name": "Admin One",
+  "phone": "0123456789",
+  "department": "Administration"
+}
+
+### Register Teacher
+# @name registerTeacher
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "teacher1@music.edu",
+  "password": "Password123!",
+  "name": "Teacher One",
+  "phone": "0123456788",
+  "department": "Music Department"
+}
+
+### Register Student
+# @name registerStudent
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "student1@music.edu",
+  "password": "Password123!",
+  "name": "Student One",
+  "phone": "0123456787",
+  "department": "Piano Studies"
+}
+
+### 2. Đăng nhập với từng tài khoản để lấy token
+
+### Login as Admin
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "password123",
+  "rememberMe": true
+}
+
+### Save Admin token
+@adminToken = {{loginAdmin.response.body.data.accessToken}}
+
+### Login as Teacher
+# @name loginTeacher
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "teacher1@music.edu",
+  "password": "Password123!",
+  "rememberMe": true
+}
+
+### Save Teacher token
+@teacherToken = {{loginTeacher.response.body.data.accessToken}}
+
+### Login as Student
+# @name loginStudent
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "student1@music.edu",
+  "password": "Password123!",
+  "rememberMe": true
+}
+
+### Save Student token
+@studentToken = {{loginStudent.response.body.data.accessToken}}
+
+### 3. Cập nhật vai trò cho các người dùng (cần tài khoản ADMIN)
+
+### Set Admin Role
+PUT {{baseUrl}}/users/12/role
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "role": "ADMIN"
+}
+
+### Set Teacher Role
+PUT {{baseUrl}}/users/13/role
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "role": "TEACHER"
+}
+
+### Set Student Role
+PUT {{baseUrl}}/users/14/role
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "role": "STUDENT"
+}
+
+### 4. Test role-based access
+
+### LIST USERS API
+### Admin - Liệt kê tất cả người dùng (Cho phép)
+GET {{baseUrl}}/users
+Authorization: Bearer {{adminToken}}
+
+### Teacher - Liệt kê học sinh của mình (Cho phép)
+GET {{baseUrl}}/users/students?teacherId=13
+Authorization: Bearer {{teacherToken}}
+
+### Teacher - Liệt kê tất cả người dùng (Không cho phép)
+GET {{baseUrl}}/users
+Authorization: Bearer {{teacherToken}}
+
+### Student - Liệt kê tất cả người dùng (Không cho phép)
+GET {{baseUrl}}/users
+Authorization: Bearer {{studentToken}}
+
+### CREATE USER API
+### Admin - Tạo người dùng giáo viên mới (Cho phép)
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "email": "newteacher@music.edu",
+  "password": "Password123!",
+  "name": "New Teacher",
+  "phone": "0123456786",
+  "role": "TEACHER",
+  "department": "Music Theory"
+}
+
+### Teacher - Tạo học sinh mới (Cho phép)
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{teacherToken}}
+
+{
+  "email": "newstudent@music.edu",
+  "password": "Password123!",
+  "name": "New Student",
+  "phone": "0123456785",
+  "role": "STUDENT",
+  "department": "Piano Studies"
+}
+
+### Teacher - Tạo giáo viên mới (Không cho phép)
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{teacherToken}}
+
+{
+  "email": "newteacher2@music.edu",
+  "password": "Password123!",
+  "name": "New Teacher 2",
+  "phone": "0123456784",
+  "role": "TEACHER",
+  "department": "Sound Engineering"
+}
+
+### UPDATE USER API
+### Admin - Cập nhật thông tin người dùng (Cho phép)
+PUT {{baseUrl}}/users/14
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Student Updated",
+  "phone": "0123456783",
+  "department": "Music Theory"
+}
+
+### Teacher - Cập nhật thông tin học sinh của mình (Cho phép)
+PUT {{baseUrl}}/users/15
+Content-Type: application/json
+Authorization: Bearer {{teacherToken}}
+
+{
+  "name": "Student Updated By Teacher",
+  "phone": "0123456782",
+  "department": "Piano Studies"
+}
+
+### DELETE USER API
+### Admin - Xóa người dùng (Cho phép)
+DELETE {{baseUrl}}/users/15
+Authorization: Bearer {{adminToken}}
+
+### Teacher - Xóa học sinh của mình (Cho phép)
+DELETE {{baseUrl}}/users/16
+Authorization: Bearer {{teacherToken}}
+
+### Teacher - Xóa học sinh không phải của mình (Không cho phép)
+DELETE {{baseUrl}}/users/14
+Authorization: Bearer {{teacherToken}}
+
+### 5. Test Resource Owner Guard
+
+### Student updating their own profile (Cho phép)
+PUT {{baseUrl}}/auth/profile
+Content-Type: application/json
+Authorization: Bearer {{studentToken}}
+
+{
+  "name": "Student Self Updated",
+  "phone": "0123456781",
+  "department": "Composition"
+}
+
+### Student trying to access another user's data by ID (Không cho phép)
+GET {{baseUrl}}/users/1
+Authorization: Bearer {{studentToken}}
+
+### 6. Test Teacher-Student Relationship
+
+### Teacher viewing list of their students
+GET {{baseUrl}}/users/students?teacherId=13
+Authorization: Bearer {{teacherToken}}
+
+### 7. Test không có token hoặc token không hợp lệ
+
+### No Token
+GET {{baseUrl}}/auth/profile
+
+### Invalid Token
+GET {{baseUrl}}/auth/profile
+Authorization: Bearer invalid_token_here

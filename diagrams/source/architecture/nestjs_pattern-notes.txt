@@ -1,0 +1,199 @@
+# Hướng dẫn chia nhỏ diagrams "NestJS Message & Event Patterns"
+
+## Vấn đề
+Các diagram mô tả cơ chế MessagePattern và EventPattern trong NestJS có thể khó hiểu khi đứng riêng lẻ, cần được trình bày song song để hiểu rõ sự khác biệt.
+
+## Cách trình bày song song để so sánh
+
+### 1. So sánh MessagePattern và EventPattern
+
+**Thành phần giữ lại:**
+- Diagram MessagePattern và EventPattern đơn giản hóa
+- Tập trung vào sự khác biệt về cách message được phân phối
+
+**Code để tạo diagram so sánh:**
+```plantuml
+@startuml nestjs-patterns-comparison
+title So sánh MessagePattern và EventPattern trong NestJS
+
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam shadowing true
+skinparam defaultTextAlignment center
+skinparam ArrowColor Black
+skinparam ArrowThickness 2
+skinparam rectangleFontSize 14
+
+rectangle "**MessagePattern**" as MP #E1F5FE {
+  rectangle "NATS SERVER" as NATS1 #B3E5FC
+  rectangle "Service Instance" as Service1 #FFCDD2
+  
+  NATS1 --> Service1 : "Message gửi đến 1 instance duy nhất\n(Load balancing)"
+}
+
+rectangle "**EventPattern**" as EP #F1F8E9 {
+  rectangle "NATS SERVER" as NATS2 #B3E5FC
+  rectangle "Service Instance 1" as Service2A #FFCDD2
+  rectangle "Service Instance 2" as Service2B #FFCDD2
+  rectangle "Service Instance 3" as Service2C #FFCDD2
+  
+  NATS2 --> Service2A : "Message gửi đến tất cả instances\n(Broadcast)"
+  NATS2 --> Service2B
+  NATS2 --> Service2C
+}
+
+note bottom of MP
+  MessagePattern:
+  - Cơ chế **Request-Response**
+  - Chỉ 1 service instance nhận và xử lý
+  - Luôn có response trả về
+  - Tương tự HTTP Request
+end note
+
+note bottom of EP
+  EventPattern:
+  - Cơ chế **Publish-Subscribe**
+  - Tất cả service instances đều nhận message
+  - Không yêu cầu response
+  - Phù hợp cho event notification
+end note
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này so sánh trực quan sự khác biệt giữa MessagePattern và EventPattern trong NestJS khi sử dụng với NATS. Nó cho thấy cách message được phân phối khác nhau trong hai pattern và các đặc điểm chính của mỗi pattern.
+
+### 2. Chi tiết về MessagePattern
+
+**Thành phần giữ lại:**
+- Chi tiết về MessagePattern với NATS
+- Tập trung vào cơ chế request-response
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml nestjs-messagepattern-detail
+title Chi tiết về MessagePattern trong NestJS với NATS
+
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam shadowing true
+skinparam defaultTextAlignment center
+skinparam ArrowColor Black
+skinparam ArrowThickness 2
+skinparam rectangleFontSize 14
+skinparam sequenceMessageAlign center
+
+participant "Client Service" as Client
+participant "NATS SERVER" as NATS
+participant "Service\n@MessagePattern('computer.createSchedule')" as Service
+
+Client -> NATS : Gửi request\nsubject: "computer.createSchedule"
+NATS -> Service : Chuyển request đến\n1 instance (load balancing)
+Service --> NATS : Trả về response
+NATS --> Client : Chuyển response về client
+
+note right of NATS
+  1. NATS hoạt động như một message broker
+  2. Trong MessagePattern, NATS chọn 1 service instance để xử lý (queue group)
+  3. Cơ chế này tương tự RPC (Remote Procedure Call)
+  4. Client chờ đợi response từ service
+end note
+
+note right of Service
+  Service phải:
+  - Đăng ký xử lý message với pattern cụ thể
+  - Xử lý message
+  - Trả về response
+  - Chỉ 1 instance xử lý mỗi message
+end note
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này mô tả chi tiết cách MessagePattern hoạt động trong NestJS với NATS. Nó giải thích quá trình từ khi client gửi request đến khi nhận được response, và vai trò của NATS trong việc phân phối message.
+
+### 3. Chi tiết về EventPattern
+
+**Thành phần giữ lại:**
+- Chi tiết về EventPattern với NATS
+- Tập trung vào cơ chế publish-subscribe
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml nestjs-eventpattern-detail
+title Chi tiết về EventPattern trong NestJS với NATS
+
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam shadowing true
+skinparam defaultTextAlignment center
+skinparam ArrowColor Black
+skinparam ArrowThickness 2
+skinparam rectangleFontSize 14
+skinparam sequenceMessageAlign center
+
+participant "Publisher Service" as Publisher
+participant "NATS SERVER" as NATS
+participant "Subscriber 1\n@EventPattern('computer.createSchedule')" as Sub1
+participant "Subscriber 2\n@EventPattern('computer.createSchedule')" as Sub2
+participant "Subscriber 3\n@EventPattern('computer.createSchedule')" as Sub3
+
+Publisher -> NATS : Publish event\nsubject: "computer.createSchedule"
+NATS -> Sub1 : Broadcast event
+NATS -> Sub2 : Broadcast event
+NATS -> Sub3 : Broadcast event
+
+note right of NATS
+  1. NATS hoạt động như một message broker
+  2. Trong EventPattern, NATS gửi event đến tất cả subscribers
+  3. Không có response trả về cho publisher
+  4. Cơ chế này là Publish-Subscribe không đồng bộ
+end note
+
+note right of Sub1
+  Mỗi subscriber:
+  - Đăng ký nhận events với pattern cụ thể
+  - Xử lý event mà không trả về response
+  - Tất cả instances đều nhận được event
+end note
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này mô tả chi tiết cách EventPattern hoạt động trong NestJS với NATS. Nó giải thích quá trình từ khi một service publish event đến khi các subscribers nhận được event, và vai trò của NATS trong việc broadcast event.
+
+## Thiết lập để dễ đọc hơn
+Các thiết lập sau giúp cải thiện khả năng đọc của diagram:
+
+```plantuml
+' Thêm vào đầu file để cải thiện hiển thị
+skinparam shadowing false
+skinparam defaultFontSize 14
+skinparam rectangleFontSize 15
+skinparam noteFontSize 12
+skinparam noteBackgroundColor #FFFFCC
+skinparam noteBorderColor #999999
+skinparam rectangleBorderThickness 2
+```
+
+## Khi trình bày trong Word
+
+### Trình bày song song để so sánh
+1. **So sánh hai pattern**: Sử dụng diagram #1 để giải thích sự khác biệt cơ bản
+2. **Chi tiết MessagePattern**: Sử dụng diagram #2 để giải thích chi tiết về MessagePattern
+3. **Chi tiết EventPattern**: Sử dụng diagram #3 để giải thích chi tiết về EventPattern
+
+### Bảng so sánh
+Tạo bảng so sánh chi tiết giữa hai pattern:
+
+| Đặc điểm          | MessagePattern                  | EventPattern                      |
+|-------------------|---------------------------------|-----------------------------------|
+| Mô hình giao tiếp | Request-Response                | Publish-Subscribe                 |
+| Phân phối message | Load balancing (1 instance)     | Broadcasting (tất cả instances)   |
+| Response          | Bắt buộc                        | Không cần                         |
+| Use cases phù hợp | Lấy dữ liệu, thực hiện thao tác | Thông báo, cập nhật trạng thái    |
+| Xử lý lỗi         | Trả về lỗi cho client           | Xử lý nội bộ, không thông báo lại |
+| Khả năng mở rộng  | Scale horizontally              | Broadcast đến tất cả instances    |

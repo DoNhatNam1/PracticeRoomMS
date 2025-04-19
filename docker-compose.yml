@@ -1,0 +1,225 @@
+
+# services:
+#   nats:
+#     image: nats:latest
+#     ports:
+#       - "4222:4222"  # Client port
+#       - "8222:8222"  # HTTP monitoring
+#     restart: always
+
+#   # API Gateway của dự án (microservices)
+#   api-gateway:
+#     build:
+#       context: ./backend-microservices
+#       dockerfile: ./apps/api-gateway/Dockerfile
+#     ports:
+#       - "3100:3000"  # Đổi port để tránh xung đột
+#     environment:
+#       - USERS_CLIENT_HOST=users-service
+#       - USER_CLIENT_PORT=3101
+#       - ROOMS_CLIENT_HOST=rooms-service
+#       - ROOMS_CLIENT_PORT=3102
+#       - COMPUTERS_CLIENT_HOST=computers-service
+#       - COMPUTERS_CLIENT_PORT=3103
+#       - DATABASE_URL=postgresql://example:example@db:5432/practice_room_ms?schema=public
+#     depends_on:
+#       users-service:
+#         condition: service_started
+#       rooms-service:
+#         condition: service_started
+#       computers-service:
+#         condition: service_started
+#       db:
+#         condition: service_healthy
+#     networks:
+#       - shared-network
+#     restart: unless-stopped
+
+#   # Microservices của dự án
+#   users-service:
+#     build:
+#       context: ./backend-microservices
+#       dockerfile: ./apps/users/Dockerfile
+#     environment:
+#       - PORT=3101
+#       - HOST=0.0.0.0
+#       - DATABASE_URL=postgresql://example:example@db:5432/practice_room_ms?schema=public
+#     networks:
+#       - shared-network
+#     restart: unless-stopped
+#     depends_on:
+#       db:
+#         condition: service_healthy
+
+#   rooms-service:
+#     build:
+#       context: ./backend-microservices
+#       dockerfile: ./apps/rooms/Dockerfile
+#     environment:
+#       - PORT=3102 
+#       - HOST=0.0.0.0
+#       - DATABASE_URL=postgresql://example:example@db:5432/practice_room_ms?schema=public
+#     networks:
+#       - shared-network
+#     restart: unless-stopped
+#     depends_on:
+#       db:
+#         condition: service_healthy
+
+#   computers-service:
+#     build:
+#       context: ./backend-microservices
+#       dockerfile: ./apps/computers/Dockerfile
+#     environment:
+#       - PORT=3103
+#       - HOST=0.0.0.0
+#       - DATABASE_URL=postgresql://example:example@db:5432/practice_room_ms?schema=public
+#     networks:
+#       - shared-network
+#     restart: unless-stopped
+#     depends_on:
+#       db:
+#         condition: service_healthy
+
+#   # Database dùng chung
+#   db:
+#     image: postgres:15-alpine
+#     environment:
+#       - POSTGRES_USER=example
+#       - POSTGRES_PASSWORD=example
+#       - POSTGRES_DB=practice_room_ms
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - db_data:/var/lib/postgresql/data
+#       - ./backend-microservices/libs/prisma/prisma/migrations:/migrations
+#       - ./apply-migrations.sh:/docker-entrypoint-initdb.d/apply-migrations.sh
+#     networks:
+#       - shared-network
+#     restart: unless-stopped
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U example"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   # Redis (nếu cần)
+#   redis:
+#     image: redis:latest
+#     ports:
+#       - "6379:6379"
+#     networks:
+#       - shared-network
+#     restart: unless-stopped
+#     healthcheck:
+#       test: ["CMD", "redis-cli", "ping"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   # Frontend với Nginx tích hợp
+#   frontend:
+#     build:
+#       context: ./frontend
+#       dockerfile: Dockerfile
+#     ports:
+#       - "80:80"
+#     depends_on:
+#       api-gateway:
+#         condition: service_started
+#     networks:
+#       - shared-network
+#     restart: unless-stopped
+
+# networks:
+#   shared-network:
+#     driver: bridge
+
+# volumes:
+#   db_data:
+
+services:
+  frontend:
+    image: my-frontend-image:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    ports:
+      - "80:80"
+
+  api-gateway:
+    image: my-api-gateway-image:latest
+    build:
+      context: ./backend-microservices
+      dockerfile: ./apps/api-gateway/Dockerfile
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    ports:
+      - "3100:3000"
+
+  user-service:
+    image: my-user-service-image:latest
+    build:
+      context: ./backend-microservices
+      dockerfile: ./apps/user-service/Dockerfile
+    networks:
+      - app-network
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - node.hostname == worker1
+
+  room-service:
+    image: my-room-service-image:latest
+    build:
+      context: ./backend-microservices
+      dockerfile: ./apps/room-service/Dockerfile
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == worker1
+
+  computer-service:
+    image: my-computer-service-image:latest
+    build:
+      context: ./backend-microservices
+      dockerfile: ./apps/computer-service/Dockerfile
+    networks:
+      - app-network
+    deploy:
+      replicas: 3
+      placement:
+        constraints:
+          - node.hostname == worker2
+
+  nats:
+    image: nats:latest
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == worker3
+    ports:
+      - "4222:4222" 
+      - "8222:8222" 
+
+networks:
+  app-network:
+    driver: overlay
+

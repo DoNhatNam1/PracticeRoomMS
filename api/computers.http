@@ -1,0 +1,155 @@
+@baseUrl = http://localhost:3000/api
+@authToken = {{login.response.body.access_token}}
+
+### Login to get token
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "password123"
+}
+
+### Get all computers
+GET {{baseUrl}}/computers?page=1&limit=10&status=OPERATIONAL
+Authorization: Bearer {{authToken}}
+
+### Get computer by ID
+GET {{baseUrl}}/computers/1
+Authorization: Bearer {{authToken}}
+
+### Get computers in a room
+GET {{baseUrl}}/rooms/1/computers
+Authorization: Bearer {{authToken}}
+
+### Create new computer (Admin or Teacher)
+POST {{baseUrl}}/computers
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "PC-101",
+  "roomId": 1,
+  "ipAddress": "192.168.1.101",
+  "macAddress": "AA:BB:CC:DD:EE:FF",
+  "status": "OPERATIONAL",
+  "specs": {
+    "processor": "Intel i7",
+    "ram": "16GB",
+    "storage": "512GB SSD"
+  }
+}
+
+### Update computer (Admin or Teacher)
+PUT {{baseUrl}}/computers/1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "PC-101-Updated",
+  "ipAddress": "192.168.1.102",
+  "specs": {
+    "processor": "Intel i7",
+    "ram": "32GB",
+    "storage": "1TB SSD"
+  }
+}
+
+### Update computer status (Admin or Teacher)
+PUT {{baseUrl}}/computers/1/status
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "status": "MAINTENANCE"
+}
+
+### Delete computer (Admin only)
+DELETE {{baseUrl}}/computers/2
+Authorization: Bearer {{authToken}}
+
+### Get computer activity history
+GET {{baseUrl}}/computers/1/activity-history?page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### Get computer usage history
+GET {{baseUrl}}/computers/1/usage-history?page=1&limit=10&startDate=2023-01-01&endDate=2023-12-31
+Authorization: Bearer {{authToken}}
+
+### Start computer usage
+POST {{baseUrl}}/computer-usages
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "computerId": 1,
+  "notes": "Programming class usage"
+}
+
+### End computer usage
+PUT {{baseUrl}}/computer-usages/1/end
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "notes": "Class completed successfully"
+}
+
+### Get all computer usages (Admin or Teacher)
+GET {{baseUrl}}/computer-usages?page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### Get computer usage by ID
+GET {{baseUrl}}/computer-usages/1
+Authorization: Bearer {{authToken}}
+
+### Get user computer usage statistics
+GET {{baseUrl}}/users/3/computer-usage-stats?startDate=2023-01-01&endDate=2023-12-31
+Authorization: Bearer {{authToken}}
+
+### Upload and transfer file
+POST {{baseUrl}}/file-transfers
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Authorization: Bearer {{authToken}}
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test.txt"
+Content-Type: text/plain
+
+This is a test file content
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="targetComputerIds"
+
+1,2,3
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="sourceId"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Get file transfers
+GET {{baseUrl}}/file-transfers?page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### Get file transfer by ID
+GET {{baseUrl}}/file-transfers/1
+Authorization: Bearer {{authToken}}
+
+### Update file transfer status
+PUT {{baseUrl}}/file-transfers/1/status
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "status": "COMPLETED",
+  "notes": "Transfer completed successfully"
+}
+
+### Get file transfer activity history
+GET {{baseUrl}}/file-transfers/1/activity-history?page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### Get user computer activities
+GET {{baseUrl}}/users/3/computer-activities?page=1&limit=10&startDate=2023-01-01&endDate=2023-12-31
+Authorization: Bearer {{authToken}}

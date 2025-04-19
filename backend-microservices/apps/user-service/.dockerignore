@@ -1,0 +1,57 @@
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log
+yarn-debug.log
+package-lock.json
+yarn.lock
+
+# Build files
+dist
+**/dist
+build
+**/build
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Environment
+.env
+**/.env
+.env.*
+!.env.example
+
+# IDE
+.idea
+.vscode
+**/.idea
+**/.vscode
+*.sublime-*
+
+# Tests
+test
+**/*.spec.ts
+**/*.e2e-spec.ts
+coverage
+.nyc_output
+
+# Temp files
+tmp
+temp
+.tmp
+.temp
+
+# Docs
+docs
+*.md
+
+# Db migrations not needed in services
+prisma/migrations
+prisma/seed.ts

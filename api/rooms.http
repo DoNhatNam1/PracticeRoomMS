@@ -1,0 +1,144 @@
+@baseUrl = http://localhost:3000/api
+
+### Login to get token
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Password32!"
+}
+
+### Save Admin token
+@adminToken = {{loginAdmin.response.body.data.accessToken}}
+
+### Get all rooms
+GET {{baseUrl}}/rooms?page=1&limit=10&status=AVAILABLE
+Authorization: Bearer {{adminToken}}
+
+### Get room by ID
+GET {{baseUrl}}/rooms/1
+Authorization: Bearer {{adminToken}}
+
+### Create new room (Admin only)
+POST {{baseUrl}}/rooms
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Lab 102",
+  "floor": 1,
+  "building": "A",
+  "capacity": 30,
+  "status": "AVAILABLE",
+  "equipment": ["Projector", "Computers", "Whiteboards"]
+}
+
+### Update room (Admin only)
+PUT {{baseUrl}}/rooms/4
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Lab 104 Updated",
+  "capacity": 35,
+  "equipment": ["Projector", "Computers", "Whiteboards", "Audio System"]
+}
+
+### Update room status (Admin or Teacher)
+PATCH {{baseUrl}}/rooms/4/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "MAINTENANCE"
+}
+
+### Delete room (Admin only)
+DELETE {{baseUrl}}/rooms/1
+Authorization: Bearer {{adminToken}}
+
+### Get room activity history
+GET {{baseUrl}}/rooms/4/activity-history?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Get room usage statistics
+GET {{baseUrl}}/rooms/1/usage-stats?startDate=2023-01-01&endDate=2023-12-31
+Authorization: Bearer {{adminToken}}
+
+### Get room schedules
+GET {{baseUrl}}/rooms/1/schedules?startDate=2023-01-01&endDate=2023-12-31
+Authorization: Bearer {{adminToken}}
+
+### Get all schedules
+GET {{baseUrl}}/schedules?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Get schedule by ID
+GET {{baseUrl}}/schedules/1
+Authorization: Bearer {{adminToken}}
+
+### Create new schedule
+POST {{baseUrl}}/schedules
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "roomId": 1,
+  "title": "Computer Programming Class",
+  "startTime": "2023-06-15T09:00:00Z",
+  "endTime": "2023-06-15T11:00:00Z",
+  "repeat": "WEEKLY"
+}
+
+### Update schedule
+PUT {{baseUrl}}/schedules/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Updated Computer Programming Class",
+  "startTime": "2023-06-15T10:00:00Z",
+  "endTime": "2023-06-15T12:00:00Z"
+}
+
+### Delete schedule
+DELETE {{baseUrl}}/schedules/2
+Authorization: Bearer {{adminToken}}
+
+### Approve schedule (Admin or Teacher)
+PUT {{baseUrl}}/schedules/1/approve
+Authorization: Bearer {{adminToken}}
+
+### Reject schedule (Admin or Teacher)
+PUT {{baseUrl}}/schedules/3/reject
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "reason": "Time slot already reserved for another class"
+}
+
+### Check schedule conflicts
+POST {{baseUrl}}/schedules/check-conflicts
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "roomId": 1,
+  "startTime": "2023-06-16T09:00:00Z",
+  "endTime": "2023-06-16T11:00:00Z",
+  "excludeScheduleId": 5
+}
+
+### Mark room for maintenance
+POST {{baseUrl}}/rooms/1/maintenance
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "reason": "Computer hardware upgrades",
+  "startTime": "2023-07-01T08:00:00Z",
+  "endTime": "2023-07-05T18:00:00Z"
+}

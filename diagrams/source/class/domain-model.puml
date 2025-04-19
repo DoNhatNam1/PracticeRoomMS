@@ -1,0 +1,205 @@
+@startuml domain-model
+title Class Diagram - Mô hình miền (Domain Model)
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FEFEFE
+skinparam class {
+  BackgroundColor #E3F2FD
+  ArrowColor #2196F3
+  BorderColor #0D47A1
+}
+
+package "User Module" {
+  enum Role {
+    ADMIN
+    TEACHER
+    STUDENT
+  }
+  
+  class User {
+    -id: number
+    -email: string
+    -password: string
+    -name: string
+    -phone: string
+    -role: Role
+    -department: string
+    -isActive: boolean
+    -createdAt: Date
+    -updatedAt: Date
+    +create()
+    +update()
+    +delete()
+    +findAll()
+    +findOne()
+  }
+  
+  class Token {
+    -id: number
+    -userId: number
+    -token: string
+    -expiresAt: Date
+    -deviceInfo: string
+    +validate()
+    +revoke()
+  }
+  
+  User "1" --> "*" Token : has
+  User --> Role : has
+}
+
+package "Room Module" {
+  enum RoomStatus {
+    AVAILABLE
+    IN_USE
+    MAINTENANCE
+    RESERVED
+  }
+  
+  class Room {
+    -id: number
+    -name: string
+    -location: string
+    -capacity: number
+    -description: string
+    -isActive: boolean
+    -status: RoomStatus
+    -createdAt: Date
+    -updatedAt: Date
+    +create()
+    +update()
+    +delete()
+    +findAll()
+    +findOne()
+    +changeStatus()
+  }
+  
+  class Schedule {
+    -id: number
+    -roomId: number
+    -title: string
+    -startTime: Date
+    -endTime: Date
+    -repeat: RepeatType
+    -createdBy: number
+    -createdAt: Date
+    -updatedAt: Date
+    +create()
+    +update()
+    +delete()
+    +approve()
+    +reject()
+    +cancel()
+  }
+  
+  class RoomUsage {
+    -id: number
+    -roomId: number
+    -userId: number
+    -startTime: Date
+    -endTime: Date
+    -purpose: string
+    -scheduleId: number
+    -createdAt: Date
+    -updatedAt: Date
+    +create()
+    +update()
+    +end()
+    +findByRoom()
+    +findByUser()
+  }
+  
+  enum RepeatType {
+    NONE
+    DAILY
+    WEEKLY
+    MONTHLY
+  }
+  
+  Room "1" --> "*" Schedule : has
+  Room "1" --> "*" RoomUsage : has
+  Schedule "1" --> "*" RoomUsage : generates
+  Schedule --> RepeatType : has
+  Room --> RoomStatus : has
+}
+
+package "Computer Module" {
+  enum ComputerStatus {
+    OPERATIONAL
+    IN_USE
+    MAINTENANCE
+    OFFLINE
+  }
+  
+  class Computer {
+    -id: number
+    -name: string
+    -ipAddress: string
+    -macAddress: string
+    -specs: Json
+    -roomId: number
+    -status: ComputerStatus
+    -createdAt: Date
+    -updatedAt: Date
+    +create()
+    +update()
+    +delete()
+    +findAll()
+    +findOne()
+    +changeStatus()
+  }
+  
+  class ComputerUsage {
+    -id: number
+    -computerId: number
+    -notes: string
+    -roomUsageId: number
+    -startTime: Date
+    -endTime: Date
+    -createdAt: Date
+    -updatedAt: Date
+    +create()
+    +update()
+    +end()
+    +findByComputer()
+  }
+  
+  class FileTransfer {
+    -id: number
+    -filename: string
+    -originalName: string
+    -size: number
+    -mimeType: string
+    -path: string
+    -sourceId: number
+    -transferredAt: Date
+    -status: TransferStatus
+    -userId: number
+    -createdAt: Date
+    -updatedAt: Date
+    +create()
+    +update()
+    +complete()
+    +fail()
+  }
+  
+  enum TransferStatus {
+    PENDING
+    COMPLETED
+    FAILED
+  }
+  
+  Computer "1" --> "*" ComputerUsage : has
+  Computer "1" --> "*" FileTransfer : sources
+  FileTransfer --> TransferStatus : has
+  Computer --> ComputerStatus : has
+}
+
+' Relationships between packages
+Room "1" --> "*" Computer : contains
+User "1" --> "*" Schedule : creates
+User "1" --> "*" RoomUsage : performs
+RoomUsage "1" --> "*" ComputerUsage : includes
+User "1" --> "*" FileTransfer : initiates
+
+@enduml

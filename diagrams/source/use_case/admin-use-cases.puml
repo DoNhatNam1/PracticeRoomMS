@@ -1,0 +1,74 @@
+@startuml admin-use-cases
+title Use Cases cho Admin - Hệ thống Quản lý Phòng Thực hành
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecaseStyle roundedBox
+skinparam backgroundColor #FEFEFE
+skinparam handwritten false
+
+actor "Admin" as Admin
+
+rectangle "Hệ thống Quản lý Phòng Thực hành" {
+  usecase "Đăng nhập vào hệ thống" as UC0
+  usecase "Truy cập dashboard" as UC0_1
+  
+  usecase "Quản lý tài khoản người dùng" as UC1
+  usecase "Tạo tài khoản giáo viên" as UC1_1
+  usecase "Tạo tài khoản sinh viên" as UC1_2
+  usecase "Vô hiệu hóa tài khoản" as UC1_3
+  usecase "Phân quyền người dùng" as UC1_4
+  
+  usecase "Quản lý phòng thực hành" as UC2
+  usecase "Thêm phòng mới" as UC2_1
+  usecase "Cập nhật thông tin phòng" as UC2_2
+  usecase "Đánh dấu phòng bảo trì" as UC2_3
+  
+  usecase "Quản lý máy tính" as UC3
+  usecase "Thêm máy tính mới" as UC3_1
+  usecase "Cập nhật cấu hình máy tính" as UC3_2
+  usecase "Đánh dấu máy tính bảo trì" as UC3_3
+  
+  usecase "Xem báo cáo thống kê" as UC4
+  usecase "Xem lịch sử sử dụng phòng" as UC4_1
+  usecase "Xem lịch sử sử dụng máy tính" as UC4_2
+  usecase "Xuất báo cáo" as UC4_3
+  
+  usecase "Quản lý hệ thống" as UC5
+  usecase "Cấu hình hệ thống" as UC5_1
+  usecase "Xem nhật ký hệ thống" as UC5_2
+  usecase "Sao lưu dữ liệu" as UC5_3
+  
+  ' Mối quan hệ giữa Admin và các Use Case chính
+  Admin --> UC0
+  UC0 <.. UC0_1 : extends
+  Admin --> UC1
+  Admin --> UC2
+  Admin --> UC3
+  Admin --> UC4
+  Admin --> UC5
+  
+  ' Mối quan hệ giữa Use Case chính và các Use Case con
+  UC1 <.. UC1_1 : extends
+  UC1 <.. UC1_2 : extends
+  UC1 <.. UC1_3 : extends
+  UC1 <.. UC1_4 : extends
+  
+  UC2 <.. UC2_1 : extends
+  UC2 <.. UC2_2 : extends
+  UC2 <.. UC2_3 : extends
+  
+  UC3 <.. UC3_1 : extends
+  UC3 <.. UC3_2 : extends
+  UC3 <.. UC3_3 : extends
+  
+  UC4 <.. UC4_1 : extends
+  UC4 <.. UC4_2 : extends
+  UC4 <.. UC4_3 : extends
+  
+  UC5 <.. UC5_1 : extends
+  UC5 <.. UC5_2 : extends
+  UC5 <.. UC5_3 : extends
+}
+
+@enduml

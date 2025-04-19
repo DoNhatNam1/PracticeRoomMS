@@ -1,0 +1,151 @@
+@startuml database-schema
+title Entity Relationship Diagram - Hệ thống Quản lý Phòng Thực hành
+
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b><u>x</u></b>
+!define foreign_key(x) <i>x</i>
+!define unique(x) <color:green>x</color>
+!define not_null(x) <b>x</b>
+
+' User Management
+Table(User, "User") {
+  primary_key(id) INT
+  unique(email) VARCHAR(100)
+  not_null(password) VARCHAR(255)
+  not_null(name) VARCHAR(100)
+  phone VARCHAR(20)
+  not_null(role) ENUM
+  department VARCHAR(100)
+  not_null(isActive) BOOLEAN
+  foreign_key(createdById) INT
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(Token, "Token") {
+  primary_key(id) INT
+  foreign_key(userId) INT
+  unique(token) VARCHAR(255)
+  not_null(expiresAt) TIMESTAMP
+  deviceInfo VARCHAR(255)
+  not_null(createdAt) TIMESTAMP
+  not_null(type) VARCHAR(20)
+}
+
+' Room Management
+Table(Room, "Room") {
+  primary_key(id) INT
+  unique(name) VARCHAR(100)
+  location VARCHAR(150)
+  not_null(capacity) SMALLINT
+  description VARCHAR(500)
+  not_null(isActive) BOOLEAN
+  not_null(status) ENUM
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(Schedule, "Schedule") {
+  primary_key(id) INT
+  foreign_key(roomId) INT
+  not_null(title) TEXT
+  not_null(startTime) TIMESTAMP
+  not_null(endTime) TIMESTAMP
+  repeat ENUM
+  foreign_key(createdBy) INT
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(RoomUsage, "RoomUsage") {
+  primary_key(id) INT
+  foreign_key(roomId) INT
+  foreign_key(userId) INT
+  not_null(startTime) TIMESTAMP
+  endTime TIMESTAMP
+  purpose VARCHAR(200)
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+  foreign_key(scheduleId) INT
+}
+
+' Computer Management
+Table(Computer, "Computer") {
+  primary_key(id) INT
+  not_null(name) VARCHAR(100)
+  ipAddress VARCHAR(45)
+  macAddress VARCHAR(17)
+  specs JSONB
+  foreign_key(roomId) INT
+  not_null(status) ENUM
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(ComputerUsage, "ComputerUsage") {
+  primary_key(id) INT
+  foreign_key(computerId) INT
+  notes VARCHAR(255)
+  foreign_key(roomUsageId) INT
+  not_null(startTime) TIMESTAMP
+  endTime TIMESTAMP
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(FileTransfer, "FileTransfer") {
+  primary_key(id) INT
+  not_null(filename) VARCHAR(255)
+  not_null(originalName) VARCHAR(255)
+  not_null(size) INT
+  not_null(mimeType) VARCHAR(100)
+  not_null(path) VARCHAR(255)
+  foreign_key(sourceId) INT
+  not_null(transferredAt) TIMESTAMP
+  not_null(status) ENUM
+  foreign_key(userId) INT
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(FileTransferTarget, "FileTransferTarget") {
+  primary_key(id) INT
+  foreign_key(fileTransferId) INT
+  foreign_key(computerId) INT
+  not_null(status) ENUM
+}
+
+' Activity Logging
+Table(Activity, "Activity") {
+  primary_key(id) INT
+  not_null(action) VARCHAR(50)
+  details JSONB
+  not_null(createdAt) TIMESTAMP
+  foreign_key(actorId) INT
+  foreign_key(visibleToId) INT
+}
+
+' Relationships
+User "1" -- "*" Token : has
+User "1" -- "*" User : creates
+User "1" -- "*" Schedule : creates
+User "1" -- "*" RoomUsage : performs
+User "1" -- "*" FileTransfer : initiates
+User "1" -- "*" Activity : performs
+User "1" -- "*" Activity : views
+
+Room "1" -- "*" Schedule : has
+Room "1" -- "*" RoomUsage : has
+Room "1" -- "*" Computer : contains
+
+Schedule "1" -- "*" RoomUsage : generates
+
+RoomUsage "1" -- "*" ComputerUsage : includes
+
+Computer "1" -- "*" ComputerUsage : has
+Computer "1" -- "*" FileTransfer : sources
+Computer "1" -- "*" FileTransferTarget : targets
+
+FileTransfer "1" -- "*" FileTransferTarget : has
+
+@enduml

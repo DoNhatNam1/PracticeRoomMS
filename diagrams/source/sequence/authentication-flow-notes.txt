@@ -1,0 +1,245 @@
+# Hướng dẫn Chi Tiết Chia Nhỏ Sequence Diagram "Authentication Flow"
+
+## Vấn đề
+Sequence diagram cho quy trình xác thực có nhiều tác nhân và nhiều bước tương tác, khó đọc khi thu nhỏ để vừa trang Word.
+
+## Cách chia nhỏ chi tiết theo giai đoạn
+
+### 1. Giai đoạn Đăng nhập
+
+**Thành phần giữ lại:**
+- Actor (User/Teacher/Student)
+- Frontend
+- API Gateway
+- User Service
+- Database
+- Các tương tác từ đầu đến khi nhận JWT token
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml authentication-login
+title Quá trình Đăng nhập (Authentication)
+
+skinparam sequenceArrowThickness 2
+skinparam sequenceMessageAlign center
+skinparam noteFontSize 13
+skinparam participantFontSize 14
+
+actor "User" as User
+participant "Frontend" as FE
+participant "API Gateway" as API
+participant "User Service" as US
+database "Database" as DB
+
+autonumber
+
+== Đăng nhập ==
+
+User -> FE: Truy cập trang đăng nhập
+User -> FE: Nhập thông tin đăng nhập\n(email, password)
+FE -> API: POST /auth/login\n{email, password}
+API -> US: Chuyển tiếp thông tin đăng nhập
+US -> DB: Tìm kiếm người dùng\nSELECT * FROM users WHERE email = ?
+DB --> US: Trả về thông tin người dùng
+US -> US: Kiểm tra mật khẩu\n(so sánh hash)
+
+alt Đăng nhập thành công
+    US -> US: Tạo JWT token
+    US -> DB: Lưu token vào bảng tokens\nINSERT INTO tokens
+    DB --> US: Xác nhận lưu token
+    US --> API: Trả về thông tin người dùng và token
+    API --> FE: Trả về thông tin người dùng và token
+    FE -> FE: Lưu token vào localStorage
+    FE --> User: Hiển thị thông báo thành công
+    FE -> FE: Chuyển hướng đến dashboard
+else Đăng nhập thất bại
+    US --> API: Trả về lỗi (401 Unauthorized)
+    API --> FE: Trả về lỗi
+    FE --> User: Hiển thị thông báo lỗi
+end
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào quá trình đăng nhập, từ khi người dùng nhập thông tin đến khi nhận được token xác thực hoặc thông báo lỗi. Nó cho thấy cách thông tin đăng nhập được kiểm tra và cách JWT token được tạo và lưu trữ.
+
+### 2. Giai đoạn Xác thực và Phân quyền
+
+**Thành phần giữ lại:**
+- Actor (User/Teacher/Student)
+- Frontend
+- API Gateway (với JWT Guard)
+- User Service
+- Các tương tác liên quan đến việc sử dụng token để truy cập tài nguyên
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml authentication-authorization
+title Xác thực Token và Phân quyền (Authorization)
+
+skinparam sequenceArrowThickness 2
+skinparam sequenceMessageAlign center
+skinparam noteFontSize 13
+skinparam participantFontSize 14
+
+actor "User" as User
+participant "Frontend" as FE
+participant "API Gateway\nJWT Guard" as API
+participant "User Service" as US
+database "Database" as DB
+
+autonumber
+
+== Truy cập bảo mật ==
+
+User -> FE: Truy cập trang bảo mật\n(dashboard/profile)
+FE -> FE: Lấy token từ localStorage
+FE -> API: GET /api/protected-resource\nAuthorization: Bearer {token}
+API -> API: JWT Guard kiểm tra token
+
+alt Token hợp lệ
+    API -> US: Xác minh token
+    US -> DB: Kiểm tra token\nSELECT * FROM tokens WHERE token = ?
+    DB --> US: Trả về thông tin token
+    
+    alt Token chưa hết hạn
+        US -> US: Giải mã payload để lấy user_id và role
+        US -> US: Kiểm tra quyền truy cập dựa trên role
+        
+        alt Có quyền truy cập
+            US --> API: Xác nhận người dùng có quyền
+            API -> API: Tiếp tục xử lý request
+            API --> FE: Trả về dữ liệu bảo mật
+            FE --> User: Hiển thị nội dung
+        else Không có quyền
+            US --> API: Trả về lỗi (403 Forbidden)
+            API --> FE: Trả về lỗi
+            FE --> User: Hiển thị thông báo không có quyền
+        end
+        
+    else Token đã hết hạn
+        US --> API: Trả về lỗi token hết hạn
+        API --> FE: Trả về lỗi (401 Unauthorized)
+        FE -> FE: Xóa token từ localStorage
+        FE -> FE: Chuyển hướng đến trang đăng nhập
+        FE --> User: Hiển thị thông báo cần đăng nhập lại
+    end
+    
+else Token không hợp lệ
+    API -> API: Từ chối request
+    API --> FE: Trả về lỗi (401 Unauthorized)
+    FE -> FE: Xóa token từ localStorage
+    FE -> FE: Chuyển hướng đến trang đăng nhập
+    FE --> User: Hiển thị thông báo lỗi xác thực
+end
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào quá trình xác thực token và phân quyền, từ khi người dùng truy cập tài nguyên bảo mật đến khi xác định liệu họ có quyền truy cập hay không. Nó cho thấy cách JWT token được kiểm tra và cách hệ thống xử lý các trường hợp token không hợp lệ hoặc hết hạn.
+
+### 3. Giai đoạn Đăng xuất và Làm mới Token
+
+**Thành phần giữ lại:**
+- Actor (User/Teacher/Student)
+- Frontend
+- API Gateway
+- User Service
+- Database
+- Các tương tác liên quan đến đăng xuất và làm mới token
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml authentication-logout-refresh
+title Đăng xuất và Làm mới Token
+
+skinparam sequenceArrowThickness 2
+skinparam sequenceMessageAlign center
+skinparam noteFontSize 13
+skinparam participantFontSize 14
+
+actor "User" as User
+participant "Frontend" as FE
+participant "API Gateway" as API
+participant "User Service" as US
+database "Database" as DB
+
+autonumber
+
+== Làm mới Token ==
+
+FE -> FE: Phát hiện token sắp hết hạn
+FE -> API: POST /auth/refresh-token\nAuthorization: Bearer {token}
+API -> US: Chuyển tiếp yêu cầu làm mới token
+US -> DB: Kiểm tra token\nSELECT * FROM tokens WHERE token = ?
+DB --> US: Trả về thông tin token
+
+alt Token hợp lệ và có thể làm mới
+    US -> US: Tạo token mới
+    US -> DB: Cập nhật token trong database\nUPDATE tokens SET token = ?, expires_at = ?
+    DB --> US: Xác nhận cập nhật
+    US --> API: Trả về token mới
+    API --> FE: Trả về token mới
+    FE -> FE: Cập nhật token trong localStorage
+else Token không thể làm mới
+    US --> API: Trả về lỗi
+    API --> FE: Trả về lỗi
+    FE -> FE: Chuyển hướng đến trang đăng nhập
+    FE --> User: Hiển thị thông báo cần đăng nhập lại
+end
+
+== Đăng xuất ==
+
+User -> FE: Nhấn nút đăng xuất
+FE -> API: POST /auth/logout\nAuthorization: Bearer {token}
+API -> US: Chuyển tiếp yêu cầu đăng xuất
+US -> DB: Vô hiệu hóa token\nUPDATE tokens SET is_active = false WHERE token = ?
+DB --> US: Xác nhận cập nhật
+US --> API: Trả về thành công
+API --> FE: Trả về thành công
+FE -> FE: Xóa token từ localStorage
+FE -> FE: Chuyển hướng đến trang đăng nhập
+FE --> User: Hiển thị thông báo đăng xuất thành công
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào quá trình làm mới token và đăng xuất. Nó cho thấy cách hệ thống xử lý khi token sắp hết hạn và cần được làm mới, cũng như cách token được vô hiệu hóa khi người dùng đăng xuất.
+
+## Thiết lập để dễ đọc hơn
+Các thiết lập sau giúp cải thiện khả năng đọc của sequence diagram:
+
+```plantuml
+' Thêm vào đầu file để cải thiện hiển thị
+skinparam backgroundColor #FAFAFA
+skinparam sequenceArrowThickness 2
+skinparam sequenceGroupBackgroundColor #EEEEEE
+skinparam sequenceGroupBorderColor #666666
+skinparam sequenceLifeLineBorderColor #999999
+skinparam sequenceParticipantBorderColor #666666
+skinparam sequenceParticipantBackgroundColor #E1F5FE
+skinparam sequenceActorBackgroundColor #FFEBEE
+skinparam sequenceDatabaseBackgroundColor #E8F5E9
+```
+
+## Khi trình bày trong Word
+
+### Trình bày theo giai đoạn
+1. **Tổng quan quy trình xác thực**: Mô tả ngắn gọn toàn bộ luồng xác thực
+2. **Giai đoạn đăng nhập**: Giải thích chi tiết giai đoạn 1 với diagram #1
+3. **Giai đoạn xác thực và phân quyền**: Giải thích chi tiết giai đoạn 2 với diagram #2
+4. **Giai đoạn đăng xuất và làm mới token**: Giải thích chi tiết giai đoạn 3 với diagram #3
+
+### Bảng mô tả các khái niệm quan trọng
+Tạo bảng giải thích các khái niệm liên quan đến xác thực:
+
+| Khái niệm | Mô tả | Ví dụ |
+|-----------|-------|-------|
+| JWT Token | JSON Web Token, dùng để xác thực người dùng | eyJhbGciOiJIUzI1... |
+| Refresh Token | Token dùng để lấy JWT token mới | abcde12345... |
+| Authorization Header | Header chứa token để gửi lên server | Bearer eyJhbGciOiJIUzI1... |
+| Token Expiration | Thời gian hết hạn của token | 1 giờ kể từ khi tạo |
+| Role-based Authorization | Phân quyền dựa trên vai trò | admin, teacher, student |

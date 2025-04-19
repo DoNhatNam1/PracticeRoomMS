@@ -1,0 +1,108 @@
+# ==========================================
+# DOCKER SWARM DEPLOYMENT COMMANDS
+# ==========================================
+
+# ---- SETUP DOCKER SWARM CLUSTER ----
+
+# 1. SSH vào Manager Node
+cd C:\Nam_Projects\PracticeRoomMS\vagrant
+vagrant ssh manager
+
+# 2. Kiểm tra Swarm Status (nếu đã thiết lập)
+docker node ls
+
+# 3. Khởi tạo Swarm (chỉ cần làm 1 lần)
+docker swarm init --advertise-addr 192.168.33.10
+
+# 4. Lấy token để worker join
+docker swarm join-token worker
+# Sau đó copy lệnh này để chạy trong worker nodes
+
+# ---- DEPLOY STACK TỪ DOCKER-COMPOSE ----
+
+# 5. Di chuyển đến thư mục chứa docker-compose.yml
+cd /vagrant
+
+# 6. Deploy hoặc update stack
+docker stack deploy -c docker-compose.yml practiceroomms
+
+# ---- KIỂM TRA STATUS ----
+
+# 7. Liệt kê tất cả stacks
+docker stack ls
+
+# 8. Liệt kê tất cả services trong stack
+docker stack services practiceroomms
+
+# 9. Liệt kê tất cả tasks (containers) trong stack
+docker stack ps practiceroomms
+
+# 10. Kiểm tra node cụ thể đang chạy những gì
+docker node ps $(docker node ls -q)
+
+# ---- XEM LOGS ----
+
+# 11. Xem logs của service cụ thể (theo dõi liên tục)
+docker service logs practiceroomms_api-gateway -f
+
+# 12. Xem logs của service với số lượng dòng giới hạn
+docker service logs practiceroomms_api-gateway --tail 100
+
+# ---- SCALING SERVICES ----
+
+# 13. Scale một service
+docker service scale practiceroomms_api-gateway=3
+
+# ---- QUẢN LÝ SERVICES ----
+
+# 14. Liệt kê tất cả service đang chạy
+docker service ls
+
+# 15. Xem chi tiết cấu hình của service
+docker service inspect practiceroomms_api-gateway
+
+# 16. Cập nhật service (ví dụ: cập nhật image)
+docker service update --image my-frontend-image:v2 practiceroomms_frontend
+
+# ---- XÓA RESOURCES ----
+
+# 17. Xóa một stack
+docker stack rm practiceroomms
+
+# 18. Rời khỏi Swarm (chỉ dùng khi muốn tháo node)
+docker swarm leave --force
+
+# ---- NETWORK & VOLUME COMMANDS ----
+
+# 19. Liệt kê networks trong Swarm
+docker network ls
+
+# 20. Liệt kê volumes
+docker volume ls
+
+# ---- DEBUGGING ----
+
+# 21. Kiểm tra Docker daemon logs
+journalctl -u docker
+
+# 22. Kiểm tra thông tin hệ thống
+docker system info
+
+# 23. Kiểm tra tài nguyên đang sử dụng
+docker stats
+
+# 24. Kiểm tra disk usage
+docker system df
+
+# ---- CLEANUP ----
+
+# 25. Dọn dẹp resources không sử dụng
+docker system prune -a
+
+# ==========================================
+# CHÚ Ý:
+# - Thay practiceroomms bằng tên stack của bạn nếu khác
+# - Thay service names (api-gateway, etc) tương ứng với services trong docker-compose.yml
+# - Luôn chạy các lệnh deploy từ Manager node
+# - Thông báo lỗi thường xuất hiện ở logs service
+# ==========================================

@@ -1,0 +1,1 @@
+export const ROOM_SERVICE_CLIENT = Symbol('ROOM_SERVICE_CLIENT');

@@ -1,0 +1,29 @@
+@startuml microservice_communication
+title **Sơ đồ giao tiếp giữa các service** \n(Ứng dụng kiến trúc microservice - hệ thống quản lý Phòng thực hành)
+
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam shadowing true
+skinparam defaultTextAlignment center
+
+rectangle "User Service" as UserService #FFB6B6 {
+  [User-service Action]
+}
+
+rectangle "NATS Server\n(gửi message cho nhiều service cùng lúc\nchỉ service không có loadbalancer)" as NATSServer #B3E5FC {
+}
+
+rectangle "Computer Service 3" as ComputerService #FFCDD2 {
+  [Computer-service Controller]
+  [Computer-service Action]
+}
+
+rectangle "Database\n(PostgreSQL)" as DB #F8BBD0 {
+}
+
+UserService --> NATSServer : Gửi message\n"computer.createSchedule"\nTCP host: user-service:4222\npid: 39492
+NATSServer --> ComputerService : Gửi message\n"computer.createSchedule"\nTCP host: computer-service:4222\npid: 39592
+[Computer-service Controller] --> [Computer-service Action]
+[Computer-service Action] --> DB : INSERT ... FROM
+
+@enduml

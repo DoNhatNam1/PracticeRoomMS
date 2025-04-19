@@ -1,0 +1,30 @@
+.admin-menu-item {
+  color: black;
+}
+
+.admin-menu-item:hover {
+  background-color: #f0f0f0;
+}
+
+.admin-logout-button {
+  color: #fa5252;
+}
+
+.admin-logout-button:hover {
+  background-color: #fff5f5;
+}
+
+/* Dark mode support if needed */
+@media (prefers-color-scheme: dark) {
+  .admin-menu-item {
+    color: white;
+  }
+  
+  .admin-menu-item:hover {
+    background-color: #373A40;
+  }
+  
+  .admin-logout-button:hover {
+    background-color: #3D1212;
+  }
+}

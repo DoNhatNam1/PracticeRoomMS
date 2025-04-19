@@ -1,0 +1,30 @@
+@startuml nestjs_eventpattern_nats_multiple_messages
+title NATS gửi đồng thời nhiều event tới một service \n(@EventPattern trong NestJS - ví dụ 'computer.createSchedule')
+
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam shadowing true
+skinparam defaultTextAlignment center
+skinparam ArrowColor Black
+skinparam ArrowThickness 2
+
+rectangle "NATS SERVER\nTopic: computer.createSchedule" as NATSServer #B3E5FC
+rectangle "Room Service\n@EventPattern('computer.createSchedule')" as RoomService #FFCDD2
+
+rectangle " " as Spacer1 #white
+rectangle " " as Spacer2 #white
+
+NATSServer -[#black]-> RoomService : Gửi message lần 2\n"computer.createSchedule"
+NATSServer -[#black]-> Spacer1 : Gửi message lần 1\n"computer.createSchedule"
+NATSServer -[#black]-> Spacer2 : Gửi message lần 3\n"computer.createSchedule"
+Spacer1 --> RoomService
+Spacer2 --> RoomService
+
+note bottom of RoomService
+Room Service sẽ nhận tất cả các event này nếu:\n
+- Không sử dụng queue group\n
+- Các event là instance độc lập\n
+- Xử lý không idempotent có thể gây lỗi trùng
+end note
+
+@enduml

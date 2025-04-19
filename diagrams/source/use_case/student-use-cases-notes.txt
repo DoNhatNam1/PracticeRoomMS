@@ -1,0 +1,20 @@
+# Hướng dẫn chia nhỏ diagram "Student Use Cases"
+
+## Vấn đề
+Diagram use case của Student có nhiều mối quan hệ và quá nhiều chi tiết khi thu nhỏ để vừa trang Word.
+
+## Cách chia nhỏ theo luồng sử dụng
+1. **Luồng đăng nhập và truy cập phòng**:
+   - Tập trung vào UC1 và các use case con UC1_1 đến UC1_5
+   - Xuất thành ảnh "student-room-access-flow.png"
+
+2. **Luồng thực hiện bài tập**:
+   - Tập trung vào UC2 và các use case con UC2_1 đến UC2_5
+   - Xuất thành ảnh "student-assignment-flow.png"
+
+3. **Luồng sử dụng máy tính và báo cáo sự cố**:
+   - Tập trung vào UC3, UC4 và các use case con liên quan
+   - Xuất thành ảnh "student-computer-issue-reporting.png"
+
+## Thiết lập hiển thị
+Thêm vào đầu file student-use-cases.puml:

@@ -1,0 +1,38 @@
+@startuml container-network
+title Network Diagram - Docker Swarm Deployment trong Hệ thống Quản lý Phòng Thực hành
+
+nwdiag {
+  network internet {
+    width = full
+    Client_Browser [address = "192.168.1.100"];
+    LoadBalancer [address = "203.0.113.10"];
+  }
+  
+  network swarm_network {
+    width = full
+    address = "172.16.0.0/16"
+    
+    LoadBalancer [address = "172.16.0.1"];
+    
+    // Manager Node (192.168.56.23)
+    Manager_Node [address = "172.16.0.10"];
+    Frontend [address = "172.16.0.11", description = "Manager"];
+    API_Gateway [address = "172.16.0.12", description = "Manager"];
+    
+    // Worker 1 Node
+    Worker1_Node [address = "172.16.0.20"];
+    User_Service [address = "172.16.0.21", description = "Worker1"];
+    Room_Service [address = "172.16.0.22", description = "Worker1"];
+    
+    // Worker 2 Node
+    Worker2_Node [address = "172.16.0.30"];
+    Computer_Service [address = "172.16.0.31", description = "Worker2"];
+    
+    // Worker 3 Node (DB Only)
+    Worker3_Node [address = "172.16.0.40"];
+    NATS_Server [address = "172.16.0.41", description = "Worker3"];
+    PostgreSQL_Master [address = "172.16.0.42", description = "Worker3"];
+  }
+}
+
+@enduml

@@ -1,0 +1,48 @@
+# Hướng dẫn và giải thích về diagram "Container Network"
+
+## Tổng quan
+Diagram này mô tả kiến trúc mạng của hệ thống Docker Swarm bao gồm 1 Manager Node và 3 Worker Nodes. Diagram thể hiện cách các service được phân bố trên các node và kết nối mạng giữa chúng.
+
+## Giải thích các thành phần
+
+### Internet Network
+- **Client_Browser (192.168.1.100)**: Trình duyệt người dùng cuối kết nối từ internet
+- **LoadBalancer (203.0.113.10)**: Điểm vào của hệ thống, phân phối tải giữa các service
+
+### Swarm Network (172.16.0.0/16)
+- **Manager Node (172.16.0.10)**: Node quản lý, điều khiển Docker Swarm cluster
+  * Frontend (172.16.0.11): Giao diện người dùng
+  * API Gateway (172.16.0.12): Cổng API, điều hướng request
+
+- **Worker 1 Node (172.16.0.20)**: Node worker để chạy service người dùng và phòng
+  * User Service (172.16.0.21): Xử lý nghiệp vụ liên quan đến người dùng
+  * Room Service (172.16.0.22): Xử lý nghiệp vụ liên quan đến phòng học
+
+- **Worker 2 Node (172.16.0.30)**: Node worker để chạy service máy tính
+  * Computer Service (172.16.0.31): Xử lý nghiệp vụ liên quan đến máy tính 
+
+- **Worker 3 Node (172.16.0.40)**: Node dữ liệu
+  * NATS Server (172.16.0.41): Message broker cho giao tiếp giữa các service
+  * PostgreSQL Master (172.16.0.42): Cơ sở dữ liệu chính
+
+## Luồng dữ liệu
+1. Client truy cập qua LoadBalancer
+2. LoadBalancer điều hướng request đến Frontend hoặc API Gateway
+3. API Gateway xử lý và phân phối request đến các service tương ứng
+4. Các service giao tiếp với nhau qua NATS server
+5. Tất cả các service đều kết nối đến PostgreSQL để lưu trữ dữ liệu
+
+## Hướng dẫn chia nhỏ diagram cho tài liệu Word
+1. **Toàn bộ mạng**: Giữ nguyên diagram
+   - Xuất thành "container-network-full.png"
+
+2. **Internet và Manager Node**: 
+   - Chỉ bao gồm Client_Browser, LoadBalancer, Manager_Node, Frontend và API_Gateway
+   - Xuất thành "container-network-frontend.png"
+
+3. **Service Distribution**:
+   - Tập trung vào các Worker Nodes và các service
+   - Xuất thành "container-network-services.png"
+
+## Thiết lập để dễ đọc hơn
+Có thể cải thiện diagram bằng cách thêm các thiết lập sau vào đầu file:

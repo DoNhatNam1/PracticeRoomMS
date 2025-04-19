@@ -1,0 +1,41 @@
+# Global ignores (not service specific)
+.git
+.github
+.gitlab-ci.yml
+.vscode
+.idea
+
+# Documentation
+docs
+*.md
+
+# Node common
+**/node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build outputs
+**/dist
+**/build
+
+# Environment files
+**/.env
+**/.env.*
+!**/.env.example
+
+# Logs
+**/logs
+**/*.log
+
+# Testing
+**/coverage
+**/.nyc_output
+
+# Vagrant
+vagrant
+.vagrant
+
+# Docker specific files
+docker-compose.yml
+docker-compose.*.yml

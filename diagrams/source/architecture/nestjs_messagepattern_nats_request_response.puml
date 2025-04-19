@@ -1,0 +1,22 @@
+@startuml nestjs_messagepattern_nats_request_response
+title NATS Gửi đồng thời Message Pattern cho một service \n(@MessagePattern trong NestJS - ví dụ 'computer.createSchedule')
+
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam shadowing true
+skinparam defaultTextAlignment center
+skinparam ArrowColor Black
+skinparam ArrowThickness 2
+
+rectangle "NATS SERVER\n\"computer.createSchedule\" lần 2\n\"computer.createSchedule\" lần 3" as NATSServer #B3E5FC
+rectangle "Room Service\n@MessagePattern('computer.createSchedule')" as RoomService #FFCDD2
+
+' Flow
+NATSServer -> RoomService : Gửi message lần 1\n"computer.createSchedule"
+RoomService --> NATSServer : Xác nhận đã nhận message\nlần 1 (ACK)
+
+note bottom of RoomService
+Room Service xử lý và trả về phản hồi\ncho từng message theo cơ chế request-response
+end note
+
+@enduml

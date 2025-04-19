@@ -1,0 +1,46 @@
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log
+yarn-debug.log
+
+# Dist folders
+dist
+**/dist
+build
+**/build
+
+# Git & CI
+.git
+.github
+.gitlab-ci.yml
+
+# ENV files
+.env
+**/.env
+.env.*
+!.env.example
+
+# IDE
+.idea
+.vscode
+**/.idea
+**/.vscode
+
+# Logs
+logs
+*.log
+
+# Testing
+coverage
+.nyc_output
+test
+jest*
+**/*.spec.ts
+**/*.test.ts
+
+# Config files not needed in Docker
+nodemon.json
+.eslintrc
+.prettierrc
+tsconfig.build.json

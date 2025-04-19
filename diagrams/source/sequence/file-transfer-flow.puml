@@ -1,0 +1,79 @@
+@startuml file-transfer-flow
+title Sequence Diagram - Luồng Truyền File Giữa Các Máy Tính
+
+actor "Giáo viên" as Teacher
+participant "Frontend\n(React)" as Frontend
+participant "API Gateway" as Gateway
+participant "Computer Service" as ComputerService
+participant "NATS Server" as NATS
+participant "File Service" as FileService
+database "File Storage\n(MinIO)" as Storage
+collections "Target Computers" as TargetComputers
+
+autonumber
+
+== Khởi tạo Truyền File ==
+
+Teacher -> Frontend: Chọn file để truyền
+Teacher -> Frontend: Chọn máy tính đích
+Frontend -> Frontend: Hiển thị hộp thoại xác nhận
+
+Teacher -> Frontend: Xác nhận truyền file
+Frontend -> Gateway: POST /api/file-transfer\n(file, targetComputerIds)
+
+Gateway -> Gateway: Xác thực và kiểm tra quyền
+Gateway -> ComputerService: Chuyển tiếp yêu cầu truyền file
+
+ComputerService -> ComputerService: Kiểm tra trạng thái các máy đích
+ComputerService -> Storage: Lưu file tạm thời
+Storage --> ComputerService: Trả về URL file
+
+ComputerService -> ComputerService: Tạo bản ghi FileTransfer
+ComputerService -> ComputerService: Tạo các bản ghi FileTransferTarget
+
+== Thông Báo Các Máy Đích ==
+
+ComputerService -> NATS: Publish "file.transfer.initiated"\n(fileTransferId, targetIds)
+NATS -> TargetComputers: Broadcast event
+
+TargetComputers -> TargetComputers: Hiển thị thông báo có file mới
+
+== Báo Cáo Trạng Thái ==
+
+ComputerService --> Gateway: Trả về thông tin trạng thái truyền file
+Gateway --> Frontend: Trả về thông tin trạng thái
+Frontend --> Teacher: Hiển thị trạng thái truyền file
+
+== Tải File ==
+
+TargetComputers -> Gateway: GET /api/file-transfer/:id/download
+Gateway -> ComputerService: Chuyển tiếp yêu cầu tải file
+ComputerService -> Storage: Lấy file
+Storage --> ComputerService: Trả về nội dung file
+ComputerService --> Gateway: Trả về nội dung file
+Gateway --> TargetComputers: Trả về nội dung file
+
+TargetComputers -> TargetComputers: Lưu file vào ổ cứng
+
+== Cập Nhật Trạng Thái ==
+
+TargetComputers -> Gateway: POST /api/file-transfer/:id/status\n(status: COMPLETED)
+Gateway -> ComputerService: Cập nhật trạng thái
+ComputerService -> ComputerService: Cập nhật FileTransferTarget
+
+ComputerService -> NATS: Publish "file.transfer.completed"\n(fileTransferId, computerId)
+NATS -> Frontend: Forward event
+Frontend -> Frontend: Cập nhật UI trạng thái
+
+ComputerService -> ComputerService: Kiểm tra nếu tất cả target đã hoàn thành
+ComputerService -> ComputerService: Cập nhật FileTransfer.status nếu cần
+
+ComputerService --> Gateway: Trả về trạng thái đã cập nhật
+Gateway --> TargetComputers: Xác nhận đã cập nhật
+
+== Hiển Thị Báo Cáo ==
+
+NATS -> Frontend: Forward event "file.transfer.completed"
+Frontend --> Teacher: Hiển thị báo cáo hoàn thành
+
+@enduml

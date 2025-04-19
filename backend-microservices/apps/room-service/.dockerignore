@@ -1,0 +1,51 @@
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log
+yarn-debug.log
+package-lock.json
+yarn.lock
+
+# Build files
+dist
+**/dist
+build
+**/build
+
+# Environment
+.env
+**/.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# Project files not needed in Docker
+README.md
+CHANGELOG.md
+jest.config.js
+.eslintrc
+.prettierrc
+tsconfig.json
+tsconfig.build.json
+
+# IDE
+.idea
+.vscode
+**/.idea
+**/.vscode
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Test files
+test
+coverage
+.nyc_output
+jest-e2e.json
+**/*.spec.ts
+**/*.test.ts

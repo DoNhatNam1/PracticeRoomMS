@@ -1,0 +1,203 @@
+# Hướng dẫn Chi Tiết Chia Nhỏ Use Case Diagram "Admin Use Cases"
+
+## Vấn đề
+Use case diagram cho Admin có nhiều chức năng và mối quan hệ extends, khó đọc khi thu nhỏ để vừa trang Word.
+
+## Cách chia nhỏ chi tiết theo nhóm chức năng
+
+### 1. Quản lý Người dùng và Phân quyền
+
+**Thành phần giữ lại:**
+- Actor Admin
+- Use case "Đăng nhập vào hệ thống" và extends
+- Use case "Quản lý tài khoản người dùng" và tất cả extends liên quan
+- Mối quan hệ giữa Admin và các use case này
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml admin-user-management
+title Use Cases cho Admin - Quản lý Người dùng
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecaseStyle roundedBox
+skinparam backgroundColor #FEFEFE
+skinparam handwritten false
+skinparam usecase {
+  fontSize 14
+  BackgroundColor #E1F5FE
+  BorderColor #0288D1
+}
+
+actor "Admin" as Admin
+
+rectangle "Hệ thống Quản lý Phòng Thực hành" {
+  usecase "Đăng nhập vào hệ thống" as UC0
+  usecase "Truy cập dashboard" as UC0_1
+  
+  usecase "Quản lý tài khoản người dùng" as UC1
+  usecase "Tạo tài khoản giáo viên" as UC1_1
+  usecase "Tạo tài khoản sinh viên" as UC1_2
+  usecase "Vô hiệu hóa tài khoản" as UC1_3
+  usecase "Phân quyền người dùng" as UC1_4
+  
+  ' Mối quan hệ
+  Admin --> UC0
+  UC0 <.. UC0_1 : extends
+  Admin --> UC1
+  
+  UC1 <.. UC1_1 : extends
+  UC1 <.. UC1_2 : extends
+  UC1 <.. UC1_3 : extends
+  UC1 <.. UC1_4 : extends
+}
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào các chức năng quản lý người dùng của Admin, bao gồm đăng nhập, tạo tài khoản, vô hiệu hóa tài khoản và phân quyền. Nó cho thấy Admin có thể tạo và quản lý các loại tài khoản khác nhau trong hệ thống.
+
+### 2. Quản lý Phòng và Máy tính
+
+**Thành phần giữ lại:**
+- Actor Admin
+- Use case "Quản lý phòng thực hành" và tất cả extends liên quan
+- Use case "Quản lý máy tính" và tất cả extends liên quan
+- Mối quan hệ giữa Admin và các use case này
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml admin-room-computer-management
+title Use Cases cho Admin - Quản lý Phòng và Máy tính
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecaseStyle roundedBox
+skinparam backgroundColor #FEFEFE
+skinparam handwritten false
+skinparam usecase {
+  fontSize 14
+  BackgroundColor #E8F5E9
+  BorderColor #4CAF50
+}
+
+actor "Admin" as Admin
+
+rectangle "Hệ thống Quản lý Phòng Thực hành" {
+  usecase "Quản lý phòng thực hành" as UC2
+  usecase "Thêm phòng mới" as UC2_1
+  usecase "Cập nhật thông tin phòng" as UC2_2
+  usecase "Đánh dấu phòng bảo trì" as UC2_3
+  
+  usecase "Quản lý máy tính" as UC3
+  usecase "Thêm máy tính mới" as UC3_1
+  usecase "Cập nhật cấu hình máy tính" as UC3_2
+  usecase "Đánh dấu máy tính bảo trì" as UC3_3
+  
+  ' Mối quan hệ
+  Admin --> UC2
+  Admin --> UC3
+  
+  UC2 <.. UC2_1 : extends
+  UC2 <.. UC2_2 : extends
+  UC2 <.. UC2_3 : extends
+  
+  UC3 <.. UC3_1 : extends
+  UC3 <.. UC3_2 : extends
+  UC3 <.. UC3_3 : extends
+}
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào các chức năng quản lý phòng thực hành và máy tính của Admin, bao gồm thêm phòng/máy tính mới, cập nhật thông tin và đánh dấu phòng/máy tính bảo trì. Nó cho thấy Admin có toàn quyền kiểm soát cơ sở vật chất của hệ thống.
+
+### 3. Báo cáo và Quản lý Hệ thống
+
+**Thành phần giữ lại:**
+- Actor Admin
+- Use case "Xem báo cáo thống kê" và tất cả extends liên quan
+- Use case "Quản lý hệ thống" và tất cả extends liên quan
+- Mối quan hệ giữa Admin và các use case này
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml admin-report-system-management
+title Use Cases cho Admin - Báo cáo và Quản lý Hệ thống
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecaseStyle roundedBox
+skinparam backgroundColor #FEFEFE
+skinparam handwritten false
+skinparam usecase {
+  fontSize 14
+  BackgroundColor #FFF9C4
+  BorderColor #FBC02D
+}
+
+actor "Admin" as Admin
+
+rectangle "Hệ thống Quản lý Phòng Thực hành" {
+  usecase "Xem báo cáo thống kê" as UC4
+  usecase "Xem lịch sử sử dụng phòng" as UC4_1
+  usecase "Xem lịch sử sử dụng máy tính" as UC4_2
+  usecase "Xuất báo cáo" as UC4_3
+  
+  usecase "Quản lý hệ thống" as UC5
+  usecase "Cấu hình hệ thống" as UC5_1
+  usecase "Xem nhật ký hệ thống" as UC5_2
+  usecase "Sao lưu dữ liệu" as UC5_3
+  
+  ' Mối quan hệ
+  Admin --> UC4
+  Admin --> UC5
+  
+  UC4 <.. UC4_1 : extends
+  UC4 <.. UC4_2 : extends
+  UC4 <.. UC4_3 : extends
+  
+  UC5 <.. UC5_1 : extends
+  UC5 <.. UC5_2 : extends
+  UC5 <.. UC5_3 : extends
+}
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào các chức năng báo cáo và quản lý hệ thống của Admin, bao gồm xem báo cáo thống kê, xuất báo cáo, cấu hình hệ thống, xem nhật ký và sao lưu dữ liệu. Nó cho thấy Admin có quyền giám sát và bảo trì toàn bộ hệ thống.
+
+## Thiết lập để dễ đọc hơn
+Các thiết lập sau giúp cải thiện khả năng đọc của use case diagram:
+
+```plantuml
+' Thêm vào đầu file để cải thiện hiển thị
+skinparam backgroundColor #FAFAFA
+skinparam usecaseBorderThickness 2
+skinparam actorBorderThickness 2
+skinparam defaultFontSize 14
+skinparam actorFontSize 16
+skinparam usecaseFontSize 14
+skinparam packageFontSize 16
+```
+
+## Khi trình bày trong Word
+
+### Trình bày theo nhóm chức năng
+1. **Tổng quan vai trò Admin**: Mô tả ngắn gọn vai trò và trách nhiệm của Admin, có thể sử dụng một diagram đơn giản chỉ hiển thị các use case chính (không có extends)
+2. **Quản lý người dùng**: Giải thích chi tiết chức năng quản lý người dùng với diagram #1
+3. **Quản lý phòng và máy tính**: Giải thích chi tiết chức năng quản lý phòng/máy tính với diagram #2
+4. **Báo cáo và quản lý hệ thống**: Giải thích chi tiết chức năng báo cáo/quản lý hệ thống với diagram #3
+
+### Bảng mô tả use case
+Tạo bảng mô tả chi tiết từng use case:
+
+| Use Case | Mô tả | Actor | Tiền điều kiện | Kết quả |
+|----------|-------|-------|---------------|----------|
+| Tạo tài khoản giáo viên | Tạo tài khoản mới với quyền giáo viên | Admin | Đã đăng nhập với quyền admin | Tài khoản giáo viên mới được tạo |
+| Thêm phòng mới | Đăng ký phòng mới vào hệ thống | Admin | Đã đăng nhập với quyền admin | Phòng mới được thêm vào hệ thống |
+| Cập nhật cấu hình máy tính | Cập nhật thông tin kỹ thuật của máy tính | Admin | Đã đăng nhập với quyền admin | Thông tin máy tính được cập nhật |
+| ... | ... | ... | ... | ... |

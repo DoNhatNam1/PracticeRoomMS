@@ -1,0 +1,77 @@
+@startuml teacher-use-cases
+title Use Cases cho Giáo viên - Hệ thống Quản lý Phòng Thực hành
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecaseStyle roundedBox
+skinparam backgroundColor #FEFEFE
+skinparam handwritten false
+
+actor "Giáo viên" as Teacher
+
+rectangle "Hệ thống Quản lý Phòng Thực hành" {
+  usecase "Sử dụng phòng thực hành" as UC0
+  usecase "Xem danh sách phòng" as UC0_1
+  usecase "Kiểm tra trạng thái phòng" as UC0_2
+  usecase "Chọn phòng" as UC0_3
+  usecase "Đăng nhập vào hệ thống" as UC0_4
+  usecase "Truy cập dashboard" as UC0_5
+  
+  usecase "Quản lý lớp học" as UC1
+  usecase "Tạo lớp học mới" as UC1_1
+  usecase "Thêm sinh viên vào lớp" as UC1_2
+  usecase "Xem danh sách lớp" as UC1_3
+  
+  usecase "Xem lịch phòng thực hành" as UC2
+  usecase "Xem lịch đã được đặt trước" as UC2_1
+  usecase "Xem chi tiết phòng" as UC2_2
+  usecase "Truy cập phòng đã đặt" as UC2_3
+  usecase "Kiểm tra thiết bị trong phòng" as UC2_4
+  
+  usecase "Quản lý bài thực hành" as UC3
+  usecase "Tạo bài thực hành mới" as UC3_1
+  usecase "Cập nhật bài thực hành" as UC3_2
+  usecase "Phân công bài thực hành" as UC3_3
+  usecase "Chấm điểm bài thực hành" as UC3_4
+  usecase "Gửi file cho sinh viên" as UC3_5
+  
+  usecase "Quản lý báo cáo" as UC4
+  usecase "Xem tiến độ thực hành của sinh viên" as UC4_1
+  usecase "Xuất báo cáo điểm" as UC4_2
+  usecase "Báo cáo sự cố phòng/máy" as UC4_3
+  
+  ' Mối quan hệ giữa Giáo viên và các Use Case chính
+  Teacher --> UC0
+  UC0 <.. UC0_1 : extends
+  UC0 <.. UC0_2 : extends
+  UC0 <.. UC0_3 : extends
+  UC0 <.. UC0_4 : extends
+  UC0 <.. UC0_5 : extends
+  
+  Teacher --> UC1
+  Teacher --> UC2
+  Teacher --> UC3
+  Teacher --> UC4
+  
+  ' Mối quan hệ giữa Use Case chính và các Use Case con
+  UC1 <.. UC1_1 : extends
+  UC1 <.. UC1_2 : extends
+  UC1 <.. UC1_3 : extends
+  
+  UC2 <.. UC2_1 : extends
+  UC2 <.. UC2_2 : extends
+  UC2 <.. UC2_3 : extends
+  UC2 <.. UC2_4 : extends
+  
+  UC3 <.. UC3_1 : extends
+  UC3 <.. UC3_2 : extends
+  UC3 <.. UC3_3 : extends
+  UC3 <.. UC3_4 : extends
+  UC3 <.. UC3_5 : extends
+  
+  UC4 <.. UC4_1 : extends
+  UC4 <.. UC4_2 : extends
+  UC4 <.. UC4_3 : extends
+}
+
+@enduml

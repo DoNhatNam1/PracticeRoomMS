@@ -1,0 +1,95 @@
+@startuml production-deployment
+title Deployment Diagram - Triển khai Hệ thống Quản lý Phòng Thực hành
+
+skinparam node {
+  backgroundColor #E8F5E9
+  borderColor #81C784
+}
+
+skinparam database {
+  backgroundColor #E3F2FD
+  borderColor #64B5F6
+}
+
+skinparam component {
+  backgroundColor #FFF9C4
+  borderColor #FFF176
+}
+
+skinparam cloud {
+  backgroundColor #F3E5F5
+  borderColor #CE93D8
+}
+
+node "Client Devices" {
+  [Web Browser] as WebBrowser
+  component [Mobile App] as MobileApp
+  [Desktop App] as DesktopApp
+}
+
+node "Load Balancer (Nginx)" as LoadBalancer {
+  component [Nginx Proxy Manager] as NginxProxy
+  component [SSL Termination] as SSL
+  component [Load Balancing Logic] as LBLogic
+}
+
+cloud "Docker Swarm Cluster" {
+  node "Manager Node" {
+    component [Docker Swarm Manager] as SwarmManager
+    component [Frontend Container (1 replica)] as Frontend
+    component [API Gateway Container (1 replica)] as APIGateway
+  }
+  
+  node "Worker Node 1" {
+    component [User Service (2 replicas)] as UserService
+    component [Room Service (1 replica)] as RoomService
+  }
+  
+  node "Worker Node 2" {
+    component [Computer Service (3 replicas)] as ComputerService
+  }
+  
+  node "Worker Node 3 (DB)" {
+    component [NATS Server Container] as NATS
+    database "PostgreSQL Master" as DBMaster
+  }
+  
+  node "Storage" {
+    database "File Storage (MinIO)" as FileStorage
+  }
+}
+
+WebBrowser --> LoadBalancer : HTTPS
+MobileApp --> LoadBalancer : HTTPS
+DesktopApp --> LoadBalancer : HTTPS
+
+LoadBalancer --> Frontend : HTTP
+LoadBalancer --> APIGateway : HTTP
+
+Frontend --> APIGateway : HTTP/REST
+
+APIGateway --> UserService : gRPC/TCP
+APIGateway --> RoomService : gRPC/TCP
+APIGateway --> ComputerService : gRPC/TCP
+
+UserService --> NATS : pub/sub
+RoomService --> NATS : pub/sub
+ComputerService --> NATS : pub/sub
+
+UserService --> DBMaster : TCP/IP
+RoomService --> DBMaster : TCP/IP
+ComputerService --> DBMaster : TCP/IP
+
+UserService ..> FileStorage : S3 API
+ComputerService ..> FileStorage : S3 API
+
+SwarmManager --> Frontend : manages
+SwarmManager --> APIGateway : manages
+SwarmManager --> UserService : manages
+SwarmManager --> RoomService : manages
+SwarmManager --> ComputerService : manages
+SwarmManager --> NATS : manages
+SwarmManager --> DBMaster : manages
+SwarmManager --> FileStorage : manages
+
+@enduml

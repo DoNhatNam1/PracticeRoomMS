@@ -1,0 +1,192 @@
+# Hướng dẫn chia nhỏ diagram "Microservice Communication"
+
+## Vấn đề
+Diagram mô tả giao tiếp giữa các microservice có thể khó hiểu khi xem tổng thể, đặc biệt khi thu nhỏ để vừa trang Word.
+
+## Cách chia nhỏ chi tiết theo luồng giao tiếp
+
+### 1. Tổng quan về luồng giao tiếp
+
+**Thành phần giữ lại:**
+- Tất cả các service (đơn giản hóa)
+- Tập trung vào mũi tên liên kết
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml microservice-communication-overview
+title Tổng quan giao tiếp giữa các service
+
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+skinparam arrowFontSize 12
+skinparam rectangleFontSize 15
+
+rectangle "User Service" as UserService #FFB6B6
+rectangle "NATS Server" as NATSServer #B3E5FC
+rectangle "Computer Service" as ComputerService #FFCDD2
+rectangle "Database\n(PostgreSQL)" as DB #F8BBD0
+
+UserService --> NATSServer : Gửi message
+NATSServer --> ComputerService : Chuyển tiếp message
+ComputerService --> DB : Thao tác dữ liệu
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này cung cấp tổng quan về cách các service giao tiếp với nhau thông qua NATS Server. Nó đơn giản hóa các chi tiết để người đọc dễ dàng nắm bắt luồng thông tin cơ bản.
+
+### 2. Chi tiết message từ User Service đến NATS
+
+**Thành phần giữ lại:**
+- User Service với chi tiết nội bộ
+- NATS Server (đơn giản hóa)
+- Chi tiết message được gửi
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml microservice-communication-user-nats
+title Gửi message từ User Service đến NATS
+
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+skinparam arrowFontSize 12
+skinparam rectangleFontSize 15
+
+rectangle "User Service" as UserService #FFB6B6 {
+  [User-service Action]
+}
+
+rectangle "NATS Server" as NATSServer #B3E5FC
+
+UserService --> NATSServer : Gửi message\n"computer.createSchedule"\nTCP host: user-service:4222\npid: 39492
+
+note bottom of UserService
+  1. User Service tạo message
+  2. Message được định dạng theo chuẩn
+  3. Message gửi đến NATS với subject cụ thể
+end note
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào quá trình User Service gửi message đến NATS Server. Nó giải thích chi tiết về message được gửi và cách tạo message.
+
+### 3. Chi tiết message từ NATS đến Computer Service
+
+**Thành phần giữ lại:**
+- NATS Server (đơn giản hóa)
+- Computer Service với chi tiết nội bộ
+- Chi tiết message được nhận và xử lý
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml microservice-communication-nats-computer
+title Nhận và xử lý message từ NATS đến Computer Service
+
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+skinparam arrowFontSize 12
+skinparam rectangleFontSize 15
+
+rectangle "NATS Server" as NATSServer #B3E5FC {
+}
+
+rectangle "Computer Service" as ComputerService #FFCDD2 {
+  [Computer-service Controller]
+  [Computer-service Action]
+}
+
+NATSServer --> [Computer-service Controller] : Gửi message\n"computer.createSchedule"\nTCP host: computer-service:4222\npid: 39592
+[Computer-service Controller] --> [Computer-service Action]
+
+note bottom of ComputerService
+  1. Computer Service đăng ký subscriber
+  2. NATS chuyển message đến subscribers đã đăng ký
+  3. Computer-service Controller nhận message
+  4. Controller chuyển yêu cầu đến Action để xử lý
+end note
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào quá trình NATS Server chuyển message đến Computer Service và cách service xử lý message. Nó giải thích chi tiết về luồng xử lý bên trong service.
+
+### 4. Chi tiết xử lý trong Computer Service
+
+**Thành phần giữ lại:**
+- Computer Service với chi tiết nội bộ
+- Database
+- Quy trình xử lý và lưu trữ dữ liệu
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml microservice-communication-computer-db
+title Xử lý và lưu trữ dữ liệu trong Computer Service
+
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+skinparam arrowFontSize 12
+skinparam rectangleFontSize 15
+
+rectangle "Computer Service" as ComputerService #FFCDD2 {
+  [Computer-service Controller]
+  [Computer-service Action]
+}
+
+database "Database\n(PostgreSQL)" as DB #F8BBD0 {
+}
+
+[Computer-service Action] --> DB : INSERT ... FROM
+
+note bottom of ComputerService
+  1. Computer-service Action xử lý logic nghiệp vụ
+  2. Thực hiện kiểm tra dữ liệu đầu vào
+  3. Tạo các query thích hợp
+  4. Lưu dữ liệu vào database
+  5. Phản hồi kết quả (nếu cần)
+end note
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào quá trình xử lý cuối cùng trong Computer Service. Nó giải thích chi tiết về cách dữ liệu được xử lý và lưu trữ vào database.
+
+## Thiết lập để dễ đọc hơn
+Các thiết lập sau giúp cải thiện khả năng đọc của diagram:
+
+```plantuml
+' Thêm vào đầu file để cải thiện hiển thị
+skinparam shadowing false
+skinparam defaultFontSize 14
+skinparam rectangleFontSize 15
+skinparam rectangleBorderColor #666666
+skinparam noteFontSize 12
+skinparam noteBackgroundColor #FFFFCC
+skinparam noteBorderColor #999999
+```
+
+## Khi trình bày trong Word
+
+### Trình bày theo luồng xử lý
+1. **Tổng quan giao tiếp**: Sử dụng diagram #1 để giải thích tổng quan
+2. **Khởi tạo message**: Sử dụng diagram #2 để giải thích cách tạo và gửi message
+3. **Phân phối message**: Sử dụng diagram #3 để giải thích cách NATS phân phối message
+4. **Xử lý và lưu trữ**: Sử dụng diagram #4 để giải thích cách xử lý và lưu trữ dữ liệu
+
+### Giải thích chi tiết Message Pattern
+Tạo bảng để giải thích các loại message pattern sử dụng trong hệ thống:
+
+| Pattern | Mô tả | Ví dụ |
+|---------|-------|-------|
+| Request-Response | Gửi yêu cầu và chờ phản hồi | Lấy thông tin người dùng |
+| Event | Thông báo một sự kiện đã xảy ra | Người dùng đã đăng nhập |
+| Command | Yêu cầu thực hiện một hành động | Tạo lịch sử dụng phòng |
+| Query | Yêu cầu dữ liệu | Lấy danh sách phòng trống |

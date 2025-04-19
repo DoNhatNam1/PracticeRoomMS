@@ -1,0 +1,135 @@
+# Hướng dẫn chia nhỏ diagram "System Overview"
+
+## Vấn đề
+Khi xuất diagram này để đưa vào file Word, chữ có thể quá nhỏ và khó đọc do kích thước tổng thể của diagram.
+
+## Cách chia nhỏ
+1. **Phần Frontend và API Gateway**: 
+   - Chỉ giữ User, Frontend, Nginx và API Gateway
+   - Xuất riêng thành ảnh "system-overview-frontend-gateway.png"
+   
+2. **Phần Microservices**:
+   - Tập trung vào API Gateway, NATS và các Microservices
+   - Xuất riêng thành ảnh "system-overview-services.png"
+   
+3. **Phần Database**:
+   - Tập trung vào các Microservices và Database
+   - Xuất riêng thành ảnh "system-overview-database.png"
+
+## Thiết lập cỡ chữ
+Thêm vào đầu file system-overview.puml:
+```plantuml
+skinparam defaultFontSize 14
+skinparam defaultTextAlignment center
+skinparam componentFontSize 16
+skinparam componentFontStyle bold
+skinparam rectangleFontSize 15
+```
+
+## Code cho từng phần cụ thể
+
+### 1. Frontend và API Gateway
+```plantuml
+@startuml system-overview-frontend
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+
+actor "Giao diện người dùng" as User
+
+rectangle "Frontend (http://localhost:3000)\nVite React" as Frontend #ffff88
+rectangle "Nginx Server\n(http://localhost:80)\nProxy DNS + CORS + Load Balancing" as Nginx #ccffcc
+
+rectangle "API Gateway\n(http://localhost:3100/api)" as APIGateway #ffcccc {
+  [REST API\n/api/computer-service/] as ComputerAPI
+  [REST API\n/api/user-service/] as UserAPI
+  [REST API\n/api/room-service/] as RoomAPI
+}
+
+User --> Frontend
+Frontend --> Nginx
+Nginx --> APIGateway
+@enduml
+```
+
+### 2. Microservices và NATS
+```plantuml
+@startuml system-overview-services
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+
+rectangle "API Gateway\n(http://localhost:3100/api)" as APIGateway #ffcccc {
+  [REST API\n/api/computer-service/] as ComputerAPI
+  [REST API\n/api/user-service/] as UserAPI
+  [REST API\n/api/room-service/] as RoomAPI
+}
+
+rectangle "NATS Server\n(pub-sub messages)" as NATS #ccddff {
+  [host: computer-service:4222]
+  [host: room-service:4222]
+  [host: user-service:4222]
+}
+
+rectangle "Computer Service" as ComputerService #ffcccc {
+  [Computer Service Module]
+  [pid: 39892]
+}
+
+rectangle "Room Service" as RoomService #ffcccc {
+  [Room Service Module]
+  [pid: 39592]
+}
+
+rectangle "User Service" as UserService #ffcccc {
+  [User Service Module]
+  [pid: 39492]
+}
+
+APIGateway --> ComputerAPI
+APIGateway --> UserAPI
+APIGateway --> RoomAPI
+
+APIGateway --> NATS
+
+NATS --> ComputerService
+NATS --> RoomService
+NATS --> UserService
+@enduml
+```
+
+### 3. Microservices và Database
+```plantuml
+@startuml system-overview-database
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam defaultFontSize 14
+
+rectangle "Computer Service" as ComputerService #ffcccc {
+  [Computer Service Module]
+  [pid: 39892]
+}
+
+rectangle "Room Service" as RoomService #ffcccc {
+  [Room Service Module]
+  [pid: 39592]
+}
+
+rectangle "User Service" as UserService #ffcccc {
+  [User Service Module]
+  [pid: 39492]
+}
+
+database "Database\nPostgreSQL" as DB #ffccff
+
+ComputerService --> DB
+RoomService --> DB
+UserService --> DB
+@enduml
+```
+
+## Khi trình bày trong Word
+- Bắt đầu với phần tổng quan về kiến trúc
+- Sau đó đi vào chi tiết từng phần với các diagram nhỏ hơn
+- Các diagram nên được trang trí với màu sắc nhất quán
+- Thêm mũi tên đánh số để chỉ ra luồng dữ liệu

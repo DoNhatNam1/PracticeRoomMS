@@ -1,0 +1,54 @@
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log
+yarn-debug.log
+package-lock.json
+yarn.lock
+
+# Build files
+dist
+**/dist
+build
+**/build
+
+# Environment files
+.env*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# Docker files
+docker-compose*
+Dockerfile*
+.dockerignore
+
+# Test files
+test
+**/*.spec.ts
+**/*.e2e-spec.ts
+coverage
+.nyc_output
+
+# IDE settings
+.idea
+.vscode
+**/.idea
+**/.vscode
+
+# Logs
+logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Project specific files
+**/*.md
+*.yaml
+*.yml
+!nest-cli.yml
+nodemon.json

@@ -1,0 +1,341 @@
+# Hướng dẫn Chi Tiết Chia Nhỏ "Deployment Diagram"
+
+## Vấn đề
+Deployment diagram hiển thị toàn bộ kiến trúc triển khai có nhiều thành phần, khiến chữ bị nhỏ khi thu gọn để vừa trang Word và dễ gây rối mắt.
+
+## Cách chia nhỏ chi tiết theo tầng kiến trúc
+
+### 1. Tầng Client và Load Balancer
+
+**Thành phần giữ lại:**
+- Client Devices (WebBrowser, MobileApp, DesktopApp)
+- Load Balancer (NginxProxy, SSL, LBLogic)
+- Chỉ giữ các mũi tên kết nối giữa Client Devices và Load Balancer
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml deployment-client-loadbalancer
+title Frontend Client & Load Balancer Layer
+
+skinparam defaultFontSize 14
+skinparam nodeFontSize 16
+skinparam nodeFontStyle bold
+skinparam ArrowColor #0066CC
+skinparam ArrowThickness 2
+
+skinparam node {
+  backgroundColor #E8F5E9
+  borderColor #81C784
+}
+
+skinparam component {
+  backgroundColor #FFF9C4
+  borderColor #FFF176
+}
+
+node "Client Devices" {
+  [Web Browser] as WebBrowser
+  component [Mobile App] as MobileApp
+  [Desktop App] as DesktopApp
+}
+
+node "Load Balancer (Nginx)" as LoadBalancer {
+  component [Nginx Proxy Manager] as NginxProxy
+  component [SSL Termination] as SSL
+  component [Load Balancing Logic] as LBLogic
+}
+
+WebBrowser --> LoadBalancer : HTTPS
+MobileApp --> LoadBalancer : HTTPS
+DesktopApp --> LoadBalancer : HTTPS
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này cho thấy các loại client có thể truy cập hệ thống và cách chúng kết nối đến Load Balancer - điểm vào của hệ thống. Nó giúp người đọc hiểu rõ các giao diện người dùng được hỗ trợ và cơ chế xử lý yêu cầu ban đầu.
+
+### 2. Tầng Manager Node và API Gateway
+
+**Thành phần giữ lại:**
+- Load Balancer (chỉ hiển thị như một node đơn giản)
+- Docker Swarm Cluster với Manager Node
+- Frontend Container và API Gateway Container
+- Các mũi tên kết nối từ Load Balancer đến Frontend và API Gateway
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml deployment-manager-gateway
+title Manager Node & API Gateway Layer
+
+skinparam defaultFontSize 14
+skinparam nodeFontSize 16
+skinparam nodeFontStyle bold
+skinparam ArrowColor #0066CC
+skinparam ArrowThickness 2
+
+skinparam node {
+  backgroundColor #E8F5E9
+  borderColor #81C784
+}
+
+skinparam component {
+  backgroundColor #FFF9C4
+  borderColor #FFF176
+}
+
+skinparam cloud {
+  backgroundColor #F3E5F5
+  borderColor #CE93D8
+}
+
+node "Load Balancer" as LoadBalancer
+
+cloud "Docker Swarm Cluster" {
+  node "Manager Node" {
+    component [Docker Swarm Manager] as SwarmManager
+    component [Frontend Container (1 replica)] as Frontend
+    component [API Gateway Container (1 replica)] as APIGateway
+  }
+}
+
+LoadBalancer --> Frontend : HTTP
+LoadBalancer --> APIGateway : HTTP
+Frontend --> APIGateway : HTTP/REST
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào Manager Node, nơi chứa Frontend và API Gateway. Nó cho thấy cách Load Balancer phân phối yêu cầu đến các service này và cách Frontend giao tiếp với API Gateway.
+
+### 3. Tầng Worker Nodes và Microservices
+
+**Thành phần giữ lại:**
+- Docker Swarm Cluster
+- Manager Node (hiển thị đơn giản)
+- Worker Node 1 với User Service và Room Service
+- Worker Node 2 với Computer Service
+- API Gateway Container
+- Các mũi tên kết nối từ API Gateway đến các service
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml deployment-worker-services
+title Worker Nodes & Microservices Layer
+
+skinparam defaultFontSize 14
+skinparam nodeFontSize 16
+skinparam nodeFontStyle bold
+skinparam ArrowColor #0066CC
+skinparam ArrowThickness 2
+
+skinparam node {
+  backgroundColor #E8F5E9
+  borderColor #81C784
+}
+
+skinparam component {
+  backgroundColor #FFF9C4
+  borderColor #FFF176
+}
+
+skinparam cloud {
+  backgroundColor #F3E5F5
+  borderColor #CE93D8
+}
+
+cloud "Docker Swarm Cluster" {
+  node "Manager Node" {
+    component [API Gateway Container (1 replica)] as APIGateway
+  }
+  
+  node "Worker Node 1" {
+    component [User Service (2 replicas)] as UserService
+    component [Room Service (1 replica)] as RoomService
+  }
+  
+  node "Worker Node 2" {
+    component [Computer Service (3 replicas)] as ComputerService
+  }
+}
+
+APIGateway --> UserService : gRPC/TCP
+APIGateway --> RoomService : gRPC/TCP
+APIGateway --> ComputerService : gRPC/TCP
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào các Worker Node và Microservices chạy trên chúng. Nó cho thấy cách các service được phân bố trên các node khác nhau và cách API Gateway kết nối đến từng service.
+
+### 4. Tầng Database và NATS Messaging
+
+**Thành phần giữ lại:**
+- Docker Swarm Cluster
+- Worker Node 3 với NATS Server và PostgreSQL Master
+- Các Service Containers đơn giản hóa
+- Các mũi tên kết nối từ service đến NATS và Database
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml deployment-database-messaging
+title Database & Messaging Layer
+
+skinparam defaultFontSize 14
+skinparam nodeFontSize 16
+skinparam nodeFontStyle bold
+skinparam ArrowColor #0066CC
+skinparam ArrowThickness 2
+
+skinparam node {
+  backgroundColor #E8F5E9
+  borderColor #81C784
+}
+
+skinparam component {
+  backgroundColor #FFF9C4
+  borderColor #FFF176
+}
+
+skinparam database {
+  backgroundColor #E3F2FD
+  borderColor #64B5F6
+}
+
+skinparam cloud {
+  backgroundColor #F3E5F5
+  borderColor #CE93D8
+}
+
+cloud "Docker Swarm Cluster" {
+  node "Worker Node 1" {
+    component [User Service] as UserService
+    component [Room Service] as RoomService
+  }
+  
+  node "Worker Node 2" {
+    component [Computer Service] as ComputerService
+  }
+  
+  node "Worker Node 3 (DB)" {
+    component [NATS Server Container] as NATS
+    database "PostgreSQL Master" as DBMaster
+  }
+  
+  node "Storage" {
+    database "File Storage (MinIO)" as FileStorage
+  }
+}
+
+UserService --> NATS : pub/sub
+RoomService --> NATS : pub/sub
+ComputerService --> NATS : pub/sub
+
+UserService --> DBMaster : TCP/IP
+RoomService --> DBMaster : TCP/IP
+ComputerService --> DBMaster : TCP/IP
+
+UserService ..> FileStorage : S3 API
+ComputerService ..> FileStorage : S3 API
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào lớp dữ liệu, hiển thị NATS Server, PostgreSQL Database và File Storage. Nó cho thấy cách các service giao tiếp với nhau qua NATS và kết nối đến cơ sở dữ liệu.
+
+### 5. Luồng Dữ Liệu Tổng Thể (Đơn Giản Hóa)
+
+**Thành phần giữ lại:**
+- Tất cả các thành phần chính nhưng hiển thị đơn giản hóa
+- Tập trung vào các mũi tên kết nối để thể hiện luồng dữ liệu
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml deployment-data-flow
+title Data Flow Through System (Simplified)
+
+skinparam defaultFontSize 14
+skinparam nodeFontSize 16
+skinparam nodeFontStyle bold
+skinparam ArrowColor #0066CC
+skinparam ArrowThickness 2
+
+node "Clients" as Clients
+node "Load Balancer" as LB
+node "Frontend" as FE
+node "API Gateway" as API
+node "User Service" as US
+node "Room Service" as RS
+node "Computer Service" as CS
+node "NATS" as NATS
+database "PostgreSQL" as DB
+database "File Storage" as FS
+
+Clients --> LB : 1. HTTP Request
+LB --> FE : 2. Forward
+LB --> API : 2. Forward API Request
+FE --> API : 3. API Call
+API --> US : 4. Service Call
+API --> RS : 4. Service Call
+API --> CS : 4. Service Call
+US --> NATS : 5. Publish Event
+RS --> NATS : 5. Publish Event
+CS --> NATS : 5. Publish Event
+NATS --> US : 6. Subscribe
+NATS --> RS : 6. Subscribe
+NATS --> CS : 6. Subscribe
+US --> DB : 7. Query/Update
+RS --> DB : 7. Query/Update
+CS --> DB : 7. Query/Update
+US --> FS : 8. File Operation
+CS --> FS : 8. File Operation
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này là bản đơn giản hóa của toàn bộ hệ thống, tập trung vào luồng dữ liệu với các mũi tên được đánh số theo thứ tự. Nó giúp người đọc dễ dàng theo dõi cách request được xử lý qua các thành phần khác nhau trong hệ thống.
+
+## Thiết lập để dễ đọc hơn
+Ngoài các thiết lập đã đề xuất ở trên, bạn cũng có thể thêm:
+
+```plantuml
+' Thêm vào đầu file để điều chỉnh màu và kiểu hiển thị
+skinparam monochrome false
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 100
+skinparam ranksep 80
+```
+
+## Khi trình bày trong Word
+
+### Trình bày theo thứ tự tầng
+1. **Giới thiệu tổng quan**: Sử dụng diagram gốc với cỡ chữ nhỏ hơn, chỉ để người đọc nắm được bức tranh tổng thể
+2. **Tầng Client**: Sử dụng diagram #1 để giải thích cách người dùng tương tác với hệ thống
+3. **Tầng Manager Node**: Sử dụng diagram #2 để giải thích điểm vào của hệ thống
+4. **Tầng Worker Nodes**: Sử dụng diagram #3 để giải thích cách các service được phân bố
+5. **Tầng Database**: Sử dụng diagram #4 để giải thích cách lưu trữ và trao đổi dữ liệu
+6. **Tổng hợp luồng dữ liệu**: Sử dụng diagram #5 để tóm tắt cách dữ liệu di chuyển qua hệ thống
+
+### Trình bày theo loại tương tác
+1. **Tương tác người dùng**: Diagram #1 + Diagram #2
+2. **Tương tác giữa các service**: Diagram #3 + NATS từ Diagram #4
+3. **Tương tác dữ liệu**: Diagram #4 + Diagram #5
+
+### Bảng mô tả thành phần
+Tạo bảng chi tiết liệt kê từng thành phần và chức năng của chúng:
+
+| Thành phần | Node | Replicas | Chức năng chính | Kết nối đến |
+|------------|------|----------|-----------------|-------------|
+| Frontend | Manager | 1 | Giao diện người dùng | API Gateway |
+| API Gateway | Manager | 1 | Điều hướng request | Microservices |
+| User Service | Worker 1 | 2 | Quản lý người dùng | DB, NATS, Storage |
+| Room Service | Worker 1 | 1 | Quản lý phòng | DB, NATS |
+| Computer Service | Worker 2 | 3 | Quản lý máy tính | DB, NATS, Storage |
+| NATS | Worker 3 | 1 | Messaging | - |
+| PostgreSQL | Worker 3 | 1 | Lưu trữ dữ liệu | - |
+| File Storage | Storage | 1 | Lưu trữ file | - |

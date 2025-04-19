@@ -1,0 +1,61 @@
+@startuml system-overview
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+
+actor "Giao diện người dùng" as User
+
+rectangle "Frontend (http://localhost:3000)\nVite React" as Frontend #ffff88
+rectangle "Nginx Server\n(http://localhost:80)\nProxy DNS + CORS + Load Balancing" as Nginx #ccffcc
+
+rectangle "API Gateway\n(http://localhost:3100/api)" as APIGateway #ffcccc {
+  [REST API\n/api/computer-service/] as ComputerAPI
+  [REST API\n/api/user-service/] as UserAPI
+  [REST API\n/api/room-service/] as RoomAPI
+}
+
+rectangle "NATS Server\n(pub-sub messages)" as NATS #ccddff {
+  [host: computer-service:4222]
+  [host: room-service:4222]
+  [host: user-service:4222]
+}
+
+rectangle "Computer Service" as ComputerService #ffcccc {
+  [Computer Service Module]
+  [pid: 39892]
+}
+
+rectangle "Room Service" as RoomService #ffcccc {
+  [Room Service Module]
+  [pid: 39592]
+}
+
+rectangle "User Service" as UserService #ffcccc {
+  [User Service Module]
+  [pid: 39492]
+}
+
+database "Database\nPostgreSQL" as DB #ffccff
+
+' Kết nối từ người dùng
+User --> Frontend
+Frontend --> Nginx
+Nginx --> APIGateway
+
+' Từ API Gateway đến các REST API
+APIGateway --> ComputerAPI
+APIGateway --> UserAPI
+APIGateway --> RoomAPI
+
+' Từ API Gateway đến NATS
+APIGateway --> NATS
+
+' Từ NATS đến các service
+NATS --> ComputerService
+NATS --> RoomService
+NATS --> UserService
+
+' Từ các service đến DB
+ComputerService --> DB
+RoomService --> DB
+UserService --> DB
+@enduml

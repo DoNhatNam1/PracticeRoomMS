@@ -1,0 +1,256 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique @db.VarChar(100)
+  password      String    @db.VarChar(255)
+  name          String    @db.VarChar(100)
+  phone         String?   @db.VarChar(20)
+  role          Role      @default(STUDENT)
+  department    String?   @db.VarChar(100)
+  isActive      Boolean   @default(true)
+  
+  // Thêm các trường mới để quản lý phân cấp
+  createdById   Int?      // ID của người tạo tài khoản
+  createdBy     User?     @relation("UserCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdUsers  User[]    @relation("UserCreator")
+  
+  // Các trường hiện có
+  schedules     Schedule[]
+  roomUsages    RoomUsage[]
+  createdAt     DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @db.Timestamp(6)
+  tokens        Token[]
+  fileTransfers FileTransfer[]
+  activities       Activity[] @relation("UserActivities") 
+  visibleActivities Activity[] @relation("VisibleActivities")
+
+  @@index([email])
+  @@index([role])
+  @@index([department])
+  @@index([createdById])
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+model Token {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  token       String   @unique @db.VarChar(255)
+  expiresAt   DateTime @db.Timestamp(6)
+  deviceInfo  String?  @db.VarChar(255)
+  metadata    String?  @db.VarChar(255)
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  type        String   @default("AUTH") @db.VarChar(20) // AUTH, REFRESH, etc.
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+// Room Management
+model Room {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique @db.VarChar(100)
+  location    String?   @db.VarChar(150)
+  capacity    Int       @db.SmallInt
+  description String?   @db.VarChar(500)
+  isActive    Boolean   @default(true)
+  status      RoomStatus @default(AVAILABLE)
+  computers   Computer[]
+  schedules   Schedule[]
+  usages      RoomUsage[]
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @db.Timestamp(6)
+
+  @@index([status])
+}
+
+enum RoomStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  RESERVED
+}
+
+enum ScheduleStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+model Schedule {
+  id          Int             @id @default(autoincrement())
+  roomId      Int
+  room        Room            @relation(fields: [roomId], references: [id])
+  title       String          @db.VarChar(100)
+  startTime   DateTime        @db.Timestamp(6)
+  endTime     DateTime        @db.Timestamp(6)
+  repeat      RepeatType?     @default(NONE)
+  status      ScheduleStatus  @default(PENDING)
+  createdBy   Int
+  user        User            @relation(fields: [createdBy], references: [id])
+  
+  roomUsages  RoomUsage[]
+  
+  createdAt   DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime        @updatedAt @db.Timestamp(6)
+
+  @@index([roomId])
+  @@index([startTime, endTime])
+  @@index([status])
+  @@index([createdBy]) // Thêm index cho hiệu suất truy vấn
+}
+
+enum RepeatType {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+// Computer Management
+model Computer {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  ipAddress   String?   @db.VarChar(45)
+  macAddress  String?   @db.VarChar(17)
+  specs       Json?     // CPU, RAM, OS, etc.
+  roomId      Int
+  room        Room      @relation(fields: [roomId], references: [id])
+  status      ComputerStatus @default(OPERATIONAL)
+  usages      ComputerUsage[]
+  fileTransfersSources FileTransfer[] @relation("SourceComputer")
+  fileTransfersTargets FileTransferTarget[]
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @db.Timestamp(6)
+
+  @@index([roomId])
+  @@index([status])
+}
+
+enum ComputerStatus {
+  OPERATIONAL
+  IN_USE
+  MAINTENANCE
+  OFFLINE
+}
+
+// Usage Tracking
+model RoomUsage {
+  id          Int       @id @default(autoincrement())
+  roomId      Int
+  room        Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startTime   DateTime  @db.Timestamp(6)
+  endTime     DateTime? @db.Timestamp(6)
+  purpose     String?   @db.VarChar(200)
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @db.Timestamp(6)
+  computerUsages ComputerUsage[]
+  
+  scheduleId  Int?        // Added field
+  schedule    Schedule?   @relation(fields: [scheduleId], references: [id], onDelete: SetNull) // Added field
+
+  @@index([roomId])
+  @@index([userId])
+  @@index([startTime, endTime])
+  @@index([scheduleId]) // Added index
+}
+
+model ComputerUsage {
+  id          Int       @id @default(autoincrement())
+  computerId  Int
+  computer    Computer  @relation(fields: [computerId], references: [id], onDelete: Cascade)
+  notes       String?   @db.VarChar(255)
+  roomUsageId Int
+  roomUsage   RoomUsage @relation(fields: [roomUsageId], references: [id], onDelete: Cascade)
+  startTime   DateTime  @db.Timestamp(6)
+  endTime     DateTime? @db.Timestamp(6)
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @db.Timestamp(6)
+
+  @@index([computerId])
+  @@index([roomUsageId])
+  @@index([startTime, endTime])
+}
+
+// File Transfer
+model FileTransfer {
+  id            Int       @id @default(autoincrement())
+  filename      String    @db.VarChar(255)
+  originalName  String    @db.VarChar(255)
+  size          Int
+  mimeType      String    @db.VarChar(100)
+  path          String    @db.VarChar(255)
+  sourceId      Int?      // Null if uploaded from outside
+  source        Computer? @relation("SourceComputer", fields: [sourceId], references: [id])
+  transferredAt DateTime  @default(now()) @db.Timestamp(6)
+  status        TransferStatus @default(PENDING)
+  userId        Int?
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt     DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @db.Timestamp(6)
+  
+  targets       FileTransferTarget[] // Relation to targets
+
+  @@index([sourceId])
+  @@index([status])
+  @@index([userId])
+}
+
+model FileTransferTarget {
+  id             Int            @id @default(autoincrement())
+  fileTransferId Int
+  fileTransfer   FileTransfer   @relation(fields: [fileTransferId], references: [id], onDelete: Cascade)
+  computerId     Int
+  computer       Computer       @relation(fields: [computerId], references: [id])
+  status         TransferStatus @default(PENDING)
+  
+  @@unique([fileTransferId, computerId])
+  @@index([fileTransferId])
+  @@index([computerId])
+}
+
+enum TransferStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+// Activity Logging
+model Activity {
+  id            Int       @id @default(autoincrement())
+  action        String    @db.VarChar(50)
+  details       Json?
+  createdAt     DateTime  @default(now()) @db.Timestamp(6)
+  
+  // User thực hiện hành động
+  actorId       Int?       
+  actor         User?     @relation("UserActivities", fields: [actorId], references: [id], onDelete: SetNull)
+  
+  // User cần được thông báo về activity này (ngoài admin)
+  visibleToId   Int?      // Teacher ID hoặc null nếu chỉ admin xem được
+  visibleTo     User?     @relation("VisibleActivities", fields: [visibleToId], references: [id], onDelete: SetNull)
+
+  @@index([action])
+  @@index([createdAt])
+  @@index([actorId])
+  @@index([visibleToId])
+}

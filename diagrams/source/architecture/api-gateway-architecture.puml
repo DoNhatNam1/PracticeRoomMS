@@ -1,0 +1,66 @@
+@startuml api-gateway-architecture
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor<<Auth>> #dddddd
+  BackgroundColor<<Service>> #ffcccc
+  BackgroundColor<<NATS>> #ccffff
+}
+
+actor "Client" as User
+
+rectangle "API Gateway\n(http://localhost:3100/api)" as Gateway #ff4444 {
+  rectangle "Auth-core" <<Auth>> {
+    [Guard]
+    [Decorators]
+    [Strategies JWT]
+  }
+
+  rectangle "/api/computer-service/\nComputer-service Controller" as ComputerCtrl <<Service>> {
+    [activity log computer service]
+    [computers service]
+    [file transfer service]
+    [computer-usage service]
+  }
+
+  rectangle "/api/user-service/\nUser-service Controller" as UserCtrl <<Service>> {
+    [activity log user service]
+    [auth service]
+    [profile service]
+    [users service]
+  }
+
+  rectangle "/api/room-service/\nRoom-service Controller" as RoomCtrl <<Service>> {
+    [activity log room service]
+    [room usage service]
+    [rooms service]
+    [schedule service]
+  }
+}
+
+rectangle "NATS SERVER\nGửi message cho nhiều service cùng 1 lúc\n(Chỉ service nào có loadbalancer)" <<NATS>> as NATS
+
+' Kết nối giữa client và gateway
+User --> Gateway
+
+' Auth-core kết nối tới tất cả controller
+[Guard] --> ComputerCtrl
+[Guard] --> UserCtrl
+[Guard] --> RoomCtrl
+
+' Tất cả service nhỏ kết nối tới NATS
+[activity log computer service] --> NATS
+[computers service] --> NATS
+[file transfer service] --> NATS
+[computer-usage service] --> NATS
+
+[activity log user service] --> NATS
+[auth service] --> NATS
+[profile service] --> NATS
+[users service] --> NATS
+
+[activity log room service] --> NATS
+[room usage service] --> NATS
+[rooms service] --> NATS
+[schedule service] --> NATS
+@enduml

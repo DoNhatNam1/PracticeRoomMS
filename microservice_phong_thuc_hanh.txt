@@ -1,0 +1,7 @@
+
+Ứng dụng kiến trúc microservice và container hóa trong xây dựng và triển khai hệ thống quản lý Phòng thực hành tại trường học
+
+– Đề tài nghiên cứu và ứng dụng kiến trúc microservice và container hóa xây dựng và triển khai ứng dụng quản lý phòng thực hành tại trường học.
+– Xây dựng ứng dụng Website trên nền tảng docker và kiến trúc microservice để ứng dụng dễ dàng triển khai và mở rộng với các chức năng cơ bản quản lý thông tin phòng máy, trạng thái thiết bị, tình trạng phòng, tài khoản người dùng,...
+– Xây dựng app hỗ trợ quản lý: kết nối máy tính trong phòng thực hành và kết nối tới web, quản lý máy tính sinh viên đang sử dụng, hỗ trợ truyền gửi file...
+– Rèn luyện kỹ năng phân tích thiết kế hệ thống thông tin, cài đặt ứng dụng, trình bày báo cáo, làm việc độc lập và theo nhóm.

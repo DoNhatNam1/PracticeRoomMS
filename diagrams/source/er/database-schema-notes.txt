@@ -1,0 +1,334 @@
+# Hướng dẫn Chi Tiết Chia Nhỏ Entity Relationship Diagram
+
+## Vấn đề
+Diagram ER của cơ sở dữ liệu rất phức tạp với nhiều bảng và mối quan hệ, khó đọc khi thu nhỏ để vừa trang Word.
+
+## Cách chia nhỏ chi tiết theo module
+
+### 1. Module User Management
+
+**Thành phần giữ lại:**
+- User (và các thuộc tính)
+- Token
+- Activity (liên quan đến User)
+- Các mối quan hệ trực tiếp giữa các bảng này
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml database-schema-user-management
+title User Management Schema
+
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b><u>x</u></b>
+!define foreign_key(x) <i>x</i>
+!define unique(x) <color:green>x</color>
+!define not_null(x) <b>x</b>
+
+' Tăng kích thước font
+skinparam classFontSize 16
+skinparam classAttributeFontSize 14
+
+' User Management
+Table(User, "User") {
+  primary_key(id) INT
+  unique(email) VARCHAR(100)
+  not_null(password) VARCHAR(255)
+  not_null(name) VARCHAR(100)
+  phone VARCHAR(20)
+  not_null(role) ENUM
+  department VARCHAR(100)
+  not_null(isActive) BOOLEAN
+  foreign_key(createdById) INT
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(Token, "Token") {
+  primary_key(id) INT
+  foreign_key(userId) INT
+  unique(token) VARCHAR(255)
+  not_null(expiresAt) TIMESTAMP
+  deviceInfo VARCHAR(255)
+  not_null(createdAt) TIMESTAMP
+  not_null(type) VARCHAR(20)
+}
+
+Table(Activity, "Activity") {
+  primary_key(id) INT
+  not_null(action) VARCHAR(50)
+  details JSONB
+  not_null(createdAt) TIMESTAMP
+  foreign_key(actorId) INT
+  foreign_key(visibleToId) INT
+}
+
+' Relationships
+User "1" -- "*" Token : has
+User "1" -- "*" User : creates
+User "1" -- "*" Activity : performs
+User "1" -- "*" Activity : views
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào quản lý người dùng, hiển thị cấu trúc User, Token và Activity logging. Nó cho thấy cách theo dõi phiên đăng nhập và hoạt động của người dùng.
+
+### 2. Module Room Management
+
+**Thành phần giữ lại:**
+- Room
+- Schedule
+- RoomUsage
+- User (đơn giản hóa)
+- Các mối quan hệ trực tiếp giữa các bảng này
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml database-schema-room-management
+title Room Management Schema
+
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b><u>x</u></b>
+!define foreign_key(x) <i>x</i>
+!define unique(x) <color:green>x</color>
+!define not_null(x) <b>x</b>
+
+' Tăng kích thước font
+skinparam classFontSize 16
+skinparam classAttributeFontSize 14
+
+' Simplified User
+Table(User, "User") {
+  primary_key(id) INT
+  not_null(name) VARCHAR(100)
+  not_null(role) ENUM
+}
+
+' Room Management
+Table(Room, "Room") {
+  primary_key(id) INT
+  unique(name) VARCHAR(100)
+  location VARCHAR(150)
+  not_null(capacity) SMALLINT
+  description VARCHAR(500)
+  not_null(isActive) BOOLEAN
+  not_null(status) ENUM
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(Schedule, "Schedule") {
+  primary_key(id) INT
+  foreign_key(roomId) INT
+  not_null(title) TEXT
+  not_null(startTime) TIMESTAMP
+  not_null(endTime) TIMESTAMP
+  repeat ENUM
+  foreign_key(createdBy) INT
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(RoomUsage, "RoomUsage") {
+  primary_key(id) INT
+  foreign_key(roomId) INT
+  foreign_key(userId) INT
+  not_null(startTime) TIMESTAMP
+  endTime TIMESTAMP
+  purpose VARCHAR(200)
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+  foreign_key(scheduleId) INT
+}
+
+' Relationships
+User "1" -- "*" Schedule : creates
+User "1" -- "*" RoomUsage : performs
+Room "1" -- "*" Schedule : has
+Room "1" -- "*" RoomUsage : has
+Schedule "1" -- "*" RoomUsage : generates
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào quản lý phòng thực hành, cho thấy cách phòng được lên lịch và sử dụng. Nó hiển thị mối quan hệ giữa phòng, lịch trình và người dùng.
+
+### 3. Module Computer Management
+
+**Thành phần giữ lại:**
+- Computer
+- ComputerUsage
+- Room (đơn giản hóa)
+- RoomUsage (đơn giản hóa)
+- Các mối quan hệ trực tiếp giữa các bảng này
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml database-schema-computer-management
+title Computer Management Schema
+
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b><u>x</u></b>
+!define foreign_key(x) <i>x</i>
+!define unique(x) <color:green>x</color>
+!define not_null(x) <b>x</b>
+
+' Tăng kích thước font
+skinparam classFontSize 16
+skinparam classAttributeFontSize 14
+
+' Simplified Room
+Table(Room, "Room") {
+  primary_key(id) INT
+  not_null(name) VARCHAR(100)
+}
+
+' Simplified RoomUsage
+Table(RoomUsage, "RoomUsage") {
+  primary_key(id) INT
+  foreign_key(roomId) INT
+  not_null(startTime) TIMESTAMP
+  endTime TIMESTAMP
+}
+
+' Computer Management
+Table(Computer, "Computer") {
+  primary_key(id) INT
+  not_null(name) VARCHAR(100)
+  ipAddress VARCHAR(45)
+  macAddress VARCHAR(17)
+  specs JSONB
+  foreign_key(roomId) INT
+  not_null(status) ENUM
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(ComputerUsage, "ComputerUsage") {
+  primary_key(id) INT
+  foreign_key(computerId) INT
+  notes VARCHAR(255)
+  foreign_key(roomUsageId) INT
+  not_null(startTime) TIMESTAMP
+  endTime TIMESTAMP
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+' Relationships
+Room "1" -- "*" Computer : contains
+RoomUsage "1" -- "*" ComputerUsage : includes
+Computer "1" -- "*" ComputerUsage : has
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào quản lý máy tính, cho thấy cách máy tính thuộc về phòng và được sử dụng trong các buổi thực hành. Nó hiển thị mối quan hệ giữa máy tính, phòng và việc sử dụng máy tính.
+
+### 4. Module File Transfer
+
+**Thành phần giữ lại:**
+- FileTransfer
+- FileTransferTarget
+- Computer (đơn giản hóa)
+- User (đơn giản hóa)
+- Các mối quan hệ trực tiếp giữa các bảng này
+
+**Code để tạo sub-diagram:**
+```plantuml
+@startuml database-schema-file-transfer
+title File Transfer Schema
+
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b><u>x</u></b>
+!define foreign_key(x) <i>x</i>
+!define unique(x) <color:green>x</color>
+!define not_null(x) <b>x</b>
+
+' Tăng kích thước font
+skinparam classFontSize 16
+skinparam classAttributeFontSize 14
+
+' Simplified User
+Table(User, "User") {
+  primary_key(id) INT
+  not_null(name) VARCHAR(100)
+}
+
+' Simplified Computer
+Table(Computer, "Computer") {
+  primary_key(id) INT
+  not_null(name) VARCHAR(100)
+  not_null(status) ENUM
+}
+
+Table(FileTransfer, "FileTransfer") {
+  primary_key(id) INT
+  not_null(filename) VARCHAR(255)
+  not_null(originalName) VARCHAR(255)
+  not_null(size) INT
+  not_null(mimeType) VARCHAR(100)
+  not_null(path) VARCHAR(255)
+  foreign_key(sourceId) INT
+  not_null(transferredAt) TIMESTAMP
+  not_null(status) ENUM
+  foreign_key(userId) INT
+  not_null(createdAt) TIMESTAMP
+  not_null(updatedAt) TIMESTAMP
+}
+
+Table(FileTransferTarget, "FileTransferTarget") {
+  primary_key(id) INT
+  foreign_key(fileTransferId) INT
+  foreign_key(computerId) INT
+  not_null(status) ENUM
+}
+
+' Relationships
+User "1" -- "*" FileTransfer : initiates
+Computer "1" -- "*" FileTransfer : sources
+Computer "1" -- "*" FileTransferTarget : targets
+FileTransfer "1" -- "*" FileTransferTarget : has
+
+@enduml
+```
+
+**Mô tả:**
+Diagram này tập trung vào chức năng truyền file, cho thấy cách giáo viên có thể gửi file đến nhiều máy tính của sinh viên. Nó hiển thị mối quan hệ giữa việc truyền file, người gửi và các máy tính đích.
+
+## Thiết lập hiển thị tốt hơn
+Các thiết lập sau giúp cải thiện khả năng đọc của diagram ER:
+
+```plantuml
+' Thêm vào đầu file để cải thiện hiển thị
+skinparam ClassBackgroundColor #FEFEFE
+skinparam ClassBorderColor #333333
+skinparam ClassFontSize 14
+skinparam ClassAttributeFontSize 12
+skinparam ClassAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+```
+
+## Khi trình bày trong Word
+
+### Trình bày theo module
+1. **Giới thiệu tổng quan**: Hiển thị diagram tổng thể đơn giản hóa, tập trung vào các bảng chính mà không hiển thị các thuộc tính
+2. **Module User Management**: Sử dụng diagram #1
+3. **Module Room Management**: Sử dụng diagram #2
+4. **Module Computer Management**: Sử dụng diagram #3
+5. **Module File Transfer**: Sử dụng diagram #4
+
+### Bảng mô tả chi tiết
+Tạo bảng để mô tả chi tiết từng bảng trong database:
+
+| Bảng | Module | Chức năng | Quan hệ chính |
+|------|--------|-----------|---------------|
+| User | User Management | Lưu thông tin người dùng | 1-n với Token, Activity |
+| Room | Room Management | Lưu thông tin phòng | 1-n với Schedule, Computer |
+| Computer | Computer Management | Lưu thông tin máy tính | n-1 với Room, 1-n với ComputerUsage |
+| FileTransfer | File Transfer | Lưu thông tin truyền file | 1-n với FileTransferTarget |
+| ... | ... | ... | ... |

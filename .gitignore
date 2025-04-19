@@ -1,0 +1,91 @@
+# Vagrant
+.vagrant/
+*.log
+ubuntu-*-cloudimg-console.log
+vagrant_ansible_inventory_*
+.vagrant.d/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Database & Data
+*.sql
+*.sqlite
+*.db
+db_data/
+
+# Node.js / NestJS
+node_modules/
+dist/
+build/
+coverage/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Docker
+.docker/
+docker-compose.override.yml
+docker/data/
+
+# File Storage
+storage/
+uploads/
+downloads/
+tmp/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS specific
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IDE - JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Images generated from PlantUML
+diagrams/images/**/*.png
+diagrams/images/**/*.svg
+diagrams/images/**/*.jpg
+
+# Build files
+*.zip
+*.tar.gz
+*.rar
+
+# Local development SSL certificates
+*.pem
+*.crt
+*.key
+*.csr
+*.srl
+
+# Compiled output
+/dist
+/build
+/node_modules
+
+# Credential files
+**/credentials.json
+**/secret.json
+**/private-key.json
+**.pem

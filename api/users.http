@@ -1,0 +1,83 @@
+@baseUrl = http://localhost:3000/api
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJyZW1lbWJlck1lIjp0cnVlLCJpYXQiOjE3NDM5MjcyMzUsImV4cCI6MTc0NjUxOTIzNX0.SaSYLAGyvYuXRC2dqQHckiztZWDoySiNS8sHjPjTEAY
+@teacherToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEzLCJyZW1lbWJlck1lIjp0cnVlLCJpYXQiOjE3NDM5MjcxMTAsImV4cCI6MTc0NjUxOTExMH0.JR9CxSYzVJsCLdXBJ4_uJWZCbbb9S0G4x29hysHM2kQ
+@studentToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE0LCJyZW1lbWJlck1lIjp0cnVlLCJpYXQiOjE3NDM5MjcxMTMsImV4cCI6MTc0NjUxOTExM30.ugJ0FDTTTj38uXdIQfnl0m754WrsuF3HTVbg0oLr5Xk
+
+### Login as Admin
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Password32!",
+  "rememberMe": true
+}
+
+### Save Admin token
+@adminToken = {{loginAdmin.response.body.data.accessToken}}
+
+### Create new user (Admin only)
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "email": "newteacher@example.com",
+  "password": "Password32!",
+  "name": "New Teacher",
+  "role": "TEACHER",
+  "department": "Computer Science"
+}
+
+### Get all users (paginated)
+GET {{baseUrl}}/users?page=1&limit=10&role=TEACHER
+Authorization: Bearer {{adminToken}}
+
+### Get user by ID
+GET {{baseUrl}}/users/2
+Authorization: Bearer {{adminToken}}
+
+### Update user
+PUT {{baseUrl}}/users/2
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Updated Teacher",
+  "department": "Information Technology"
+}
+
+### Update user status (active/inactive)
+PUT {{baseUrl}}/users/2/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "isActive": false
+}
+
+### Update user role (Admin only)
+PUT {{baseUrl}}/users/2/role
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "role": "TEACHER"
+}
+
+### Delete user (Admin only)
+DELETE {{baseUrl}}/users/2
+Authorization: Bearer {{adminToken}}
+
+### Get user activity
+GET {{baseUrl}}/users/2/activity?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Get user room usage
+GET {{baseUrl}}/users/2/room-usage?page=1&limit=10&startDate=2023-01-01&endDate=2023-12-31
+Authorization: Bearer {{adminToken}}
+
+### Get students by teacher
+GET {{baseUrl}}/users/teachers/2/students?page=1&limit=10&search=student
+Authorization: Bearer {{adminToken}}

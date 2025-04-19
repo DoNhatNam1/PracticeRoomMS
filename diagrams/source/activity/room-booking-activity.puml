@@ -1,0 +1,58 @@
+@startuml room-booking-activity
+title Activity Diagram - Quy trình đặt và sử dụng phòng thực hành
+
+|Admin|
+start
+:Đăng nhập vào hệ thống;
+:Chọn chức năng quản lý phòng;
+:Tạo lịch sử sử dụng phòng mới;
+
+|System|
+:Hiển thị form đặt phòng;
+
+|Admin|
+:Chọn phòng;
+:Chọn thời gian bắt đầu và kết thúc;
+:Chọn giáo viên phụ trách;
+:Nhập mục đích sử dụng;
+label bookingRequest
+:Gửi yêu cầu đặt phòng;
+
+|System|
+:Kiểm tra xung đột lịch;
+if (Có xung đột?) then (yes)
+  :Thông báo xung đột\nvà gợi ý thay thế;
+  |Admin|
+  :Điều chỉnh thời gian\nhoặc chọn phòng khác;
+  goto bookingRequest
+else (no)
+  :Lưu lịch sử sử dụng phòng;
+  :Gửi thông báo đến giáo viên phụ trách;
+endif
+
+|Teacher|
+:Nhận thông báo về lịch sử dụng phòng;
+:Đăng nhập vào hệ thống;
+:Xem danh sách phòng đã được đặt;
+:Chọn phòng theo lịch được phân công;
+
+|System|
+:Xác thực quyền truy cập phòng;
+:Cập nhật trạng thái phòng "Đang sử dụng";
+
+|Teacher|
+:Sử dụng phòng theo lịch;
+:Thực hiện bài giảng/hướng dẫn;
+:Báo kết thúc sử dụng;
+
+|System|
+:Ghi nhận thời gian kết thúc;
+:Cập nhật trạng thái phòng\nthành "Sẵn sàng";
+:Lưu lịch sử sử dụng;
+
+|Admin|
+:Xem báo cáo sử dụng phòng;
+:Phân tích hiệu suất sử dụng;
+stop
+
+@enduml

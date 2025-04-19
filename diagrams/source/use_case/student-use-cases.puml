@@ -1,0 +1,65 @@
+@startuml student-use-cases
+title Use Cases cho Sinh viên - Hệ thống Quản lý Phòng Thực hành
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecaseStyle roundedBox
+skinparam backgroundColor #FEFEFE
+skinparam handwritten false
+
+actor "Sinh viên" as Student
+
+rectangle "Hệ thống Quản lý Phòng Thực hành" {
+  usecase "Sử dụng phòng thực hành" as UC1
+  usecase "Chọn phòng thực hành" as UC1_1
+  usecase "Xem trạng thái phòng" as UC1_2
+  usecase "Chọn máy tính trong phòng" as UC1_3
+  usecase "Đăng nhập vào hệ thống" as UC1_4
+  usecase "Truy cập dashboard" as UC1_5
+  
+  usecase "Làm bài thực hành" as UC2
+  usecase "Xem danh sách bài thực hành" as UC2_1
+  usecase "Làm bài thực hành" as UC2_2
+  usecase "Nộp bài thực hành" as UC2_3
+  usecase "Xem kết quả đánh giá" as UC2_4
+  usecase "Xem file từ giáo viên" as UC2_5
+  
+  usecase "Sử dụng tài nguyên máy tính" as UC3
+  usecase "Sử dụng phần mềm cài đặt" as UC3_1
+  usecase "Lưu trữ dữ liệu" as UC3_2
+  usecase "Đăng xuất máy" as UC3_3
+  
+  usecase "Báo cáo sự cố" as UC4
+  usecase "Báo cáo lỗi máy tính" as UC4_1
+  usecase "Báo cáo vấn đề phòng thực hành" as UC4_2
+  usecase "Theo dõi trạng thái báo cáo" as UC4_3
+  
+  ' Mối quan hệ giữa Sinh viên và các Use Case chính
+  Student --> UC1
+  Student --> UC2
+  Student --> UC3
+  Student --> UC4
+  
+  ' Mối quan hệ giữa Use Case chính và các Use Case con
+  UC1 <.. UC1_1 : extends
+  UC1 <.. UC1_2 : extends
+  UC1 <.. UC1_3 : extends
+  UC1 <.. UC1_4 : extends
+  UC1 <.. UC1_5 : extends
+  
+  UC2 <.. UC2_1 : extends
+  UC2 <.. UC2_2 : extends
+  UC2 <.. UC2_3 : extends
+  UC2 <.. UC2_4 : extends
+  UC2 <.. UC2_5 : extends
+  
+  UC3 <.. UC3_1 : extends
+  UC3 <.. UC3_2 : extends
+  UC3 <.. UC3_3 : extends
+  
+  UC4 <.. UC4_1 : extends
+  UC4 <.. UC4_2 : extends
+  UC4 <.. UC4_3 : extends
+}
+
+@enduml

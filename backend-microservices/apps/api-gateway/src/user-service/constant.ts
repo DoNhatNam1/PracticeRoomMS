@@ -1,0 +1,1 @@
+export const USER_SERVICE_CLIENT = Symbol('USER_SERVICE_CLIENT');

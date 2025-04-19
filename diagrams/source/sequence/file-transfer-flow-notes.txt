@@ -1,0 +1,23 @@
+# Hướng dẫn chia nhỏ diagram "File Transfer Flow"
+
+## Vấn đề
+Sequence diagram cho luồng truyền file khá dài và phức tạp, khó đọc khi thu nhỏ để vừa trang Word.
+
+## Cách chia nhỏ theo giai đoạn
+1. **Giai đoạn khởi tạo**:
+   - Từ Giáo viên chọn file đến việc tạo bản ghi FileTransfer
+   - Bao gồm phần "Khởi tạo Truyền File"
+   - Xuất thành ảnh "file-transfer-initialization.png"
+
+2. **Giai đoạn truyền file**:
+   - Từ thông báo các máy đích đến việc tải file
+   - Bao gồm phần "Thông Báo Các Máy Đích", "Báo Cáo Trạng Thái" và "Tải File"
+   - Xuất thành ảnh "file-transfer-delivery.png"
+
+3. **Giai đoạn cập nhật trạng thái**:
+   - Từ cập nhật trạng thái đến hiển thị báo cáo
+   - Bao gồm phần "Cập Nhật Trạng Thái" và "Hiển Thị Báo Cáo"
+   - Xuất thành ảnh "file-transfer-status-update.png"
+
+## Thiết lập hiển thị
+Thêm vào đầu file file-transfer-flow.puml:
