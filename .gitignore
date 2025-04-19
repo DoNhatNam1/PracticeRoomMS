@@ -62,11 +62,6 @@ Desktop.ini
 *.iws
 *.ipr
 
-# Images generated from PlantUML
-diagrams/images/**/*.png
-diagrams/images/**/*.svg
-diagrams/images/**/*.jpg
-
 # Build files
 *.zip
 *.tar.gz
