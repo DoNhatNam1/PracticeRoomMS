@@ -12,9 +12,6 @@ dist
 build
 **/build
 
-# Environment files
-.env*
-!.env.example
 
 # Git
 .git

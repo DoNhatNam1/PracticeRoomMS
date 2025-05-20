@@ -119,22 +119,22 @@ async update(@Payload() payload: any) {
   const result = await this.usersService.update(id, updateUserDto, currentUser);
   
   if (result && result.success) {
-    // Sửa lại tham số gọi - sử dụng định dạng mới
-    await this.activityLogUserService.logActivity('UPDATE_USER', {
-      userId: currentUser.sub,
-      targetId: id,
-      changes: updateUserDto,
-      action: 'USER_UPDATED'
-    });
+    // Fixed parameter order
+    await this.activityLogUserService.logActivity(
+      currentUser.sub,    // userId
+      'UPDATE_USER',      // action
+      {                   // details
+        targetId: id,
+        changes: updateUserDto
+      }
+    );
   }
   
   return result;
 }
 
   @MessagePattern(USERS_PATTERNS.UPDATE_STATUS)
-  async updateStatus(
-    @Payload() payload: { id: number; isActive: boolean; currentUser: any },
-  ) {
+  async updateStatus(@Payload() payload: { id: number; isActive: boolean; currentUser: any }) {
     const { id, isActive, currentUser } = payload;
 
     this.logger.log(
@@ -162,13 +162,14 @@ async update(@Payload() payload: any) {
     const result = await this.usersService.updateStatus(id, isActive);
 
     if (result.success) {
-      // Log activity
+      // Fixed parameter order
       await this.activityLogUserService.logActivity(
-        currentUser.sub,
-        'UPDATE_STATUS',
-        'user',
-        id,
-        { isActive },
+        currentUser.sub,    // userId
+        'UPDATE_STATUS',    // action 
+        {                   // details
+          targetId: id,
+          isActive
+        }
       );
     }
 
@@ -226,13 +227,15 @@ async update(@Payload() payload: any) {
     );
 
     if (result.success) {
-      // Sửa lại tham số gọi - sử dụng định dạng mới
-      await this.activityLogUserService.logActivity('UPDATE_ROLE', {
-        userId: currentUser.sub,
-        targetId: userId,
-        newRole: updateRoleDto.role,
-        action: 'ROLE_CHANGED',
-      });
+      // Fixed parameter order
+      await this.activityLogUserService.logActivity(
+        currentUser.sub,    // userId
+        'UPDATE_ROLE',      // action
+        {                   // details
+          targetId: userId,
+          newRole: updateRoleDto.role
+        }
+      );
     }
 
     return result;
@@ -299,7 +302,14 @@ async update(@Payload() payload: any) {
 
     this.logger.log(`Nhận yêu cầu ghi nhật ký: ${action}`);
 
-    await this.activityLogUserService.logActivity(action, details);
+    // Extract userId from details if available
+    const userId = details?.userId || null;
+    
+    await this.activityLogUserService.logActivity(
+      userId,    // userId
+      action,    // action
+      details    // details
+    );
   }
 
   @MessagePattern(USERS_PATTERNS.GET_STUDENTS_BY_TEACHER)

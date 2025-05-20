@@ -14,6 +14,65 @@ Content-Type: application/json
   "rememberMe": true
 }
 
+### Dữ liệu trả về khi thành công của Login as Admin
+{
+  "success": true,
+  "message": "Đăng nhập thành công",
+  "statusCode": 200,
+  "data": {
+    "user": {
+      "id": 550,
+      "email": "admin@example.com",
+      "name": "System Administrator",
+      "role": "ADMIN"
+    },
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjU1MCwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsIm5hbWUiOiJTeXN0ZW0gQWRtaW5pc3RyYXRvciIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc0NTMyMDI2NiwiZXhwIjoxNzQ1MzIxMTY2fQ.3UvijCLJCdnRO3vWkPZQV-KDmXwzR8Te5SlBKk8fN-U",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjU1MCwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsIm5hbWUiOiJTeXN0ZW0gQWRtaW5pc3RyYXRvciIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc0NTMyMDI2NiwiZXhwIjoxNzQ1OTI1MDY2fQ.iXKlbuA4olP6KuAQfrv4Oy3iF83UHRNLreigH7JvrfA",
+    "tokenType": "Bearer"
+  }
+}
+
+### Logout user
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{adminToken}}
+
+### Dữ liệu trả về khi thành công của Logout user
+{
+  "success": true,
+  "message": "Đăng xuất thành công",
+  "statusCode": 200
+}
+
+
+### Login as TEACHER
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "newteacher@example.com",
+  "password": "Password32!",
+  "rememberMe": true
+}
+
+### Dữ liệu trả về khi thành công của Login as TEACHER
+{
+  "success": true,
+  "message": "Đăng nhập thành công",
+  "statusCode": 200,
+  "data": {
+    "user": {
+      "id": 551,
+      "email": "newteacher@example.com",
+      "name": "New Teacher",
+      "role": "TEACHER"
+    },
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjU1MSwiZW1haWwiOiJuZXd0ZWFjaGVyQGV4YW1wbGUuY29tIiwibmFtZSI6Ik5ldyBUZWFjaGVyIiwicm9sZSI6IlRFQUNIRVIiLCJpYXQiOjE3NDUzMjAyODMsImV4cCI6MTc0NTMyMTE4M30.K88WRtIr0U5C8ZSjUyWc37Duonw1roSNwojQdNZ08_Q",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjU1MSwiZW1haWwiOiJuZXd0ZWFjaGVyQGV4YW1wbGUuY29tIiwibmFtZSI6Ik5ldyBUZWFjaGVyIiwicm9sZSI6IlRFQUNIRVIiLCJpYXQiOjE3NDUzMjAyODMsImV4cCI6MTc0NTkyNTA4M30.cNy7vnKSkZ34t1odJxHhrFwmyuZiI9mx3BaB62amFdo",
+    "tokenType": "Bearer"
+  }
+}
+
 ### Save Admin token
 @adminToken = {{loginAdmin.response.body.data.accessToken}}
 
@@ -23,42 +82,171 @@ Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
 {
-  "email": "newteacher@example.com",
+  "email": "newstudenfromnewteacher@example.com",
   "password": "Password32!",
-  "name": "New Teacher",
-  "role": "TEACHER",
+  "name": "New Student From New Teacher",
+  "phone": null,
+  "role": "STUDENT",
   "department": "Computer Science"
+}
+
+### Dữ liệu trả về khi thành công của Create new user
+{
+  "id": 736,
+  "email": "newstudent1@example.com",
+  "name": "New Student",
+  "phone": null,
+  "role": "STUDENT",
+  "department": "Computer Science",
+  "isActive": true,
+  "createdById": 550,
+  "createdAt": "2025-04-22T11:12:50.878Z",
+  "updatedAt": "2025-04-22T11:12:50.878Z"
 }
 
 ### Get all users (paginated)
 GET {{baseUrl}}/users?page=1&limit=10&role=TEACHER
 Authorization: Bearer {{adminToken}}
 
+
+### Dữ liệu trả về khi thành công của Get all users
+{
+  "data": [
+    {
+      "id": 555,
+      "email": "huutoan_vuong95@yahoo.com",
+      "name": "Hữu Toàn Vương",
+      "phone": null,
+      "role": "TEACHER",
+      "department": "Wind Instruments Department",
+      "isActive": true,
+      "createdById": 550,
+      "createdAt": "2025-04-22T10:57:28.592Z",
+      "updatedAt": "2025-04-22T10:57:28.592Z"
+    },
+    {
+      "id": 554,
+      "email": "huongbinh.bui@gmail.com",
+      "name": "Hướng Bình Bùi",
+      "phone": null,
+      "role": "TEACHER",
+      "department": "String Instruments Department",
+      "isActive": true,
+      "createdById": 550,
+      "createdAt": "2025-04-22T10:57:28.320Z",
+      "updatedAt": "2025-04-22T10:57:28.320Z"
+    },
+    {
+      "id": 553,
+      "email": "dieuhuong_ha@gmail.com",
+      "name": "Diệu Hương Hà",
+      "phone": null,
+      "role": "TEACHER",
+      "department": "Piano Department",
+      "isActive": true,
+      "createdById": 550,
+      "createdAt": "2025-04-22T10:57:28.047Z",
+      "updatedAt": "2025-04-22T10:57:28.047Z"
+    },
+    {
+      "id": 552,
+      "email": "thuanhoa_hoang28@hotmail.com",
+      "name": "Thuận Hòa Hoàng",
+      "phone": null,
+      "role": "TEACHER",
+      "department": "String Instruments Department",
+      "isActive": true,
+      "createdById": 550,
+      "createdAt": "2025-04-22T10:57:27.775Z",
+      "updatedAt": "2025-04-22T10:57:27.775Z"
+    },
+    {
+      "id": 551,
+      "email": "newteacher@example.com",
+      "name": "New Teacher",
+      "phone": null,
+      "role": "TEACHER",
+      "department": "Music Department",
+      "isActive": true,
+      "createdById": 550,
+      "createdAt": "2025-04-22T10:57:27.227Z",
+      "updatedAt": "2025-04-22T11:11:23.425Z"
+    }
+  ],
+  "meta": {
+    "total": 5,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1
+  }
+}
+
 ### Get user by ID
-GET {{baseUrl}}/users/2
+GET {{baseUrl}}/users/580
 Authorization: Bearer {{adminToken}}
 
+### Dữ liệu trả về khi thành công của Get user by ID
+{
+  "id": 580,
+  "email": "hungcuong_to65@yahoo.com",
+  "name": "Hùng Cường Tô",
+  "phone": null,
+  "role": "STUDENT",
+  "department": "Music Technology",
+  "isActive": true,
+  "createdById": 551,
+  "createdAt": "2025-04-22T10:57:35.567Z",
+  "updatedAt": "2025-04-22T10:57:35.567Z"
+}
+
 ### Update user
-PUT {{baseUrl}}/users/2
+PUT {{baseUrl}}/users/580
 Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
 {
-  "name": "Updated Teacher",
+  "name": "Updated Hùng Cường Tô",
   "department": "Information Technology"
 }
 
+### Dữ liệu trả về khi thành công của Update user
+{
+  "success": true,
+  "data": {
+    "id": 580,
+    "email": "hungcuong_to65@yahoo.com",
+    "name": "Updated Hùng Cường Tô",
+    "phone": null,
+    "role": "STUDENT",
+    "department": "Information Technology",
+    "isActive": true,
+    "createdAt": "2025-04-22T10:57:35.567Z",
+    "updatedAt": "2025-04-22T11:14:44.064Z"
+  }
+}
+
 ### Update user status (active/inactive)
-PUT {{baseUrl}}/users/2/status
+PUT {{baseUrl}}/users/580/status
 Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
 {
-  "isActive": false
+  "isActive": true
+}
+
+{
+  "success": true,
+  "data": {
+    "id": 580,
+    "email": "hungcuong_to65@yahoo.com",
+    "name": "Updated Hùng Cường Tô",
+    "role": "STUDENT",
+    "isActive": true
+  }
 }
 
 ### Update user role (Admin only)
-PUT {{baseUrl}}/users/2/role
+PUT {{baseUrl}}/users/551/role
 Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
@@ -66,18 +254,141 @@ Authorization: Bearer {{adminToken}}
   "role": "TEACHER"
 }
 
+### Dữ liệu trả về khi thành công của Update user role
+{
+  "success": true,
+  "data": {
+    "id": 551,
+    "email": "newteacher@example.com",
+    "name": "New Teacher",
+    "role": "TEACHER",
+    "isActive": true
+  }
+}
+
 ### Delete user (Admin only)
-DELETE {{baseUrl}}/users/2
+DELETE {{baseUrl}}/users/736
 Authorization: Bearer {{adminToken}}
+
+### Dữ liệu trả về khi thành công của Delete user
+{
+  "success": true,
+  "message": "User with ID 736 has been successfully deleted"
+}
 
 ### Get user activity
-GET {{baseUrl}}/users/2/activity?page=1&limit=10
+GET {{baseUrl}}/users/551/activity?page=1&limit=10
 Authorization: Bearer {{adminToken}}
+
+### Dữ liệu trả về khi thành công của Get user activity
+{
+  "success": true,
+  "data": {
+    "id": 551,
+    "email": "newteacher@example.com",
+    "name": "New Teacher",
+    "role": "TEACHER",
+    "isActive": true
+  }
+}
 
 ### Get user room usage
-GET {{baseUrl}}/users/2/room-usage?page=1&limit=10&startDate=2023-01-01&endDate=2023-12-31
+GET {{baseUrl}}/users/551/room-usage?page=1&limit=10
 Authorization: Bearer {{adminToken}}
 
+### Dữ liệu trả về khi thành công của Get user room usage
+{
+  "data": [
+    {
+      "id": 1125,
+      "roomId": 17,
+      "userId": 551,
+      "startTime": "2025-05-01T07:18:34.027Z",
+      "endTime": "2025-05-01T11:18:34.027Z",
+      "purpose": "Class teaching session",
+      "createdAt": "2025-04-22T11:00:29.379Z",
+      "updatedAt": "2025-04-22T11:00:29.379Z",
+      "scheduleId": null,
+      "room": {
+        "id": 17,
+        "name": "Piano Studio B501",
+        "location": null,
+        "capacity": 28,
+        "description": null,
+        "isActive": true,
+        "status": "AVAILABLE",
+        "createdAt": "2025-04-22T10:58:18.789Z",
+        "updatedAt": "2025-04-22T10:58:18.789Z"
+      },
+      "schedule": null,
+      "computerUsages": [
+        {
+          "id": 1577,
+          "computerId": 479,
+          "notes": "Working on transcription assignment",
+          "roomUsageId": 1125,
+          "startTime": "2025-05-01T07:22:34.027Z",
+          "endTime": "2025-05-01T11:10:34.027Z",
+          "createdAt": "2025-04-22T11:02:34.682Z",
+          "updatedAt": "2025-04-22T11:02:34.682Z",
+          "computer": {
+            "id": 479,
+            "name": "PC-17-4",
+            "ipAddress": "192.168.17.13",
+            "macAddress": "0b:26:ee:04:1d:b9",
+            "specs": {
+              "os": "Windows 11 Pro",
+              "gpu": "NVIDIA RTX 3090",
+              "ram": "128GB DDR5",
+              "audio": "RME Babyface Pro FS",
+              "monitor": "34 inch Curved Ultrawide",
+              "storage": "4TB NVMe SSD",
+              "software": [
+                "Cubase Pro",
+                "Reason 12",
+                "Dorico",
+                "Studio One"
+              ],
+              "processor": "Intel Core i9-12900K"
+            },
+            "roomId": 17,
+            "status": "OPERATIONAL",
+            "createdAt": "2025-04-22T10:58:21.276Z",
+            "updatedAt": "2025-04-22T10:58:21.276Z"
+          }
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1
+  }
+}
+
 ### Get students by teacher
-GET {{baseUrl}}/users/teachers/2/students?page=1&limit=10&search=student
+GET {{baseUrl}}/users/teachers/551/students?page=1&limit=10&search=student
 Authorization: Bearer {{adminToken}}
+
+### Dữ liệu trả về khi thành công của Get students by teacher
+{
+  "data": [
+    {
+      "id": 556,
+      "name": "New Student",
+      "email": "newstudent@example.com",
+      "phone": null,
+      "department": "Computer Science",
+      "isActive": true,
+      "createdAt": "2025-04-22T10:57:28.993Z"
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1
+  }
+}

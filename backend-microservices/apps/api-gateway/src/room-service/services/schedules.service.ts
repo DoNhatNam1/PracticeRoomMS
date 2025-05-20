@@ -56,9 +56,11 @@ export class SchedulesService {
     return firstValueFrom(
       this.roomClient.send(SCHEDULES_PATTERNS.UPDATE, {
         id,
-        ...updateScheduleDto,
-        userId: user.sub,
-        userRole: user.role,
+        updateScheduleDto,
+        currentUser: { 
+          sub: user.sub,
+          role: user.role
+        }
       }),
     );
   }
@@ -96,7 +98,7 @@ export class SchedulesService {
   async cancel(id: number, user: any) {
     this.logger.log(`Cancelling schedule ${id}`);
     return firstValueFrom(
-      this.roomClient.send(SCHEDULES_PATTERNS.UPDATE_STATUS, {
+      this.roomClient.send(SCHEDULES_PATTERNS.CANCEL, {
         id,
         status: 'CANCELLED',
         userId: user.sub,

@@ -1,65 +1,68 @@
-import apiClient from './base';
+import { apiRequest } from './base';
 import { 
   User, 
-  UserFilter, 
   CreateUserDto, 
-  UpdateUserDto,
-  StudentsByTeacher
+  UpdateUserDto 
 } from '../types/user-service/users';
-import { 
-  UpdateProfileDto, 
-  ProfileStats,
-  UserProfile 
-} from '../types/user-service/profile';
-import { ApiResponse } from '../types/common/response';
-import { PaginatedResponse } from '../types/common/pagination';
+import { UserActivity } from '../types/user-service/activity'; // Correct import path
+import { ApiResponse, PaginatedResponse } from '../types/common/response';
 
-export const getUsers = async (params: UserFilter = {}): Promise<ApiResponse<PaginatedResponse<User>>> => {
-  const response = await apiClient.get<ApiResponse<PaginatedResponse<User>>>('/users', { params });
-  return response.data;
+/**
+ * Lấy danh sách người dùng với phân trang và bộ lọc
+ */
+export const getUsers = (params: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+} = {}): Promise<ApiResponse<PaginatedResponse<User>>> => {
+  return apiRequest<PaginatedResponse<User>>('GET', '/users', { params });
 };
 
-export const getUser = async (id: number): Promise<ApiResponse<User>> => {
-  const response = await apiClient.get<ApiResponse<User>>(`/users/${id}`);
-  return response.data;
+/**
+ * Lấy thông tin người dùng theo ID
+ */
+export const getUserById = (id: number): Promise<ApiResponse<User>> => {
+  return apiRequest<User>('GET', `/users/${id}`);
 };
 
-export const getStudentsByTeacher = async (teacherId: number): Promise<ApiResponse<PaginatedResponse<User>>> => {
-  const response = await apiClient.get<ApiResponse<PaginatedResponse<User>>>(`/teachers/${teacherId}/students`);
-  return response.data;
+/**
+ * Tạo người dùng mới
+ */
+export const createUser = (userData: CreateUserDto): Promise<ApiResponse<User>> => {
+  return apiRequest<User>('POST', '/users', { data: userData });
 };
 
-export const createUser = async (data: CreateUserDto): Promise<ApiResponse<User>> => {
-  const response = await apiClient.post<ApiResponse<User>>('/users', data);
-  return response.data;
+/**
+ * Cập nhật thông tin người dùng
+ */
+export const updateUser = (id: number, userData: UpdateUserDto): Promise<ApiResponse<User>> => {
+  return apiRequest<User>('PUT', `/users/${id}`, { data: userData });
 };
 
-export const updateUser = async (id: number, data: UpdateUserDto): Promise<ApiResponse<User>> => {
-  const response = await apiClient.patch<ApiResponse<User>>(`/users/${id}`, data);
-  return response.data;
+/**
+ * Xóa người dùng
+ */
+export const deleteUser = (id: number): Promise<ApiResponse<{ message: string }>> => {
+  return apiRequest<{ message: string }>('DELETE', `/users/${id}`);
 };
 
-export const deleteUser = async (id: number): Promise<ApiResponse<{ success: boolean }>> => {
-  const response = await apiClient.delete<ApiResponse<{ success: boolean }>>(`/users/${id}`);
-  return response.data;
+/**
+ * Lấy lịch sử hoạt động của người dùng
+ */
+export const getUserActivity = (
+  id: number, 
+  params: { page?: number; limit?: number }
+): Promise<ApiResponse<PaginatedResponse<UserActivity>>> => {
+  return apiRequest<PaginatedResponse<UserActivity>>('GET', `/users/${id}/activity`, { params });
 };
 
-export const getUserProfile = async (userId: number): Promise<ApiResponse<UserProfile>> => {
-  const response = await apiClient.get<ApiResponse<UserProfile>>(`/users/${userId}/profile`);
-  return response.data;
-};
-
-export const updateUserProfile = async (userId: number, data: UpdateProfileDto): Promise<ApiResponse<UserProfile>> => {
-  const response = await apiClient.patch<ApiResponse<UserProfile>>(`/users/${userId}/profile`, data);
-  return response.data;
-};
-
-export const getUserStats = async (userId: number): Promise<ApiResponse<ProfileStats>> => {
-  const response = await apiClient.get<ApiResponse<ProfileStats>>(`/users/${userId}/stats`);
-  return response.data;
-};
-
-export const assignStudentsToTeacher = async (teacherId: number, studentIds: number[]): Promise<ApiResponse<StudentsByTeacher>> => {
-  const response = await apiClient.post<ApiResponse<StudentsByTeacher>>(`/teachers/${teacherId}/students`, { studentIds });
-  return response.data;
+/**
+ * Lấy danh sách học sinh của giáo viên
+ */
+export const getStudentsByTeacher = (
+  teacherId: number,
+  params: { page?: number; limit?: number; search?: string }
+): Promise<ApiResponse<PaginatedResponse<User>>> => {
+  return apiRequest<PaginatedResponse<User>>('GET', `/users/teachers/${teacherId}/students`, { params });
 };

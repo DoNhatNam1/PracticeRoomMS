@@ -3,11 +3,11 @@ import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { COMPUTER_SERVICE_CLIENT } from '../constant';
 import { 
-  StartComputerUsageDto, 
-  EndComputerUsageDto, 
-  GetComputerUsageDto 
+  GetComputerUsageDto, 
+  CreateComputerUsageDto,
+  DeleteComputerUsageDto
 } from '../dto';
-import { COMPUTER_USAGE_PATTERNS } from '@app/contracts/computer-service';
+import { COMPUTER_USAGE_PATTERNS } from '@app/contracts/computer-service/computer-usage/constants';
 
 @Injectable()
 export class ComputerUsageService {
@@ -17,10 +17,13 @@ export class ComputerUsageService {
     @Inject(COMPUTER_SERVICE_CLIENT) private computerClient: ClientProxy
   ) {}
 
-  async findAll(params: GetComputerUsageDto) {
-    this.logger.log(`Finding all computer usages with params: ${JSON.stringify(params)}`);
+  async findAll(filters: any, user: any) {
+    this.logger.log(`Finding all computer usages with filters: ${JSON.stringify(filters)}`);
     return firstValueFrom(
-      this.computerClient.send(COMPUTER_USAGE_PATTERNS.FIND_ALL, params)
+      this.computerClient.send(COMPUTER_USAGE_PATTERNS.FIND_ALL, {
+        ...filters,
+        _metadata: { user }
+      })
     );
   }
 
@@ -29,45 +32,59 @@ export class ComputerUsageService {
     return firstValueFrom(
       this.computerClient.send(COMPUTER_USAGE_PATTERNS.FIND_ONE, {
         id,
-        userId: user.sub,
-        role: user.role
+        _metadata: { user }
       })
     );
   }
 
-  async startUsage(startUsageDto: StartComputerUsageDto) {
-    this.logger.log(`Starting computer usage: ${JSON.stringify(startUsageDto)}`);
+  async create(createDto: CreateComputerUsageDto, user: any) {
+    this.logger.log(`Creating computer usage: ${JSON.stringify(createDto)}`);
     return firstValueFrom(
-      this.computerClient.send(COMPUTER_USAGE_PATTERNS.START, startUsageDto)
+      this.computerClient.send(COMPUTER_USAGE_PATTERNS.CREATE, {
+        ...createDto,
+        _metadata: { user }
+      })
     );
   }
 
-  async endUsage(id: number, endUsageDto: EndComputerUsageDto) {
-    this.logger.log(`Ending computer usage ${id}: ${JSON.stringify(endUsageDto)}`);
+  async delete(id: number, deleteDto: DeleteComputerUsageDto, user: any) {
+    this.logger.log(`Deleting computer usage ${id}: ${JSON.stringify(deleteDto)}`);
     return firstValueFrom(
-      this.computerClient.send(COMPUTER_USAGE_PATTERNS.END, {
+      this.computerClient.send(COMPUTER_USAGE_PATTERNS.DELETE, {
         id,
-        ...endUsageDto
+        ...deleteDto,
+        _metadata: { user }
       })
     );
   }
 
-  async getComputerUsageHistory(computerId: number, params: GetComputerUsageDto) {
-    this.logger.log(`Getting usage history for computer ${computerId}`);
+  async getComputerUsageHistory(id: number, options: { 
+    page?: number, 
+    limit?: number, 
+    startDate?: string, 
+    endDate?: string 
+  }, user: any) {
+    this.logger.log(`Getting usage history for computer with ID: ${id}`);
+    
     return firstValueFrom(
-      this.computerClient.send(COMPUTER_USAGE_PATTERNS.GET_COMPUTER_HISTORY, {
-        computerId,
-        ...params
+      this.computerClient.send(COMPUTER_USAGE_PATTERNS.GET_HISTORY, {
+        id: +id,
+        page: +(options.page || 1),
+        limit: +(options.limit || 10),
+        startDate: options.startDate,
+        endDate: options.endDate,
+        _metadata: { user }
       })
     );
   }
 
-  async getUserStats(userId: number, params: { startDate?: string; endDate?: string }) {
+  async getUserStats(userId: number, params: { startDate?: string; endDate?: string }, user: any) {
     this.logger.log(`Getting computer usage stats for user ${userId}`);
     return firstValueFrom(
-      this.computerClient.send(COMPUTER_USAGE_PATTERNS.GET_USER_STATS, {
+      this.computerClient.send(COMPUTER_USAGE_PATTERNS.GET_STATS, {
         userId,
-        ...params
+        ...params,
+        _metadata: { user }
       })
     );
   }

@@ -11,5 +11,6 @@ import { PrismaModule } from '@app/prisma/prisma.module';
   ],
   controllers: [ActivityLogComputerController],
   providers: [ActivityLogComputerService],
+  exports: [ActivityLogComputerService],
 })
 export class ActivityLogComputerModule {}

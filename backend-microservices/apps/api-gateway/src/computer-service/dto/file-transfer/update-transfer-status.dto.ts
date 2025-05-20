@@ -1,13 +1,24 @@
-import { IsEnum, IsNumber } from 'class-validator';
-import { TransferStatus } from '@prisma/client';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export enum FileTransferStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  REJECTED = 'REJECTED'
+}
 
 export class UpdateTransferStatusDto {
-  @IsNumber()
-  fileTransferId: number;
+  @IsEnum(FileTransferStatus)
+  status: FileTransferStatus;
 
+  @IsOptional()
   @IsNumber()
-  computerId: number;
+  @Type(() => Number)
+  targetComputerId?: number;
 
-  @IsEnum(TransferStatus)
-  status: TransferStatus;
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }

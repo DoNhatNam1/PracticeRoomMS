@@ -9,8 +9,6 @@ export * from './computers/constants';
 
 // Computer Usage
 export * from './computer-usage/dto/computer-usage.dto';
-export * from './computer-usage/dto/start-usage.dto';
-export * from './computer-usage/dto/end-usage.dto';
 export * from './computer-usage/constants';
 
 // File Transfer

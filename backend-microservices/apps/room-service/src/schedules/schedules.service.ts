@@ -271,133 +271,74 @@ export class SchedulesService {
    * - Input: ID lịch, thông tin người hủy
    * - Output: Lịch phòng đã bị hủy
    */
-  async cancelSchedule(data: {
-    scheduleId: number;
-    userId: number;
-    userRole: Role;
-  }) {
+  async cancelSchedule(data) {
     const { scheduleId, userId, userRole } = data;
     
-    // Tìm lịch cần hủy
-    const schedule = await this.prisma.schedule.findUnique({
-      where: { id: scheduleId },
-      include: { 
-        user: {
-          select: {
-            id: true,
-            name: true,
-            role: true,
-            createdById: true
-          }
-        },
-        room: true
-      }
-    });
-    
-    if (!schedule) {
-      throw new NotFoundException(`Lịch với ID ${scheduleId} không tồn tại`);
-    }
-    
-    // Kiểm tra quyền hủy lịch
-    // - Admin: hủy được tất cả
-    // - Giáo viên: hủy được lịch của mình và sinh viên của họ
-    // - Sinh viên: chỉ hủy được lịch của mình
-    if (userRole === Role.STUDENT && schedule.createdBy !== userId) {
-      throw new ForbiddenException('Sinh viên chỉ được hủy lịch do mình tạo');
-    }
-    
-    if (userRole === Role.TEACHER) {
-      // Nếu không phải lịch của giáo viên đó tạo
-      if (schedule.createdBy !== userId) {
-        // Kiểm tra xem lịch có phải của sinh viên do giáo viên này tạo không
-        if (schedule.user.createdById !== userId) {
-          throw new ForbiddenException(
-            'Giáo viên chỉ được hủy lịch của mình hoặc sinh viên do mình quản lý'
-          );
+    try {
+      // Find existing schedule
+      const schedule = await this.prisma.schedule.findUnique({
+        where: { id: scheduleId }, // Changed from undefined to scheduleId
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              role: true,
+              createdById: true
+            }
+          },
+          room: true
         }
-      }
-    }
-    
-    // Không cho phép hủy lịch đã hoàn thành hoặc đã bị hủy/từ chối
-    if (schedule.status === ScheduleStatus.COMPLETED || 
-        schedule.status === ScheduleStatus.CANCELLED || 
-        schedule.status === ScheduleStatus.REJECTED) {
-      throw new BadRequestException(`Không thể hủy lịch đang ở trạng thái ${schedule.status}`);
-    }
-    
-    // Hủy lịch
-    const cancelledSchedule = await this.prisma.schedule.update({
-      where: { id: scheduleId },
-      data: { status: ScheduleStatus.CANCELLED },
-      include: {
-        room: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true
-          }
-        }
-      }
-    });
-    
-    // Xác định người nhận thông báo (ngoài admin)
-    let visibleToId = null as number | null;
-    
-    if (userRole === Role.ADMIN) {
-      // Nếu admin hủy lịch, thông báo cho người tạo lịch
-      visibleToId = schedule.createdBy;
-    } 
-    else if (userRole === Role.TEACHER && schedule.createdBy !== userId) {
-      // Nếu giáo viên hủy lịch của sinh viên, thông báo cho sinh viên đó
-      visibleToId = schedule.createdBy;
-    }
-    else if (userRole === Role.STUDENT && schedule.user.createdById) {
-      // Nếu sinh viên hủy lịch của mình, thông báo cho giáo viên quản lý
-      visibleToId = schedule.user.createdById;
-    }
-    
-    // Ghi log hoạt động - Sửa signature
-    await this.activityLogRoomService.logActivity(
-      userId,
-      'ROOM_SCHEDULE_CANCELLED',
-      {
-        roomId: schedule.roomId,
-        roomName: schedule.room.name,
-        title: schedule.title,
-        startTime: schedule.startTime,
-        endTime: schedule.endTime,
-        previousStatus: schedule.status,
-        entityType: 'SCHEDULE',  // Chuyển entityType vào details
-        entityId: scheduleId     // Chuyển entityId vào details
-      },
-      visibleToId
-    );
-    
-    // Phát event
-    this.natsClient.emit(SCHEDULES_EVENTS.STATUS_UPDATED, {
-      scheduleId,
-      roomId: schedule.roomId,
-      userId,
-      previousStatus: schedule.status,
-      status: ScheduleStatus.CANCELLED,
-      schedule: {
-        title: schedule.title,
-        startTime: schedule.startTime,
-        endTime: schedule.endTime
-      }
-    });
-    
-    // Phát event giải phóng phòng nếu lịch đang được duyệt
-    if (schedule.status === ScheduleStatus.APPROVED) {
-      this.natsClient.emit(SCHEDULES_EVENTS.ROOM_RELEASED, {
-        roomId: schedule.roomId,
-        scheduleId
       });
+      
+      // Check if schedule exists
+      if (!schedule) {
+        return {
+          success: false,
+          message: 'Schedule not found',
+          statusCode: 404
+        };
+      }
+      
+      // Check permissions - only creator or admin can cancel/delete
+      if (userRole !== 'ADMIN' && schedule.createdBy !== userId) {
+        return {
+          success: false,
+          message: 'You do not have permission to cancel this schedule',
+          statusCode: 403
+        };
+      }
+      
+      // Delete the schedule
+      await this.prisma.schedule.delete({
+        where: { id: scheduleId }
+      });
+      
+      // Log activity
+      await this.activityLogRoomService.logActivity(
+        userId,
+        'ROOM_SCHEDULE_CANCELLED',
+        {
+          entityType: 'SCHEDULE',
+          entityId: scheduleId,
+          roomId: schedule.roomId,
+          roomName: schedule.room.name
+        },
+        null
+      );
+      
+      return {
+        success: true,
+        message: 'Schedule cancelled successfully'
+      };
+    } catch (error) {
+      this.logger.error(`Error cancelling schedule ${scheduleId}: ${error.message}`);
+      return {
+        success: false,
+        message: 'Failed to cancel schedule',
+        error: error.message
+      };
     }
-    
-    return cancelledSchedule;
   }
   
   /**
@@ -467,5 +408,249 @@ export class SchedulesService {
     });
     
     return conflicts;
+  }
+
+  async findAll(page = 1, limit = 10, currentUser: any) {
+    try {
+      const skip = (page - 1) * limit;
+      
+      // Apply filters based on user roles
+      const filter = this.getPermissionFilter(currentUser);
+      
+      const [schedules, total] = await Promise.all([
+        this.prisma.schedule.findMany({
+          where: filter,
+          skip,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            room: {
+              select: {
+                id: true,
+                name: true,
+                location: true,
+                capacity: true
+              }
+            },
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true
+              }
+            }
+          }
+        }),
+        this.prisma.schedule.count({ where: filter })
+      ]);
+      
+      return {
+        success: true,
+        message: 'Schedules retrieved successfully',
+        data: schedules,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit)
+        }
+      };
+    } catch (error) {
+      this.logger.error(`Error finding all schedules: ${error.message}`);
+      return {
+        success: false,
+        message: 'Failed to retrieve schedules',
+        error: error.message
+      };
+    }
+  }
+
+  async findOne(id: number, currentUser: any) {
+    try {
+      // Apply permission filter
+      const filter = this.getPermissionFilter(currentUser);
+      
+      const schedule = await this.prisma.schedule.findFirst({
+        where: {
+          id,
+          ...filter
+        },
+        include: {
+          room: true,
+          user: {              // Changed from creator to user
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true
+            }
+          }
+        }
+      });
+      
+      if (!schedule) {
+        return {
+          success: false,
+          message: 'Schedule not found',
+          statusCode: 404
+        };
+      }
+      
+      return {
+        success: true,
+        message: 'Schedule found',
+        data: schedule
+      };
+    } catch (error) {
+      this.logger.error(`Error finding schedule ${id}: ${error.message}`);
+      return {
+        success: false,
+        message: 'Failed to retrieve schedule',
+        error: error.message
+      };
+    }
+  }
+
+  async update(id: number, updateScheduleDto: any, currentUser: any) {
+    try {
+      // Add safety check for missing currentUser
+      if (!currentUser) {
+        return {
+          success: false,
+          message: 'Authentication required',
+          statusCode: 401
+        };
+      }
+
+      // Find existing schedule with all required fields
+      const existingSchedule = await this.prisma.schedule.findUnique({
+        where: { id },
+        include: { 
+          room: true,
+          // Include more relations if needed
+        }
+      });
+
+      // Check if schedule exists
+      if (!existingSchedule) {
+        return {
+          success: false,
+          message: 'Schedule not found',
+          statusCode: 404
+        };
+      }
+
+      // Check permissions - only creator or admin can update
+      if (currentUser.role !== 'ADMIN' && existingSchedule.createdBy !== currentUser.sub) {
+        return {
+          success: false,
+          message: 'You do not have permission to update this schedule',
+          statusCode: 403
+        };
+      }
+
+      // Check if schedule has conflicts if time is being changed
+      if (updateScheduleDto.startTime || updateScheduleDto.endTime) {
+        const startTime = updateScheduleDto.startTime || existingSchedule.startTime;
+        const endTime = updateScheduleDto.endTime || existingSchedule.endTime;
+        
+        const hasConflicts = await this.checkScheduleConflicts({
+          roomId: existingSchedule.roomId,
+          startTime: new Date(startTime),
+          endTime: new Date(endTime),
+          excludeScheduleId: id // Exclude current schedule from conflict check
+        });
+
+        if (hasConflicts.length > 0) {  // Now returns an array of conflicts
+          return {
+            success: false,
+            message: 'The requested time slot conflicts with another schedule',
+            statusCode: 409
+          };
+        }
+      }
+
+      // Update schedule
+      const updatedSchedule = await this.prisma.schedule.update({
+        where: { id },
+        data: {
+          ...updateScheduleDto,
+          updatedAt: new Date()
+        },
+        include: {
+          room: {
+            select: {
+              id: true,
+              name: true,
+              location: true,
+              capacity: true
+            }
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true
+            }
+          }
+        }
+      });
+
+      // Log activity - Fix service name
+      await this.activityLogRoomService.logActivity(  // Change from activityLogService
+        currentUser.sub,
+        'SCHEDULE_UPDATED',
+        {
+          entityType: 'schedule',
+          entityId: id,
+          roomId: existingSchedule.roomId,
+          roomName: existingSchedule.room.name,
+          changes: updateScheduleDto
+        },
+        null
+      );
+
+      return {
+        success: true,
+        message: 'Schedule updated successfully',
+        data: updatedSchedule
+      };
+    } catch (error) {
+      this.logger.error(`Error updating schedule ${id}: ${error.message}`);
+      return {
+        success: false,
+        message: 'Failed to update schedule',
+        error: error.message
+      };
+    }
+  }
+
+  // Helper method to filter schedules based on user role
+  private getPermissionFilter(currentUser: any) {
+    if (!currentUser) {
+      return {};
+    }
+    
+    // Admin can see all schedules
+    if (currentUser.role === 'ADMIN') {
+      return {};
+    }
+    
+    // Teachers can see their own schedules and ones they've approved
+    if (currentUser.role === 'TEACHER') {
+      return {
+        OR: [
+          { createdBy: currentUser.sub },      // Changed from creatorId
+          { approvedBy: currentUser.sub }      // Changed from approvedById
+        ]
+      };
+    }
+    
+    // Students can only see their own schedules
+    return {
+      createdBy: currentUser.sub              // Changed from creatorId
+    };
   }
 }

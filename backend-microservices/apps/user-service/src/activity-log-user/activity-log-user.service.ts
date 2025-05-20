@@ -8,52 +8,46 @@ export class ActivityLogUserService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Ghi nhật ký hoạt động (phiên bản đơn giản)
-   * @param action Loại hành động 
+   * Ghi nhật ký hoạt động
+   * @param userId ID người thực hiện hành động (có thể null nếu không có người dùng)
+   * @param action Loại hành động
    * @param details Chi tiết (có thể chứa bất kỳ thông tin nào trong JSON)
+   * @param visibleToId ID người có thể xem hành động này
    */
-  async logActivity(action: string, ...args: any[]) {
+  async logActivity(
+    userId: number | null,
+    action: string,
+    details: any,
+    visibleToId: number | null = null,
+  ) {
     try {
-      // Kiểm tra số lượng tham số để xác định phiên bản nào được gọi
-      if (args.length <= 1) {
-        // Phiên bản mới (action, details?)
-        const details = args[0] || {};
-        this.logger.log(`Ghi nhật ký hoạt động (mới): ${action}`);
-        
-        await this.prisma.activity.create({
-          data: {
-            action,
-            details
-          }
-        });
-      } else {
-        // Phiên bản cũ (userId, action, entityType, entityId, additionalInfo?)
-        const [userId, entityAction, entityType, entityId, additionalInfo] = args;
-        this.logger.log(`Ghi nhật ký hoạt động (cũ): ${entityAction} - ${entityType} #${entityId}`);
-        
-        // Chuyển đổi sang cấu trúc mới
-        const details = {
-          userId,
-          entityType,
-          entityId,
-          ...additionalInfo
-        };
-        
-        await this.prisma.activity.create({
-          data: {
-            action: entityAction,
-            details
-          }
-        });
-      }
-      
-      return { success: true };
-    } catch (error) {
-      this.logger.error(`Lỗi khi ghi nhật ký hoạt động: ${error.message}`);
-      return { 
-        success: false, 
-        error: error.message 
+      const activityData: any = {
+        action,
+        details,
+        createdAt: new Date(),
       };
+
+      // Set actor ID directly if provided
+      if (userId !== null) {
+        activityData.actorId = userId;
+      }
+
+      // Set visibleTo ID directly if provided
+      if (visibleToId !== null) {
+        activityData.visibleToId = visibleToId;
+      }
+
+      // Log the data we're sending for debugging
+      this.logger.debug(
+        `Creating activity log: ${JSON.stringify(activityData)}`,
+      );
+
+      return this.prisma.activity.create({
+        data: activityData,
+      });
+    } catch (error) {
+      this.logger.error(`Error logging activity: ${error.message}`);
+      return { success: false, error: error.message };
     }
   }
 
@@ -65,28 +59,33 @@ export class ActivityLogUserService {
    * @param filters Bộ lọc
    */
   async getUserActivity(
-    userId: number, 
-    page = 1, 
-    limit = 10, 
-    filters: { action?: string } = {}
+    userId: number,
+    page = 1,
+    limit = 10,
+    filters: { action?: string } = {},
   ) {
     const skip = (page - 1) * limit;
 
     try {
-      // Tạo điều kiện truy vấn - tìm kiếm userId trong trường details
+      // Search for activities where the user is either the actor OR mentioned in details
       const where = {
         AND: [
           {
-            details: {
-              path: ['userId'],
-              equals: userId
-            }
+            OR: [
+              { actorId: userId }, // Check actorId field
+              {
+                details: {
+                  path: ['userId'],
+                  equals: userId,
+                },
+              },
+            ],
           },
-          ...(filters.action ? [{ action: filters.action }] : [])
-        ]
+          ...(filters.action ? [{ action: filters.action }] : []),
+        ],
       };
 
-      // Thực hiện truy vấn
+      // Execute query
       const [activities, totalActivities] = await Promise.all([
         this.prisma.activity.findMany({
           where,
@@ -123,7 +122,7 @@ export class ActivityLogUserService {
     userId: number,
     page = 1,
     limit = 10,
-    dateRange?: { startDate?: Date; endDate?: Date }
+    dateRange?: { startDate?: Date; endDate?: Date },
   ) {
     const skip = (page - 1) * limit;
 
@@ -160,10 +159,9 @@ export class ActivityLogUserService {
       ]);
 
       // Ghi log hoạt động
-      await this.logActivity('ROOM_USAGE_HISTORY_VIEWED', {
-        userId,
+      await this.logActivity(userId, 'ROOM_USAGE_HISTORY_VIEWED', {
         count: roomUsages.length,
-        dateRange
+        dateRange,
       });
 
       return {
@@ -182,7 +180,7 @@ export class ActivityLogUserService {
   }
 
   /**
-   * Lấy lịch sử sử dụng phòng trong khoảng thời gian 
+   * Lấy lịch sử sử dụng phòng trong khoảng thời gian
    * @param startDate Ngày bắt đầu
    * @param endDate Ngày kết thúc
    * @param page Trang
@@ -192,14 +190,14 @@ export class ActivityLogUserService {
     startDate: Date,
     endDate: Date,
     page = 1,
-    limit = 10
+    limit = 10,
   ) {
     const skip = (page - 1) * limit;
 
     try {
       const where = {
         startTime: { gte: startDate },
-        ...(endDate && { endTime: { lte: endDate } })
+        ...(endDate && { endTime: { lte: endDate } }),
       };
 
       const [roomUsages, totalRoomUsages] = await Promise.all([
@@ -227,9 +225,8 @@ export class ActivityLogUserService {
         return total + (usage.endTime.getTime() - usage.startTime.getTime());
       }, 0);
 
-      const averageUsageTime = roomUsages.length > 0 
-        ? totalUsageTime / roomUsages.length 
-        : 0;
+      const averageUsageTime =
+        roomUsages.length > 0 ? totalUsageTime / roomUsages.length : 0;
 
       return {
         data: roomUsages,
@@ -244,8 +241,8 @@ export class ActivityLogUserService {
           totalUsageTimeMs: totalUsageTime,
           averageUsageTimeMs: averageUsageTime,
           startDate,
-          endDate
-        }
+          endDate,
+        },
       };
     } catch (error) {
       this.logger.error(`Lỗi khi lấy thống kê sử dụng phòng: ${error.message}`);

@@ -23,6 +23,7 @@ interface UserContext {
 @Injectable()
 export class ActivityLogComputerService {
   private readonly logger = new Logger(ActivityLogComputerService.name);
+  private context: any = null;
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -75,77 +76,107 @@ export class ActivityLogComputerService {
   /**
    * Lấy lịch sử hoạt động của một máy tính
    */
-  async getComputerActivityHistory(
-    computerId: number,
-    currentUser: UserContext,
-    options?: PaginationOptions
-  ) {
-    const { page = 1, limit = 10, startDate, endDate } = options || {};
-    const skip = (page - 1) * limit;
-    
-    // Tạo điều kiện tìm kiếm dựa trên computerId trong details
-    const computerFilter = {
-      OR: [
-        // Đối với hoạt động được ghi với entityType = COMPUTER
-        {
-          AND: [
-            { details: { path: ['entityType'], equals: 'COMPUTER' } },
-            { details: { path: ['entityId'], equals: computerId } }
-          ]
-        },
-        // Đối với hoạt động khác có chứa computerId trong details
-        { details: { path: ['computerId'], equals: computerId } }
-      ]
-    };
-    
-    // Điều kiện lọc theo thời gian
-    const timeFilter = {};
-    if (startDate || endDate) {
-      timeFilter['createdAt'] = {};
-      if (startDate) timeFilter['createdAt']['gte'] = startDate;
-      if (endDate) timeFilter['createdAt']['lte'] = endDate;
-    }
-    
-    // Điều kiện phân quyền xem dựa trên vai trò người dùng
-    const permissionFilter = this.getPermissionFilter(currentUser);
-    
-    // Kết hợp tất cả điều kiện
-    const whereCondition = {
-      ...computerFilter,
-      ...timeFilter,
-      ...permissionFilter
-    };
-    
-    // Truy vấn dữ liệu và đếm tổng
-    const [activities, total] = await Promise.all([
-      this.prisma.activity.findMany({
-        where: whereCondition,
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
-        include: {
-          actor: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              role: true
+  async getComputerActivityHistory(id: number, options: { 
+    page: number; 
+    limit: number; 
+    startDate?: string; 
+    endDate?: string;
+  }) {
+    try {
+      // Ensure id is valid
+      if (!id || isNaN(+id)) {
+        return {
+          success: false,
+          message: 'Invalid computer ID',
+          statusCode: 400
+        };
+      }
+
+      const computerId = +id; // Ensure it's a number
+      const { page, limit, startDate, endDate } = options;
+      
+      // Validate computer exists - Fix the undefined ID issue
+      const computer = await this.prisma.computer.findUnique({
+        where: { id: computerId } // Ensure id is explicitly passed as a number
+      });
+      
+      if (!computer) {
+        return {
+          success: false,
+          message: 'Computer not found',
+          statusCode: 404
+        };
+      }
+      
+      // Build the where condition - must fix entityType to match your data
+      const where: any = {
+        OR: [
+          { 
+            AND: [
+              { details: { path: ['entityType'], equals: 'COMPUTER' } },
+              { details: { path: ['entityId'], equals: computerId } }
+            ]
+          },
+          {
+            AND: [
+              { details: { path: ['computerId'], equals: computerId } }
+            ]
+          }
+        ]
+      };
+      
+      // Add date filters if provided
+      if (startDate || endDate) {
+        where.createdAt = {};
+        if (startDate) where.createdAt.gte = new Date(startDate);
+        if (endDate) where.createdAt.lte = new Date(endDate);
+      }
+      
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+      
+      // Query activities with pagination
+      const [activities, total] = await Promise.all([
+        this.prisma.activity.findMany({
+          where,
+          skip,
+          take: +limit,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            actor: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true
+              }
             }
           }
+        }),
+        this.prisma.activity.count({ where })
+      ]);
+      
+      return {
+        success: true,
+        message: 'Computer activity history retrieved successfully',
+        data: {
+          activities,
+          meta: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit)
+          }
         }
-      }),
-      this.prisma.activity.count({ where: whereCondition })
-    ]);
-    
-    return {
-      data: activities,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+      };
+    } catch (error) {
+      this.logger.error(`Error retrieving activity for computer ${id}: ${error.message}`);
+      return {
+        success: false,
+        message: 'Failed to retrieve activity history',
+        error: error.message
+      };
+    }
   }
   
   /**
@@ -443,5 +474,13 @@ export class ActivityLogComputerService {
         endDate: endDate || now
       }
     };
+  }
+
+  /**
+   * Set context for the service
+   */
+  setContext(context: any) {
+    this.context = context;
+    this.logger.log('Activity log service context set');
   }
 }

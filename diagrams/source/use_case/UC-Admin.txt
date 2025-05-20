@@ -1,0 +1,49 @@
++------------------+-----------------------------------------------------------------------+
+| Mã Use Case      | UC-Admin                                                              |
++------------------+-----------------------------------------------------------------------+
+| Tên Use Case     | Quản lý Hệ thống Phòng Thực hành                                      |
++------------------+-----------------------------------------------------------------------+
+| Mô tả            | Use Case này mô tả các chức năng quản trị hệ thống của Admin, bao gồm |
+|                  | quản lý tài khoản người dùng, phòng thực hành, máy tính, báo cáo và   |
+|                  | cấu hình hệ thống                                                     |
++------------------+-----------------------------------------------------------------------+
+| Tác nhân         | Admin                                                                 |
++------------------+-----------------------------------------------------------------------+
+| Điều kiện        | Admin đã đăng nhập vào hệ thống với quyền quản trị                    |
+| tiên quyết       |                                                                       |
++------------------+-----------------------------------------------------------------------+
+| Điều kiện        | Thành công: Thực hiện thành công các thao tác quản trị hệ thống       |
+| kết thúc         | Thất bại: Hiển thị thông báo lỗi phù hợp                              |
++------------------+-----------------------------------------------------------------------+
+| Luồng sự kiện    |     | Admin                              | Hệ thống                   |
+| chính            | 1   | Đăng nhập vào hệ thống             |                            |
+|                  | 2   |                                    | Xác thực thành công và hiển|
+|                  |     |                                    | thị dashboard              |
+|                  | 3   | Chọn chức năng quản trị (Quản lý   |                            |
+|                  |     | tài khoản, Quản lý phòng/máy tính, |                            |
+|                  |     | Xem báo cáo, Quản lý hệ thống)     |                            |
+|                  | 4   |                                    | Hiển thị giao diện tương   |
+|                  |     |                                    | ứng với chức năng đã chọn  |
+|                  | 5   | Thực hiện thao tác quản trị cụ thể |                            |
+|                  | 6   |                                    | Xử lý yêu cầu và cập nhật  |
+|                  |     |                                    | hệ thống                   |
+|                  | 7   |                                    | Hiển thị thông báo kết quả |
+|                  | 8   | Tiếp tục sử dụng hệ thống hoặc     |                            |
+|                  |     | đăng xuất                          |                            |
++------------------+-----------------------------------------------------------------------+
+| Luồng sự kiện    |     | Admin                              | Hệ thống                   |
+| ngoại lệ         | 1.1 | Nhập thông tin đăng nhập không     |                            |
+|                  |     | chính xác                          |                            |
+|                  | 1.2 |                                    | Hiển thị thông báo lỗi và  |
+|                  |     |                                    | yêu cầu đăng nhập lại      |
+|                  | 3.1 | Chọn chức năng không được phân     |                            |
+|                  |     | quyền                              |                            |
+|                  | 3.2 |                                    | Hiển thị thông báo từ chối |
+|                  |     |                                    | truy cập                   |
+|                  | 5.1 | Nhập dữ liệu không hợp lệ          |                            |
+|                  | 5.2 |                                    | Hiển thị thông báo lỗi và  |
+|                  |     |                                    | yêu cầu nhập lại           |
+|                  | 6.1 |                                    | Gặp lỗi khi xử lý yêu cầu  |
+|                  | 6.2 |                                    | Hiển thị thông báo lỗi và  |
+|                  |     |                                    | hướng dẫn khắc phục        |
++------------------+-----------------------------------------------------------------------+

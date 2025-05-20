@@ -3,7 +3,7 @@ import { RoomDto } from '@app/contracts/room-service/rooms/dto/room.dto';
 import { CreateRoomDto } from '@app/contracts/room-service/rooms/dto/create-room.dto';
 import { UpdateRoomDto } from '@app/contracts/room-service/rooms/dto/update-room.dto';
 import { PrismaService } from '@app/prisma/prisma.service';
-import { Prisma, RoomStatus } from '@prisma/client';
+import { ComputerStatus, Prisma, RoomStatus } from '@prisma/client';
 import { UpdateRoomStatusDto } from '@app/contracts/room-service';
 import { ROOMS_EVENTS, ROOMS_PATTERNS } from '@app/contracts/room-service/rooms/constants';
 import { Logger } from '@nestjs/common';
@@ -44,10 +44,7 @@ export class RoomsService {
           capacity: createRoomDto.capacity || 1,
           location: createRoomDto.location || '',
           description: createRoomDto.description || '',
-          // Gán trực tiếp type vì nó là String trong schema
           status: roomStatus,
-          // Loại bỏ facilitiesAvailable vì không có trong schema
-          isActive: true,
         },
       });
       
@@ -194,6 +191,45 @@ export class RoomsService {
     }
     
     return this.transformToRoomDto(room);
+  }
+
+  async findOnePublic(id: number) {
+    try {
+      // Return limited fields for public view
+      const room = await this.prisma.room.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          location: true,
+          capacity: true,
+          status: true,
+          description: true,
+          // Omit sensitive fields: createdById, detailed specs, etc.
+        }
+      });
+      
+      if (!room) {
+        return {
+          success: false,
+          message: 'Room not found',
+          statusCode: 404
+        };
+      }
+      
+      return {
+        success: true,
+        message: 'Room information retrieved',
+        data: room
+      };
+    } catch (error) {
+      this.logger.error(`Error finding public info for room ${id}: ${error.message}`);
+      return {
+        success: false,
+        message: 'Failed to retrieve room information',
+        error: error.message
+      };
+    }
   }
 
   async update(id: number, updateRoomDto: UpdateRoomDto): Promise<RoomDto> {
@@ -383,6 +419,193 @@ export class RoomsService {
       return {
         success: false,
         message: error.message,
+      };
+    }
+  }
+
+  /**
+   * Find all rooms for dashboard view with pagination and detailed info
+   * For admin and teacher roles
+   */
+  async findAllForDashboard(params: {
+    page: number;
+    limit: number;
+    filters?: {
+      status?: string;
+      type?: string;
+      building?: string;
+      search?: string;
+      isActive?: boolean;
+    };
+  }) {
+    try {
+      const { page = 1, limit = 10, filters = {} } = params;
+      const { status, type, building, search, isActive } = filters;
+      const skip = (page - 1) * limit;
+      
+      // Xây dựng query filter
+      const where: Prisma.RoomWhereInput = {};
+      
+      if (status) {
+        where.status = this.mapStatusToEnum(status);
+      }
+      
+      if (building) {
+        where.location = { contains: building };
+      }
+      
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+          { location: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+      
+      if (isActive !== undefined) {
+        where.isActive = isActive;
+      }
+      
+      // Query with pagination
+      const [rooms, total] = await Promise.all([
+        this.prisma.room.findMany({
+          where,
+          skip,
+          take: limit,
+          include: {
+            computers: {
+              select: {
+                id: true,
+                name: true,
+                status: true,
+                specs: true, // Include full specs for admin/teacher
+              }
+            },
+            usages: {
+              where: {
+                endTime: { gt: new Date() }, // Show current and future usages
+              },
+              take: 5,
+              orderBy: { startTime: 'asc' },
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                  }
+                },
+                computerUsages: {
+                  include: {
+                    computer: true,
+                  }
+                }
+              }
+            }
+          },
+          orderBy: {
+            name: 'asc',
+          },
+        }),
+        this.prisma.room.count({ where })
+      ]);
+      
+      // Log activity
+      if (this.context?.userId) {
+        await this.activityLogService.logActivity(
+          this.context.userId,
+          'VIEW_ROOMS_DASHBOARD',
+          {
+            entityType: 'room',
+            entityId: null,
+            filters 
+          }
+        );
+      }
+      
+      return {
+        success: true,
+        data: rooms.map(room => this.transformToRoomDto(room)),
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit)
+        }
+      };
+    } catch (error) {
+      this.logger.error(`Error finding rooms for dashboard: ${error.message}`);
+      return {
+        success: false,
+        message: 'Failed to retrieve rooms',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Find all rooms for client view with limited info
+   * For public display on client side
+   */
+  async findAllForClient({ filters = {} }: { filters?: any }) {
+    try {
+      const { status = 'AVAILABLE', building, isActive = true } = filters;
+      
+      // Build where condition for client view
+      const where: Prisma.RoomWhereInput = {
+        isActive, // Default to active rooms only
+      };
+      
+      if (status) {
+        where.status = this.mapStatusToEnum(status);
+      }
+      
+      if (building) {
+        where.location = { contains: building };
+      }
+      
+      // For client view, include minimal information
+      const rooms = await this.prisma.room.findMany({
+        where,
+        orderBy: { name: 'asc' },
+        select: {
+          id: true,
+          name: true,
+          capacity: true,
+          location: true,
+          status: true,
+          // Include limited description
+          description: true,
+          // Only include public information
+          computers: {
+            select: {
+              id: true,
+              name: true,
+              status: true,
+              // Limited computer specs for client view
+              specs: true
+            },
+            where: {
+              status: { not: ComputerStatus.MAINTENANCE }
+            }
+          }
+        }
+      });
+      
+      // No need to log activity for public view
+      
+      return {
+        success: true,
+        data: rooms
+        // No pagination metadata for client view
+      };
+    } catch (error) {
+      this.logger.error(`Error finding rooms for client view: ${error.message}`);
+      return {
+        success: false,
+        message: 'Failed to retrieve rooms',
+        error: error.message
       };
     }
   }

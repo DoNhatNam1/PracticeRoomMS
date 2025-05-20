@@ -1,37 +1,854 @@
 @baseUrl = http://localhost:3000/api
-@authToken = {{login.response.body.access_token}}
 
 ### Login to get token
-# @name login
+# @name loginAdmin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
   "email": "admin@example.com",
-  "password": "password123"
+  "password": "Password32!"
+}
+
+### Save Admin token
+@adminToken = {{loginAdmin.response.body.data.accessToken}}
+
+### Get all computers (client view - no pagination)
+GET {{baseUrl}}/computers/client-view?roomId=18
+
+### Dữ liệu trả về của get all computers (client view)
+{
+  "success": true,
+  "message": "All computers in the specified room retrieved successfully",
+  "data": {
+    "computers": [
+      {
+        "id": 517,
+        "name": "PC-18-1",
+        "status": "OPERATIONAL",
+        "specs": {
+          "os": "Windows 11 Pro",
+          "gpu": "NVIDIA RTX 3090",
+          "ram": "128GB DDR5",
+          "audio": "RME Babyface Pro FS",
+          "monitor": "34 inch Curved Ultrawide",
+          "storage": "4TB NVMe SSD",
+          "software": [
+            "Cubase Pro",
+            "Reason 12",
+            "Dorico",
+            "Studio One"
+          ],
+          "processor": "Intel Core i9-12900K"
+        },
+        "room": {
+          "id": 18,
+          "name": "Ensemble Room A102"
+        }
+      },
+    ]
+  }
 }
 
 ### Get all computers
-GET {{baseUrl}}/computers?page=1&limit=10&status=OPERATIONAL
-Authorization: Bearer {{authToken}}
+GET {{baseUrl}}/computers/dashboard-view?page=1&limit=1
+Authorization: Bearer {{adminToken}}
+
+### Dữ liệu trả về của get all computers dashboard
+{
+  "success": true,
+  "message": "Computers retrieved successfully",
+  "data": [
+    {
+      "id": 476,
+      "name": "PC-17-1",
+      "ipAddress": "192.168.17.10",
+      "macAddress": "58:cf:a8:b2:38:d6",
+      "specs": {
+        "processor": "Apple M1 Pro",
+        "ram": "32GB Unified",
+        "storage": "1TB SSD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:20.157Z",
+      "updatedAt": "2025-04-22T10:58:20.157Z",
+      "room": {
+      },
+      "usages": [
+      ]
+    }
+  ],
+  "meta": {
+    "total": 162,
+    "page": 1,
+    "limit": 1,
+    "totalPages": 162
+  }
+}
 
 ### Get computer by ID
-GET {{baseUrl}}/computers/1
-Authorization: Bearer {{authToken}}
+GET {{baseUrl}}/computers/477
+Authorization: Bearer {{adminToken}}
+
+### Dữ liệu trả về của get computer by ID
+{
+  "id": 477,
+  "name": "PC-17-2",
+  "ipAddress": "192.168.17.11",
+  "macAddress": "7a:51:62:34:1a:7b",
+  "status": "active",
+  "roomId": 17,
+  "room": {
+    "id": 17,
+    "name": "Piano Studio B501",
+    "location": null,
+    "capacity": 28,
+    "description": null,
+    "isActive": true,
+    "status": "AVAILABLE",
+    "createdAt": "2025-04-22T10:58:18.789Z",
+    "updatedAt": "2025-04-22T10:58:18.789Z"
+  },
+  "specs": {
+    "os": "Windows 10 Pro",
+    "gpu": "NVIDIA RTX 3060",
+    "ram": "32GB DDR4",
+    "audio": "Focusrite Scarlett 2i2",
+    "monitor": "27 inch Dell UltraSharp",
+    "storage": "1TB SSD + 2TB HDD",
+    "software": [
+      "Ableton Live 11",
+      "FL Studio 20",
+      "Sibelius",
+      "ProTools"
+    ],
+    "processor": "Intel Core i7-11700K"
+  }
+}
 
 ### Get computers in a room
-GET {{baseUrl}}/rooms/1/computers
-Authorization: Bearer {{authToken}}
+GET {{baseUrl}}/rooms/18/computers
+Authorization: Bearer {{adminToken}}
+
+###Dữ liệu trả về của get computers in a room
+{
+  "success": true,
+  "message": "Computers retrieved successfully",
+  "data": [
+    {
+      "id": 517,
+      "name": "PC-18-1",
+      "ipAddress": "192.168.18.10",
+      "macAddress": "69:f3:55:46:27:b2",
+      "specs": {
+        "processor": "Intel Core i9-12900K",
+        "ram": "128GB DDR5",
+        "storage": "4TB NVMe SSD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 18,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:31.893Z",
+      "updatedAt": "2025-04-22T10:58:31.893Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null
+      },
+      "usages": [
+        {
+          "id": 1364,
+          "computerId": 517,
+          "notes": "Working on transcription assignment",
+          "roomUsageId": 971,
+          "startTime": "2025-05-08T22:38:01.617Z",
+          "endTime": "2025-05-09T00:27:01.617Z",
+          "createdAt": "2025-04-22T11:01:35.818Z",
+          "updatedAt": "2025-04-22T11:01:35.818Z",
+          "roomUsage": {
+            "id": 971,
+            "roomId": 18,
+            "userId": 634,
+            "startTime": "2025-05-08T22:33:01.617Z",
+            "endTime": "2025-05-09T00:33:01.617Z",
+            "purpose": "Recording session",
+            "createdAt": "2025-04-22T10:59:45.327Z",
+            "updatedAt": "2025-04-22T10:59:45.327Z",
+            "scheduleId": null,
+            "user": {
+              "id": 634,
+              "name": "Tùng Quang Vũ",
+              "email": "tungquang_vu@hotmail.com"
+            }
+          }
+        },
+        {
+          "id": 1210,
+          "computerId": 517,
+          "notes": "Mixing session in Pro Tools",
+          "roomUsageId": 869,
+          "startTime": "2025-04-25T18:00:48.569Z",
+          "endTime": "2025-04-25T19:51:48.569Z",
+          "createdAt": "2025-04-22T11:00:51.616Z",
+          "updatedAt": "2025-04-22T11:00:51.616Z",
+          "roomUsage": {
+            "id": 869,
+            "roomId": 18,
+            "userId": 574,
+            "startTime": "2025-04-25T17:55:48.569Z",
+            "endTime": "2025-04-25T19:55:48.569Z",
+            "purpose": "Performance preparation",
+            "createdAt": "2025-04-22T10:59:16.590Z",
+            "updatedAt": "2025-04-22T10:59:16.590Z",
+            "scheduleId": null,
+            "user": {
+              "id": 574,
+              "name": "Đông Sơn Lâm",
+              "email": "7kongson_lam@yahoo.com"
+            }
+          }
+        },
+        {
+          "id": 1458,
+          "computerId": 517,
+          "notes": "Recording MIDI tracks in Ableton",
+          "roomUsageId": 1032,
+          "startTime": "2025-04-24T08:57:11.563Z",
+          "endTime": "2025-04-24T10:47:11.563Z",
+          "createdAt": "2025-04-22T11:02:01.087Z",
+          "updatedAt": "2025-04-22T11:02:01.087Z",
+          "roomUsage": {
+            "id": 1032,
+            "roomId": 18,
+            "userId": 671,
+            "startTime": "2025-04-24T08:49:11.563Z",
+            "endTime": "2025-04-24T10:49:11.563Z",
+            "purpose": "Recording session",
+            "createdAt": "2025-04-22T11:00:02.687Z",
+            "updatedAt": "2025-04-22T11:00:02.687Z",
+            "scheduleId": null,
+            "user": {
+              "id": 671,
+              "name": "Minh Duyên Lâm",
+              "email": "minhduyen.lam@hotmail.com"
+            }
+          }
+        },
+        {
+          "id": 1548,
+          "computerId": 517,
+          "notes": "Practicing with ear training software",
+          "roomUsageId": 1101,
+          "startTime": "2025-04-13T16:57:15.361Z",
+          "endTime": "2025-04-13T19:40:15.361Z",
+          "createdAt": "2025-04-22T11:02:27.200Z",
+          "updatedAt": "2025-04-22T11:02:27.200Z",
+          "roomUsage": {
+            "id": 1101,
+            "roomId": 18,
+            "userId": 719,
+            "startTime": "2025-04-13T16:47:15.361Z",
+            "endTime": "2025-04-13T19:47:15.361Z",
+            "purpose": "Piano practice session",
+            "createdAt": "2025-04-22T11:00:22.621Z",
+            "updatedAt": "2025-04-22T11:00:22.621Z",
+            "scheduleId": null,
+            "user": {
+              "id": 719,
+              "name": "Thanh Liêm Phạm",
+              "email": "thanhliem.pham@gmail.com"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 526,
+      "name": "PC-18-10",
+      "ipAddress": "192.168.18.19",
+      "macAddress": "e4:9e:ba:9f:72:ff",
+      "specs": {
+        "processor": "Apple M1 Pro",
+        "ram": "32GB Unified",
+        "storage": "1TB SSD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 18,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:34.347Z",
+      "updatedAt": "2025-04-22T10:58:34.347Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null
+      },
+      "usages": []
+    },
+    {
+      "id": 527,
+      "name": "PC-18-11",
+      "ipAddress": "192.168.18.20",
+      "macAddress": "9d:6a:1b:d4:77:ee",
+      "specs": {
+        "processor": "AMD Ryzen 9 5900X",
+        "ram": "64GB DDR4",
+        "storage": "2TB NVMe SSD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 18,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:34.617Z",
+      "updatedAt": "2025-04-22T10:58:34.617Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null
+      },
+      "usages": [
+        {
+          "id": 1300,
+          "computerId": 527,
+          "notes": "Mixing session in Pro Tools",
+          "roomUsageId": 922,
+          "startTime": "2025-04-25T15:23:48.115Z",
+          "endTime": "2025-04-25T16:03:48.115Z",
+          "createdAt": "2025-04-22T11:01:16.670Z",
+          "updatedAt": "2025-04-22T11:01:16.670Z",
+          "roomUsage": {
+            "id": 922,
+            "roomId": 18,
+            "userId": 601,
+            "startTime": "2025-04-25T15:12:48.115Z",
+            "endTime": "2025-04-25T16:12:48.115Z",
+            "purpose": "Ensemble rehearsal",
+            "createdAt": "2025-04-22T10:59:31.749Z",
+            "updatedAt": "2025-04-22T10:59:31.749Z",
+            "scheduleId": null,
+            "user": {
+              "id": 601,
+              "name": "Thảo Trang Trần",
+              "email": "thaotrang_tran73@gmail.com"
+            }
+          }
+        },
+        {
+          "id": 1368,
+          "computerId": 527,
+          "notes": "Virtual piano practice session",
+          "roomUsageId": 976,
+          "startTime": "2025-04-24T06:24:58.562Z",
+          "endTime": "2025-04-24T09:14:58.562Z",
+          "createdAt": "2025-04-22T11:01:36.875Z",
+          "updatedAt": "2025-04-22T11:01:36.875Z",
+          "roomUsage": {
+            "id": 976,
+            "roomId": 18,
+            "userId": 636,
+            "startTime": "2025-04-24T06:20:58.562Z",
+            "endTime": "2025-04-24T09:20:58.562Z",
+            "purpose": "Music theory tutoring",
+            "createdAt": "2025-04-22T10:59:46.682Z",
+            "updatedAt": "2025-04-22T10:59:46.682Z",
+            "scheduleId": null,
+            "user": {
+              "id": 636,
+              "name": "Hữu Thực Đỗ",
+              "email": "huuthuc.7ko@gmail.com"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 528,
+      "name": "PC-18-12",
+      "ipAddress": "192.168.18.21",
+      "macAddress": "20:9c:9a:0c:b6:24",
+      "specs": {
+        "processor": "Intel Core i9-12900K",
+        "ram": "128GB DDR5",
+        "storage": "4TB NVMe SSD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 18,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:34.888Z",
+      "updatedAt": "2025-04-22T10:58:34.888Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null
+      },
+      "usages": []
+    },
+    {
+      "id": 529,
+      "name": "PC-18-13",
+      "ipAddress": "192.168.18.22",
+      "macAddress": "ea:f4:08:75:4b:14",
+      "specs": {
+        "processor": "Apple M1 Pro",
+        "ram": "32GB Unified",
+        "storage": "1TB SSD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 18,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:35.158Z",
+      "updatedAt": "2025-04-22T10:58:35.158Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null
+      },
+      "usages": []
+    },
+    {
+      "id": 530,
+      "name": "PC-18-14",
+      "ipAddress": "192.168.18.23",
+      "macAddress": "92:70:03:29:f8:93",
+      "specs": {
+        "processor": "AMD Ryzen 9 5900X",
+        "ram": "64GB DDR4",
+        "storage": "2TB NVMe SSD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 18,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:35.428Z",
+      "updatedAt": "2025-04-22T10:58:35.428Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null
+      },
+      "usages": [
+        {
+          "id": 1197,
+          "computerId": 530,
+          "notes": "Virtual piano practice session",
+          "roomUsageId": 861,
+          "startTime": "2025-05-15T18:02:16.656Z",
+          "endTime": "2025-05-15T19:53:16.656Z",
+          "createdAt": "2025-04-22T11:00:48.102Z",
+          "updatedAt": "2025-04-22T11:00:48.102Z",
+          "roomUsage": {
+            "id": 861,
+            "roomId": 18,
+            "userId": 569,
+            "startTime": "2025-05-15T18:01:16.656Z",
+            "endTime": "2025-05-15T20:01:16.656Z",
+            "purpose": "Technical ear training",
+            "createdAt": "2025-04-22T10:59:14.413Z",
+            "updatedAt": "2025-04-22T10:59:14.413Z",
+            "scheduleId": null,
+            "user": {
+              "id": 569,
+              "name": "Khắc Triệu Dương",
+              "email": "khactrieu_duong@yahoo.com"
+            }
+          }
+        },
+        {
+          "id": 1191,
+          "computerId": 530,
+          "notes": "Practicing with ear training software",
+          "roomUsageId": 857,
+          "startTime": "2025-05-13T08:51:12.535Z",
+          "endTime": "2025-05-13T11:26:12.535Z",
+          "createdAt": "2025-04-22T11:00:46.480Z",
+          "updatedAt": "2025-04-22T11:00:46.480Z",
+          "roomUsage": {
+            "id": 857,
+            "roomId": 18,
+            "userId": 567,
+            "startTime": "2025-05-13T08:40:12.535Z",
+            "endTime": "2025-05-13T11:40:12.535Z",
+            "purpose": "Music software training",
+            "createdAt": "2025-04-22T10:59:13.307Z",
+            "updatedAt": "2025-04-22T10:59:13.307Z",
+            "scheduleId": null,
+            "user": {
+              "id": 567,
+              "name": "Hồng Thảo Phan",
+              "email": "hongthao_phan@hotmail.com"
+            }
+          }
+        },
+        {
+          "id": 1167,
+          "computerId": 530,
+          "notes": "Mixing session in Pro Tools",
+          "roomUsageId": 838,
+          "startTime": "2025-05-12T15:45:06.273Z",
+          "endTime": "2025-05-12T16:33:06.273Z",
+          "createdAt": "2025-04-22T11:00:38.686Z",
+          "updatedAt": "2025-04-22T11:00:38.686Z",
+          "roomUsage": {
+            "id": 838,
+            "roomId": 18,
+            "userId": 558,
+            "startTime": "2025-05-12T15:33:06.273Z",
+            "endTime": "2025-05-12T16:33:06.273Z",
+            "purpose": "Music software training",
+            "createdAt": "2025-04-22T10:59:07.881Z",
+            "updatedAt": "2025-04-22T10:59:07.881Z",
+            "scheduleId": null,
+            "user": {
+              "id": 558,
+              "name": "Oanh Thơ Ngô",
+              "email": "oanhtho.ngo77@hotmail.com"
+            }
+          }
+        },
+        {
+          "id": 1568,
+          "computerId": 530,
+          "notes": null,
+          "roomUsageId": 1118,
+          "startTime": "2025-04-28T23:24:44.691Z",
+          "endTime": "2025-04-29T01:11:44.691Z",
+          "createdAt": "2025-04-22T11:02:32.374Z",
+          "updatedAt": "2025-04-22T11:02:32.374Z",
+          "roomUsage": {
+            "id": 1118,
+            "roomId": 18,
+            "userId": 730,
+            "startTime": "2025-04-28T23:24:44.691Z",
+            "endTime": "2025-04-29T01:24:44.691Z",
+            "purpose": "Recording session",
+            "createdAt": "2025-04-22T11:00:27.489Z",
+            "updatedAt": "2025-04-22T11:00:27.489Z",
+            "scheduleId": null,
+            "user": {
+              "id": 730,
+              "name": "Gia Linh Lâm",
+              "email": "gialinh.lam95@hotmail.com"
+            }
+          }
+        },
+        {
+          "id": 1315,
+          "computerId": 530,
+          "notes": "Mixing session in Pro Tools",
+          "roomUsageId": 929,
+          "startTime": "2025-04-09T21:32:07.201Z",
+          "endTime": "2025-04-09T22:21:07.201Z",
+          "createdAt": "2025-04-22T11:01:20.733Z",
+          "updatedAt": "2025-04-22T11:01:20.733Z",
+          "roomUsage": {
+            "id": 929,
+            "roomId": 18,
+            "userId": 605,
+            "startTime": "2025-04-09T21:26:07.201Z",
+            "endTime": "2025-04-09T22:26:07.201Z",
+            "purpose": "Technical ear training",
+            "createdAt": "2025-04-22T10:59:33.692Z",
+            "updatedAt": "2025-04-22T10:59:33.692Z",
+            "scheduleId": null,
+            "user": {
+              "id": 605,
+              "name": "Thiên Phương Lý",
+              "email": "thienphuong_ly8@yahoo.com"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 531,
+      "name": "PC-18-15",
+      "ipAddress": "192.168.18.24",
+      "macAddress": "98:ba:16:db:09:cb",
+      "specs": {
+        "processor": "Intel Core i7-11700K",
+        "ram": "32GB DDR4",
+        "storage": "1TB SSD + 2TB HDD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 18,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:35.704Z",
+      "updatedAt": "2025-04-22T10:58:35.704Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null
+      },
+      "usages": [
+        {
+          "id": 1295,
+          "computerId": 531,
+          "notes": null,
+          "roomUsageId": 919,
+          "startTime": "2025-05-15T05:53:13.472Z",
+          "endTime": "2025-05-15T07:31:13.472Z",
+          "createdAt": "2025-04-22T11:01:15.247Z",
+          "updatedAt": "2025-04-22T11:01:15.247Z",
+          "roomUsage": {
+            "id": 919,
+            "roomId": 18,
+            "userId": 600,
+            "startTime": "2025-05-15T05:41:13.472Z",
+            "endTime": "2025-05-15T07:41:13.472Z",
+            "purpose": "Individual instrument practice",
+            "createdAt": "2025-04-22T10:59:30.445Z",
+            "updatedAt": "2025-04-22T10:59:30.445Z",
+            "scheduleId": null,
+            "user": {
+              "id": 600,
+              "name": "Diễm Phúc Lâm",
+              "email": "diemphuc_lam24@gmail.com"
+            }
+          }
+        },
+        {
+          "id": 1436,
+          "computerId": 531,
+          "notes": null,
+          "roomUsageId": 1016,
+          "startTime": "2025-05-01T01:48:49.096Z",
+          "endTime": "2025-05-01T03:39:49.096Z",
+          "createdAt": "2025-04-22T11:01:55.052Z",
+          "updatedAt": "2025-04-22T11:01:55.052Z",
+          "roomUsage": {
+            "id": 1016,
+            "roomId": 18,
+            "userId": 663,
+            "startTime": "2025-05-01T01:41:49.096Z",
+            "endTime": "2025-05-01T03:41:49.096Z",
+            "purpose": "Technical ear training",
+            "createdAt": "2025-04-22T10:59:58.352Z",
+            "updatedAt": "2025-04-22T10:59:58.352Z",
+            "scheduleId": null,
+            "user": {
+              "id": 663,
+              "name": "Gia Hưng Trương",
+              "email": "giahung.truong@yahoo.com"
+            }
+          }
+        },
+        {
+          "id": 1447,
+          "computerId": 531,
+          "notes": null,
+          "roomUsageId": 1026,
+          "startTime": "2025-04-16T21:00:05.207Z",
+          "endTime": "2025-04-16T22:54:05.207Z",
+          "createdAt": "2025-04-22T11:01:57.936Z",
+          "updatedAt": "2025-04-22T11:01:57.936Z",
+          "roomUsage": {
+            "id": 1026,
+            "roomId": 18,
+            "userId": 667,
+            "startTime": "2025-04-16T20:58:05.207Z",
+            "endTime": "2025-04-16T22:58:05.207Z",
+            "purpose": "Composition project work",
+            "createdAt": "2025-04-22T11:00:01.057Z",
+            "updatedAt": "2025-04-22T11:00:01.057Z",
+            "scheduleId": null,
+            "user": {
+              "id": 667,
+              "name": "Thanh Lam Lý",
+              "email": "thanhlam_ly69@yahoo.com"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 532,
+      "name": "PC-18-16",
+      "ipAddress": "192.168.18.25",
+      "macAddress": "f9:d4:32:02:0c:0c",
+      "specs": {
+        "processor": "Intel Core i7-11700K",
+        "ram": "32GB DDR4",
+        "storage": "1TB SSD + 2TB HDD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 18,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:35.974Z",
+      "updatedAt": "2025-04-22T10:58:35.974Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null
+      },
+      "usages": [
+        {
+          "id": 1175,
+          "computerId": 532,
+          "notes": "Mixing session in Pro Tools",
+          "roomUsageId": 845,
+          "startTime": "2025-05-04T06:54:24.470Z",
+          "endTime": "2025-05-04T08:31:24.470Z",
+          "createdAt": "2025-04-22T11:00:40.850Z",
+          "updatedAt": "2025-04-22T11:00:40.850Z",
+          "roomUsage": {
+            "id": 845,
+            "roomId": 18,
+            "userId": 561,
+            "startTime": "2025-05-04T06:40:24.470Z",
+            "endTime": "2025-05-04T08:40:24.470Z",
+            "purpose": "Music theory tutoring",
+            "createdAt": "2025-04-22T10:59:10.051Z",
+            "updatedAt": "2025-04-22T10:59:10.051Z",
+            "scheduleId": null,
+            "user": {
+              "id": 561,
+              "name": "Hoa Tiên Hoàng",
+              "email": "hoatien_hoang72@yahoo.com"
+            }
+          }
+        },
+        {
+          "id": 1302,
+          "computerId": 532,
+          "notes": "Practicing with ear training software",
+          "roomUsageId": 922,
+          "startTime": "2025-04-25T15:17:48.115Z",
+          "endTime": "2025-04-25T16:06:48.115Z",
+          "createdAt": "2025-04-22T11:01:17.210Z",
+          "updatedAt": "2025-04-22T11:01:17.210Z",
+          "roomUsage": {
+            "id": 922,
+            "roomId": 18,
+            "userId": 601,
+            "startTime": "2025-04-25T15:12:48.115Z",
+            "endTime": "2025-04-25T16:12:48.115Z",
+            "purpose": "Ensemble rehearsal",
+            "createdAt": "2025-04-22T10:59:31.749Z",
+            "updatedAt": "2025-04-22T10:59:31.749Z",
+            "scheduleId": null,
+            "user": {
+              "id": 601,
+              "name": "Thảo Trang Trần",
+              "email": "thaotrang_tran73@gmail.com"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 533,
+      "name": "PC-18-17",
+      "ipAddress": "192.168.18.26",
+      "macAddress": "29:89:1f:f1:b8:97",
+      "specs": {
+        "processor": "AMD Ryzen 9 5900X",
+        "ram": "64GB DDR4",
+        "storage": "2TB NVMe SSD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 18,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:36.247Z",
+      "updatedAt": "2025-04-22T10:58:36.247Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null
+      },
+      "usages": [
+        {
+          "id": 1547,
+          "computerId": 533,
+          "notes": "Mixing session in Pro Tools",
+          "roomUsageId": 1101,
+          "startTime": "2025-04-13T17:00:15.361Z",
+          "endTime": "2025-04-13T19:47:15.361Z",
+          "createdAt": "2025-04-22T11:02:26.944Z",
+          "updatedAt": "2025-04-22T11:02:26.944Z",
+          "roomUsage": {
+            "id": 1101,
+            "roomId": 18,
+            "userId": 719,
+            "startTime": "2025-04-13T16:47:15.361Z",
+            "endTime": "2025-04-13T19:47:15.361Z",
+            "purpose": "Piano practice session",
+            "createdAt": "2025-04-22T11:00:22.621Z",
+            "updatedAt": "2025-04-22T11:00:22.621Z",
+            "scheduleId": null,
+            "user": {
+              "id": 719,
+              "name": "Thanh Liêm Phạm",
+              "email": "thanhliem.pham@gmail.com"
+            }
+          }
+        },
+        {
+          "id": 1259,
+          "computerId": 533,
+          "notes": "Mixing session in Pro Tools",
+          "roomUsageId": 902,
+          "startTime": "2025-04-07T23:05:22.707Z",
+          "endTime": "2025-04-08T00:43:22.707Z",
+          "createdAt": "2025-04-22T11:01:05.141Z",
+          "updatedAt": "2025-04-22T11:01:05.141Z",
+          "roomUsage": {
+            "id": 902,
+            "roomId": 18,
+            "userId": 591,
+            "startTime": "2025-04-07T22:57:22.707Z",
+            "endTime": "2025-04-08T00:57:22.707Z",
+            "purpose": "Ensemble rehearsal",
+            "createdAt": "2025-04-22T10:59:25.843Z",
+            "updatedAt": "2025-04-22T10:59:25.843Z",
+            "scheduleId": null,
+            "user": {
+              "id": 591,
+              "name": "Phú Hiệp Vũ",
+              "email": "phuhiep_vu@yahoo.com"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 534,
+      "name": "PC-18-18",
+      "ipAddress": "192.168.18.27",
+      "macAddress": "90:11:87:85:23:bf",
+      "specs": {
+        "processor": "Intel Core i9-12900K",
+        "ram": "128GB DDR5",
+        "storage": "4TB NVMe SSD",
+        "operatingSystem": "Unknown"
+      },
+      "roomId": 18,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:36.533Z",
+      "updatedAt": "2025-04-22T10:58:36.533Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null
+      },
+      "usages": []
+    }
+  ],
+  "meta": {
+    "total": 41,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 5
+  }
+}
 
 ### Create new computer (Admin or Teacher)
 POST {{baseUrl}}/computers
 Content-Type: application/json
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{adminToken}}
 
 {
-  "name": "PC-101",
-  "roomId": 1,
-  "ipAddress": "192.168.1.101",
+  "name": "PC-102Testing",
+  "roomId": 18,
+  "ipAddress": "192.168.1.102",
   "macAddress": "AA:BB:CC:DD:EE:FF",
   "status": "OPERATIONAL",
   "specs": {
@@ -41,115 +858,319 @@ Authorization: Bearer {{authToken}}
   }
 }
 
+### Dữ liệu trả về khi tạo thành công
+{
+  "success": true,
+  "message": "Computer created successfully",
+  "data": {
+    "id": 638,
+    "name": "PC-102Testing",
+    "ipAddress": "192.168.1.102",
+    "macAddress": "AA:BB:CC:DD:EE:FF",
+    "specs": {
+      "ram": "16GB",
+      "storage": "512GB SSD",
+      "processor": "Intel i7"
+    },
+    "roomId": 18,
+    "status": "IN_USE",
+    "createdAt": "2025-04-22T16:49:48.023Z",
+    "updatedAt": "2025-04-22T16:49:48.023Z",
+    "room": {
+      "id": 18,
+      "name": "Ensemble Room A102",
+      "location": null,
+      "capacity": 48,
+      "description": null,
+      "isActive": true,
+      "status": "AVAILABLE",
+      "createdAt": "2025-04-22T10:58:19.339Z",
+      "updatedAt": "2025-04-22T10:58:19.339Z"
+    }
+  }
+}
+
 ### Update computer (Admin or Teacher)
-PUT {{baseUrl}}/computers/1
+PUT {{baseUrl}}/computers/638
 Content-Type: application/json
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{adminToken}}
 
 {
   "name": "PC-101-Updated",
   "ipAddress": "192.168.1.102",
   "specs": {
     "processor": "Intel i7",
-    "ram": "32GB",
+    "ram": "35GB",
     "storage": "1TB SSD"
   }
 }
 
+### Dữ liệu trả về khi cập nhật thành công
+{
+  "success": true,
+  "message": "Computer updated successfully",
+  "data": {
+    "id": 638,
+    "name": "PC-101-Updated",
+    "ipAddress": "192.168.1.102",
+    "macAddress": "AA:BB:CC:DD:EE:FF",
+    "specs": {
+      "ram": "35GB",
+      "storage": "1TB SSD",
+      "processor": "Intel i7"
+    },
+    "roomId": 18,
+    "status": "IN_USE",
+    "createdAt": "2025-04-22T16:49:48.023Z",
+    "updatedAt": "2025-04-22T16:50:53.562Z",
+    "room": {
+      "id": 18,
+      "name": "Ensemble Room A102",
+      "location": null,
+      "capacity": 48,
+      "description": null,
+      "isActive": true,
+      "status": "AVAILABLE",
+      "createdAt": "2025-04-22T10:58:19.339Z",
+      "updatedAt": "2025-04-22T10:58:19.339Z"
+    }
+  }
+}
+
 ### Update computer status (Admin or Teacher)
-PUT {{baseUrl}}/computers/1/status
+PUT {{baseUrl}}/computers/638/status
 Content-Type: application/json
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{adminToken}}
 
 {
-  "status": "MAINTENANCE"
+  "status": "OPERATIONAL"
 }
+
+### Dữ liệu trả về khi cập nhật trạng thái thành công
+{"success":true,"message":"Computer status updated successfully","data":{"id":638,"name":"PC-101-Updated","ipAddress":"192.168.1.102","macAddress":"AA:BB:CC:DD:EE:FF","specs":{"ram":"35GB","storage":"1TB SSD","processor":"Intel i7"},"roomId":18,"status":"OFFLINE","createdAt":"2025-04-22T16:49:48.023Z","updatedAt":"2025-04-22T16:51:28.885Z"}}
 
 ### Delete computer (Admin only)
-DELETE {{baseUrl}}/computers/2
-Authorization: Bearer {{authToken}}
+DELETE {{baseUrl}}/computers/639
+Authorization: Bearer {{adminToken}}
+
+### Dữ liệu trả về khi xóa thành công
+{"success":true,"message":"Computer deleted successfully"}
 
 ### Get computer activity history
-GET {{baseUrl}}/computers/1/activity-history?page=1&limit=10
-Authorization: Bearer {{authToken}}
+GET {{baseUrl}}/computers/638/activity-history?page=1&limit=10
+Authorization: Bearer {{adminToken}}
 
-### Get computer usage history
-GET {{baseUrl}}/computers/1/usage-history?page=1&limit=10&startDate=2023-01-01&endDate=2023-12-31
-Authorization: Bearer {{authToken}}
+### Dữ liệu trả về khi lấy lịch sử hoạt động thành công
+{"success":true,"message":"Computer activity history retrieved successfully","data":{"activities":[{"id":278,"action":"UPDATE_STATUS","details":{"service":"computer-service","entityId":638,"newStatus":"OFFLINE","oldStatus":"IN_USE","timestamp":"2025-04-22T16:51:29.434Z","computerId":638,"entityType":"COMPUTER"},"createdAt":"2025-04-22T16:51:29.435Z","actorId":550,"visibleToId":null,"actor":{"id":550,"name":"System Administrator","email":"admin@example.com","role":"ADMIN"}},{"id":277,"action":"UPDATE_COMPUTER","details":{"changes":{"name":"PC-101-Updated","specs":{"ram":"35GB","storage":"1TB SSD","processor":"Intel i7"},"ipAddress":"192.168.1.102"},"service":"computer-service","entityId":638,"timestamp":"2025-04-22T16:50:54.921Z","computerId":638,"entityType":"COMPUTER"},"createdAt":"2025-04-22T16:50:54.923Z","actorId":550,"visibleToId":null,"actor":{"id":550,"name":"System Administrator","email":"admin@example.com","role":"ADMIN"}},{"id":276,"action":"UPDATE_COMPUTER","details":{"changes":{"name":"PC-101-Updated","specs":{"ram":"35GB","storage":"1TB SSD","processor":"Intel i7"},"ipAddress":"192.168.1.102"},"service":"computer-service","entityId":638,"timestamp":"2025-04-22T16:50:42.853Z","computerId":638,"entityType":"COMPUTER"},"createdAt":"2025-04-22T16:50:42.855Z","actorId":550,"visibleToId":null,"actor":{"id":550,"name":"System Administrator","email":"admin@example.com","role":"ADMIN"}},{"id":275,"action":"CREATE_COMPUTER","details":{"roomId":18,"service":"computer-service","entityId":638,"timestamp":"2025-04-22T16:49:50.215Z","computerId":638,"entityType":"COMPUTER","computerName":"PC-102Testing"},"createdAt":"2025-04-22T16:49:50.218Z","actorId":null,"visibleToId":null,"actor":null}],"meta":{"page":1,"limit":10,"total":4,"totalPages":1}}}
 
-### Start computer usage
+### Create computer usage
 POST {{baseUrl}}/computer-usages
 Content-Type: application/json
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{adminToken}}
 
 {
-  "computerId": 1,
-  "notes": "Programming class usage"
+  "computerId": 638,
+  "notes": "Testing computer usage for deletion"
 }
 
-### End computer usage
-PUT {{baseUrl}}/computer-usages/1/end
-Content-Type: application/json
-Authorization: Bearer {{authToken}}
-
+### Dữ liệu trả về nếu đang trong trạng thái offline
 {
-  "notes": "Class completed successfully"
+  "success": false,
+  "message": "Computer is currently offline, not available for use",
+  "statusCode": 400
 }
+
+### Dữ liệu trả về khi thành công
+{
+  "success": true,
+  "message": "Computer usage created successfully",
+  "data": {
+    "id": 1580,
+    "computerId": 638,
+    "notes": "Testing computer usage for deletion",
+    "roomUsageId": 1134,
+    "startTime": "2025-04-22T16:55:59.975Z",
+    "endTime": null,
+    "createdAt": "2025-04-22T16:55:59.976Z",
+    "updatedAt": "2025-04-22T16:55:59.976Z"
+  }
+}
+
 
 ### Get all computer usages (Admin or Teacher)
 GET {{baseUrl}}/computer-usages?page=1&limit=10
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{adminToken}}
+
+### Dữ liệu trả về khi thành công
+{"success":true,"message":"Computer usages retrieved successfully","data":{"usages":[{"id":1381,"computerId":605,"notes":"Virtual piano practice session","roomUsageId":984,"startTime":"2025-05-22T08:12:17.894Z","endTime":"2025-05-22T09:45:17.894Z","createdAt":"2025-04-22T11:01:40.322Z","updatedAt":"2025-04-22T11:01:40.322Z","computer":{"id":605,"name":"PC-20-9","ipAddress":"192.168.20.18","macAddress":"c2:27:e5:f3:ba:6d","specs":{"os":"Windows 11 Pro","gpu":"NVIDIA RTX 3080","ram":"64GB DDR4","audio":"Universal Audio Apollo Twin","monitor":"32 inch LG UltraFine","storage":"2TB NVMe SSD","software":["Pro Tools","Logic Pro X","Finale","Cubase Pro"],"processor":"AMD Ryzen 9 5900X"},"roomId":20,"status":"OPERATIONAL","createdAt":"2025-04-22T10:58:56.997Z","updatedAt":"2025-04-22T10:58:56.997Z"},"roomUsage":{"id":984,"roomId":20,"userId":641,"startTime":"2025-05-22T07:59:17.894Z","endTime":"2025-05-22T09:59:17.894Z","purpose":"Music theory tutoring","createdAt":"2025-04-22T10:59:48.918Z","updatedAt":"2025-04-22T10:59:48.918Z","scheduleId":null},"user":{"id":641,"name":"Trúc Quỳnh Vũ","email":"trucquynh_vu@gmail.com"}},{"id":1382,"computerId":626,"notes":"Researching musical techniques online","roomUsageId":984,"startTime":"2025-05-22T08:03:17.894Z","endTime":"2025-05-22T09:55:17.894Z","createdAt":"2025-04-22T11:01:40.584Z","updatedAt":"2025-04-22T11:01:40.584Z","computer":{"id":626,"name":"PC-20-30","ipAddress":"192.168.20.39","macAddress":"0c:08:bf:69:1a:70","specs":{"os":"Windows 10 Pro","gpu":"NVIDIA RTX 3060","ram":"32GB DDR4","audio":"Focusrite Scarlett 2i2","monitor":"27 inch Dell UltraSharp","storage":"1TB SSD + 2TB HDD","software":["Ableton Live 11","FL Studio 20","Sibelius","ProTools"],"processor":"Intel Core i7-11700K"},"roomId":20,"status":"OPERATIONAL","createdAt":"2025-04-22T10:59:02.712Z","updatedAt":"2025-04-22T10:59:02.712Z"},"roomUsage":{"id":984,"roomId":20,"userId":641,"startTime":"2025-05-22T07:59:17.894Z","endTime":"2025-05-22T09:59:17.894Z","purpose":"Music theory tutoring","createdAt":"2025-04-22T10:59:48.918Z","updatedAt":"2025-04-22T10:59:48.918Z","scheduleId":null},"user":{"id":641,"name":"Trúc Quỳnh Vũ","email":"trucquynh_vu@gmail.com"}},{"id":1387,"computerId":621,"notes":"Working on Sibelius composition project","roomUsageId":986,"startTime":"2025-05-22T07:36:28.810Z","endTime":"2025-05-22T08:15:28.810Z","createdAt":"2025-04-22T11:01:41.899Z","updatedAt":"2025-04-22T11:01:41.899Z","computer":{"id":621,"name":"PC-20-25","ipAddress":"192.168.20.34","macAddress":"65:33:8d:bf:c1:63","specs":{"os":"Windows 10 Pro","gpu":"NVIDIA RTX 3060","ram":"32GB DDR4","audio":"Focusrite Scarlett 2i2","monitor":"27 inch Dell UltraSharp","storage":"1TB SSD + 2TB HDD","software":["Ableton Live 11","FL Studio 20","Sibelius","ProTools"],"processor":"Intel Core i7-11700K"},"roomId":20,"status":"OPERATIONAL","createdAt":"2025-04-22T10:59:01.354Z","updatedAt":"2025-04-22T10:59:01.354Z"},"roomUsage":{"id":986,"roomId":20,"userId":645,"startTime":"2025-05-22T07:23:28.810Z","endTime":"2025-05-22T08:23:28.810Z","purpose":"Ensemble rehearsal","createdAt":"2025-04-22T10:59:49.465Z","updatedAt":"2025-04-22T10:59:49.465Z","scheduleId":null},"user":{"id":645,"name":"Yến Thảo Đinh","email":"yenthao.7kinh32@yahoo.com"}},{"id":1385,"computerId":603,"notes":null,"roomUsageId":986,"startTime":"2025-05-22T07:27:28.810Z","endTime":"2025-05-22T08:11:28.810Z","createdAt":"2025-04-22T11:01:41.375Z","updatedAt":"2025-04-22T11:01:41.375Z","computer":{"id":603,"name":"PC-20-7","ipAddress":"192.168.20.16","macAddress":"fc:cc:74:1e:83:77","specs":{"os":"macOS Monterey","gpu":"Integrated","ram":"32GB Unified","audio":"Native Instruments Komplete Audio 6","monitor":"27 inch Apple Studio Display","storage":"1TB SSD","software":["Logic Pro X","GarageBand","MuseScore","MainStage"],"processor":"Apple M1 Pro"},"roomId":20,"status":"OPERATIONAL","createdAt":"2025-04-22T10:58:56.455Z","updatedAt":"2025-04-22T10:58:56.455Z"},"roomUsage":{"id":986,"roomId":20,"userId":645,"startTime":"2025-05-22T07:23:28.810Z","endTime":"2025-05-22T08:23:28.810Z","purpose":"Ensemble rehearsal","createdAt":"2025-04-22T10:59:49.465Z","updatedAt":"2025-04-22T10:59:49.465Z","scheduleId":null},"user":{"id":645,"name":"Yến Thảo Đinh","email":"yenthao.7kinh32@yahoo.com"}},{"id":1386,"computerId":597,"notes":"Mixing session in Pro Tools","roomUsageId":986,"startTime":"2025-05-22T07:23:28.810Z","endTime":"2025-05-22T08:18:28.810Z","createdAt":"2025-04-22T11:01:41.637Z","updatedAt":"2025-04-22T11:01:41.637Z","computer":{"id":597,"name":"PC-20-1","ipAddress":"192.168.20.10","macAddress":"7c:2e:36:02:85:3f","specs":{"os":"Windows 11 Pro","gpu":"NVIDIA RTX 3080","ram":"64GB DDR4","audio":"Universal Audio Apollo Twin","monitor":"32 inch LG UltraFine","storage":"2TB NVMe SSD","software":["Pro Tools","Logic Pro X","Finale","Cubase Pro"],"processor":"AMD Ryzen 9 5900X"},"roomId":20,"status":"OPERATIONAL","createdAt":"2025-04-22T10:58:54.832Z","updatedAt":"2025-04-22T10:58:54.832Z"},"roomUsage":{"id":986,"roomId":20,"userId":645,"startTime":"2025-05-22T07:23:28.810Z","endTime":"2025-05-22T08:23:28.810Z","purpose":"Ensemble rehearsal","createdAt":"2025-04-22T10:59:49.465Z","updatedAt":"2025-04-22T10:59:49.465Z","scheduleId":null},"user":{"id":645,"name":"Yến Thảo Đinh","email":"yenthao.7kinh32@yahoo.com"}},{"id":1179,"computerId":519,"notes":"Researching musical techniques online","roomUsageId":847,"startTime":"2025-05-22T04:34:37.914Z","endTime":"2025-05-22T05:20:37.914Z","createdAt":"2025-04-22T11:00:42.211Z","updatedAt":"2025-04-22T11:00:42.211Z","computer":{"id":519,"name":"PC-18-3","ipAddress":"192.168.18.12","macAddress":"c0:d8:06:a9:2c:a2","specs":{"os":"macOS Monterey","gpu":"Integrated","ram":"32GB Unified","audio":"Native Instruments Komplete Audio 6","monitor":"27 inch Apple Studio Display","storage":"1TB SSD","software":["Logic Pro X","GarageBand","MuseScore","MainStage"],"processor":"Apple M1 Pro"},"roomId":18,"status":"OPERATIONAL","createdAt":"2025-04-22T10:58:32.443Z","updatedAt":"2025-04-22T10:58:32.443Z"},"roomUsage":{"id":847,"roomId":18,"userId":562,"startTime":"2025-05-22T04:32:37.914Z","endTime":"2025-05-22T05:32:37.914Z","purpose":"Audio engineering practice","createdAt":"2025-04-22T10:59:10.594Z","updatedAt":"2025-04-22T10:59:10.594Z","scheduleId":null},"user":{"id":562,"name":"Kim Cương Tăng","email":"kimcuong_tang@hotmail.com"}},{"id":1185,"computerId":601,"notes":"Mixing session in Pro Tools","roomUsageId":851,"startTime":"2025-05-22T00:14:47.111Z","endTime":"2025-05-22T03:05:47.111Z","createdAt":"2025-04-22T11:00:43.840Z","updatedAt":"2025-04-22T11:00:43.840Z","computer":{"id":601,"name":"PC-20-5","ipAddress":"192.168.20.14","macAddress":"66:f4:51:48:64:ea","specs":{"os":"Windows 11 Pro","gpu":"NVIDIA RTX 3090","ram":"128GB DDR5","audio":"RME Babyface Pro FS","monitor":"34 inch Curved Ultrawide","storage":"4TB NVMe SSD","software":["Cubase Pro","Reason 12","Dorico","Studio One"],"processor":"Intel Core i9-12900K"},"roomId":20,"status":"OPERATIONAL","createdAt":"2025-04-22T10:58:55.915Z","updatedAt":"2025-04-22T10:58:55.915Z"},"roomUsage":{"id":851,"roomId":20,"userId":564,"startTime":"2025-05-22T00:06:47.111Z","endTime":"2025-05-22T03:06:47.111Z","purpose":"Individual instrument practice","createdAt":"2025-04-22T10:59:11.678Z","updatedAt":"2025-04-22T10:59:11.678Z","scheduleId":null},"user":{"id":564,"name":"Tùy Linh Trần","email":"tuylinh_tran53@gmail.com"}},{"id":1184,"computerId":628,"notes":"Virtual piano practice session","roomUsageId":851,"startTime":"2025-05-22T00:10:47.111Z","endTime":"2025-05-22T03:03:47.111Z","createdAt":"2025-04-22T11:00:43.563Z","updatedAt":"2025-04-22T11:00:43.563Z","computer":{"id":628,"name":"PC-20-32","ipAddress":"192.168.20.41","macAddress":"1b:91:31:63:61:9e","specs":{"os":"Windows 11 Pro","gpu":"NVIDIA RTX 3080","ram":"64GB DDR4","audio":"Universal Audio Apollo Twin","monitor":"32 inch LG UltraFine","storage":"2TB NVMe SSD","software":["Pro Tools","Logic Pro X","Finale","Cubase Pro"],"processor":"AMD Ryzen 9 5900X"},"roomId":20,"status":"OPERATIONAL","createdAt":"2025-04-22T10:59:03.265Z","updatedAt":"2025-04-22T10:59:03.265Z"},"roomUsage":{"id":851,"roomId":20,"userId":564,"startTime":"2025-05-22T00:06:47.111Z","endTime":"2025-05-22T03:06:47.111Z","purpose":"Individual instrument practice","createdAt":"2025-04-22T10:59:11.678Z","updatedAt":"2025-04-22T10:59:11.678Z","scheduleId":null},"user":{"id":564,"name":"Tùy Linh Trần","email":"tuylinh_tran53@gmail.com"}},{"id":1439,"computerId":634,"notes":"Editing recording for portfolio","roomUsageId":1019,"startTime":"2025-05-21T22:06:01.619Z","endTime":"2025-05-21T23:56:01.619Z","createdAt":"2025-04-22T11:01:55.838Z","updatedAt":"2025-04-22T11:01:55.838Z","computer":{"id":634,"name":"PC-20-38","ipAddress":"192.168.20.47","macAddress":"2f:a1:15:26:da:b3","specs":{"os":"Windows 11 Pro","gpu":"NVIDIA RTX 3090","ram":"128GB DDR5","audio":"RME Babyface Pro FS","monitor":"34 inch Curved Ultrawide","storage":"4TB NVMe SSD","software":["Cubase Pro","Reason 12","Dorico","Studio One"],"processor":"Intel Core i9-12900K"},"roomId":20,"status":"OPERATIONAL","createdAt":"2025-04-22T10:59:04.891Z","updatedAt":"2025-04-22T10:59:04.891Z"},"roomUsage":{"id":1019,"roomId":20,"userId":665,"startTime":"2025-05-21T22:02:01.619Z","endTime":"2025-05-22T00:02:01.619Z","purpose":"Performance preparation","createdAt":"2025-04-22T10:59:59.163Z","updatedAt":"2025-04-22T10:59:59.163Z","scheduleId":null},"user":{"id":665,"name":"Thiên Đức Vương","email":"thien7kuc.vuong@yahoo.com"}},{"id":1512,"computerId":578,"notes":"Practicing with ear training software","roomUsageId":1072,"startTime":"2025-05-21T20:29:39.047Z","endTime":"2025-05-21T22:13:39.047Z","createdAt":"2025-04-22T11:02:15.548Z","updatedAt":"2025-04-22T11:02:15.548Z","computer":{"id":578,"name":"PC-19-21","ipAddress":"192.168.19.30","macAddress":"58:90:1e:f2:12:62","specs":{"os":"macOS Monterey","gpu":"Integrated","ram":"32GB Unified","audio":"Native Instruments Komplete Audio 6","monitor":"27 inch Apple Studio Display","storage":"1TB SSD","software":["Logic Pro X","GarageBand","MuseScore","MainStage"],"processor":"Apple M1 Pro"},"roomId":19,"status":"OPERATIONAL","createdAt":"2025-04-22T10:58:49.382Z","updatedAt":"2025-04-22T10:58:49.382Z"},"roomUsage":{"id":1072,"roomId":19,"userId":697,"startTime":"2025-05-21T20:17:39.047Z","endTime":"2025-05-21T22:17:39.047Z","purpose":"Audio engineering practice","createdAt":"2025-04-22T11:00:14.294Z","updatedAt":"2025-04-22T11:00:14.294Z","scheduleId":null},"user":{"id":697,"name":"Hoàng Ngôn Đào","email":"hoangngon_7kao81@gmail.com"}}],"meta":{"page":1,"limit":10,"total":426,"totalPages":43}}}
 
 ### Get computer usage by ID
-GET {{baseUrl}}/computer-usages/1
-Authorization: Bearer {{authToken}}
+GET {{baseUrl}}/computer-usages/1163
+Authorization: Bearer {{adminToken}}
 
-### Get user computer usage statistics
-GET {{baseUrl}}/users/3/computer-usage-stats?startDate=2023-01-01&endDate=2023-12-31
-Authorization: Bearer {{authToken}}
+### Dữ liệu trả về khi thành công
+{"success":true,"message":"Computer usage retrieved successfully","data":{"id":1163,"computerId":496,"notes":"Virtual piano practice session","roomUsageId":836,"startTime":"2025-04-07T09:52:24.312Z","endTime":"2025-04-07T11:43:24.312Z","createdAt":"2025-04-22T11:00:37.606Z","updatedAt":"2025-04-22T11:00:37.606Z","computer":{"id":496,"name":"PC-17-21","ipAddress":"192.168.17.30","macAddress":"ad:f2:af:a9:a1:52","specs":{"os":"Windows 10 Pro","gpu":"NVIDIA RTX 3060","ram":"32GB DDR4","audio":"Focusrite Scarlett 2i2","monitor":"27 inch Dell UltraSharp","storage":"1TB SSD + 2TB HDD","software":["Ableton Live 11","FL Studio 20","Sibelius","ProTools"],"processor":"Intel Core i7-11700K"},"roomId":17,"status":"OPERATIONAL","createdAt":"2025-04-22T10:58:26.170Z","updatedAt":"2025-04-22T10:58:26.170Z"},"roomUsage":{"id":836,"roomId":17,"userId":557,"startTime":"2025-04-07T09:45:24.312Z","endTime":"2025-04-07T11:45:24.312Z","purpose":"Individual instrument practice","createdAt":"2025-04-22T10:59:07.334Z","updatedAt":"2025-04-22T10:59:07.334Z","scheduleId":null},"user":{"id":557,"name":"Gia Kiệt Dương","email":"giakiet.duong@hotmail.com"}}}
 
-### Upload and transfer file
+### Delete computer usage
+DELETE {{baseUrl}}/computer-usages/1580
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "notes": "Testing deletion of computer usage"
+}
+
+### Dữ liệu trả về khi xóa thành công
+{"success":true,"message":"Computer usage deleted successfully"}
+
+### Login to get teacher token
+# @name loginTeacher
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "newteacher@example.com",
+  "password": "Password32!",
+  "rememberMe": true
+}
+
+### Save Teacher token
+@teacherToken = {{loginTeacher.response.body.data.accessToken}}
+
+### Upload file from teacher to students
 POST {{baseUrl}}/file-transfers
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{teacherToken}}
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="file"; filename="test.txt"
-Content-Type: text/plain
+Content-Disposition: form-data; name="file"; filename="lecture_notes.pdf"
+Content-Type: application/pdf
 
-This is a test file content
+< ./test-files/lecture_notes.pdf
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="targetComputerIds"
 
-1,2,3
+482
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="sourceId"
+
+476
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="notes"
+
+Important lecture lab 6 materials for today's class
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Dữ liệu trả về khi upload thành công
+{"success":true,"message":"File transfer created successfully","data":{"id":12,"filename":"1745341538206-lecture_notes.pdf","originalName":"lecture_notes.pdf","size":32,"mimeType":"application/pdf","path":"1745341538206-lecture_notes.pdf","sourceId":476,"transferredAt":"2025-04-22T17:05:40.450Z","status":"PENDING","userId":551,"createdAt":"2025-04-22T17:05:40.452Z","updatedAt":"2025-04-22T17:05:40.452Z"}}
+
+### Upload file from teacher to students (ZIP file)
+POST {{baseUrl}}/file-transfers
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Authorization: Bearer {{teacherToken}}
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="sample_files.zip"
+Content-Type: application/zip
+
+< ./test-files/sample_files.zip
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="targetComputerIds"
+
+1
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="sourceId"
 
 1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="notes"
+
+Important project files for lab exercise
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
-### Get file transfers
+### Mutible Student being send by teacher
+### Upload file from teacher to multiple students (multiple computers)
+POST {{baseUrl}}/file-transfers
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Authorization: Bearer {{teacherToken}}
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="lecture_notes.pdf"
+Content-Type: application/pdf
+
+< ./test-files/lecture_notes.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="targetComputerIds"
+
+517,526,527,528,530,534
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="sourceId"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="notes"
+
+Tài liệu bài giảng cho buổi thực hành hôm nay. Tất cả sinh viên vui lòng tải xuống và xem trước khi bắt đầu thực hành.
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### View all file transfers (Teacher)
 GET {{baseUrl}}/file-transfers?page=1&limit=10
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{teacherToken}}
 
-### Get file transfer by ID
-GET {{baseUrl}}/file-transfers/1
-Authorization: Bearer {{authToken}}
+### Dữ liệu trả về khi lấy danh sách file transfer thành công
+{"success":true,"message":"File transfers retrieved successfully","data":{"transfers":[{"id":12,"filename":"1745341538206-lecture_notes.pdf","originalName":"lecture_notes.pdf","size":32,"mimeType":"application/pdf","path":"1745341538206-lecture_notes.pdf","sourceId":476,"transferredAt":"2025-04-22T17:05:40.450Z","status":"PENDING","userId":551,"createdAt":"2025-04-22T17:05:40.452Z","updatedAt":"2025-04-22T17:05:40.452Z","user":{"id":551,"name":"New Teacher","email":"newteacher@example.com"},"targets":[{"id":18,"fileTransferId":12,"computerId":482,"status":"PENDING","computer":{"id":482,"name":"PC-17-7","ipAddress":"192.168.17.16","macAddress":"c7:99:fe:f4:62:44","specs":{"os":"Windows 10 Pro","gpu":"NVIDIA RTX 3060","ram":"32GB DDR4","audio":"Focusrite Scarlett 2i2","monitor":"27 inch Dell UltraSharp","storage":"1TB SSD + 2TB HDD","software":["Ableton Live 11","FL Studio 20","Sibelius","ProTools"],"processor":"Intel Core i7-11700K"},"roomId":17,"status":"OPERATIONAL","createdAt":"2025-04-22T10:58:22.094Z","updatedAt":"2025-04-22T10:58:22.094Z"}}]}],"meta":{"page":1,"limit":10,"total":1,"totalPages":1}}}
 
-### Update file transfer status
-PUT {{baseUrl}}/file-transfers/1/status
+### View file transfers for specific computer
+GET {{baseUrl}}/computers/482/file-transfers
+Authorization: Bearer {{teacherToken}}
+
+### Dữ liệu trả về khi lấy danh sách file transfer cho máy tính cụ thể thành công
+{{"success":true,"message":"File transfers retrieved successfully","data":{"transfers":[{"id":12,"filename":"1745341538206-lecture_notes.pdf","originalName":"lecture_notes.pdf","size":32,"mimeType":"application/pdf","path":"1745341538206-lecture_notes.pdf","sourceId":476,"transferredAt":"2025-04-22T17:05:40.450Z","status":"PENDING","userId":551,"createdAt":"2025-04-22T17:05:40.452Z","updatedAt":"2025-04-22T17:05:40.452Z","user":{"id":551,"name":"New Teacher","email":"newteacher@example.com"},"targets":[{"id":18,"fileTransferId":12,"computerId":482,"status":"PENDING","computer":{"id":482,"name":"PC-17-7","ipAddress":"192.168.17.16","macAddress":"c7:99:fe:f4:62:44","specs":{"os":"Windows 10 Pro","gpu":"NVIDIA RTX 3060","ram":"32GB DDR4","audio":"Focusrite Scarlett 2i2","monitor":"27 inch Dell UltraSharp","storage":"1TB SSD + 2TB HDD","software":["Ableton Live 11","FL Studio 20","Sibelius","ProTools"],"processor":"Intel Core i7-11700K"},"roomId":17,"status":"OPERATIONAL","createdAt":"2025-04-22T10:58:22.094Z","updatedAt":"2025-04-22T10:58:22.094Z"}}]}],"meta":{"page":1,"limit":10,"total":1,"totalPages":1}}}}
+
+### Login to get student token
+# @name loginStudent
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
-Authorization: Bearer {{authToken}}
+
+{
+  "email": "newstudent@example.com",
+  "password": "Password32!",
+  "rememberMe": true
+}
+
+### Save Student token
+@studentToken = {{loginStudent.response.body.data.accessToken}}
+
+### View files for student's computer
+GET {{baseUrl}}/computers/482/file-transfers?status=PENDING
+Authorization: Bearer {{studentToken}}
+
+### Dữ liệu trả về
+{"success":true,"message":"File transfers retrieved successfully","data":{"transfers":[{"id":12,"filename":"1745341538206-lecture_notes.pdf","originalName":"lecture_notes.pdf","size":32,"mimeType":"application/pdf","path":"1745341538206-lecture_notes.pdf","sourceId":476,"transferredAt":"2025-04-22T17:05:40.450Z","status":"PENDING","userId":551,"createdAt":"2025-04-22T17:05:40.452Z","updatedAt":"2025-04-22T17:05:40.452Z","user":{"id":551,"name":"New Teacher","email":"newteacher@example.com"},"targets":[{"id":18,"fileTransferId":12,"computerId":482,"status":"PENDING","computer":{"id":482,"name":"PC-17-7","ipAddress":"192.168.17.16","macAddress":"c7:99:fe:f4:62:44","specs":{"os":"Windows 10 Pro","gpu":"NVIDIA RTX 3060","ram":"32GB DDR4","audio":"Focusrite Scarlett 2i2","monitor":"27 inch Dell UltraSharp","storage":"1TB SSD + 2TB HDD","software":["Ableton Live 11","FL Studio 20","Sibelius","ProTools"],"processor":"Intel Core i7-11700K"},"roomId":17,"status":"OPERATIONAL","createdAt":"2025-04-22T10:58:22.094Z","updatedAt":"2025-04-22T10:58:22.094Z"}}]}],"meta":{"page":1,"limit":10,"total":1,"totalPages":1}}}
+
+### Download specific file
+GET {{baseUrl}}/file-transfers/12/download?computerId=482
+Authorization: Bearer {{studentToken}}
+
+### Update file transfer status (student accepting/downloading)
+PUT {{baseUrl}}/file-transfers/12/status
+Content-Type: application/json
+Authorization: Bearer {{studentToken}}
 
 {
   "status": "COMPLETED",
-  "notes": "Transfer completed successfully"
+  "targetComputerId": 482,
+  "notes": "File received and downloaded successfully"
 }
 
-### Get file transfer activity history
-GET {{baseUrl}}/file-transfers/1/activity-history?page=1&limit=10
-Authorization: Bearer {{authToken}}
+### Update file transfer status (student rejecting)
+PUT {{baseUrl}}/file-transfers/2/status
+Content-Type: application/json
+Authorization: Bearer {{studentToken}}
 
-### Get user computer activities
-GET {{baseUrl}}/users/3/computer-activities?page=1&limit=10&startDate=2023-01-01&endDate=2023-12-31
-Authorization: Bearer {{authToken}}
+{
+  "status": "REJECTED",
+  "targetComputerId": 482,
+  "notes": "File not needed"
+}
+

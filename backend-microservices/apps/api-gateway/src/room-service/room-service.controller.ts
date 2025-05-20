@@ -4,7 +4,7 @@ import {
   Logger, ParseIntPipe,
   Patch
 } from '@nestjs/common';
-import { JwtAuthGuard, Roles, RolesGuard } from '@app/contracts/common/auth';
+import { JwtAuthGuard, Public, Roles, RolesGuard } from '@app/contracts/common/auth';
 import { RoomsService } from './services/rooms.service';
 import { SchedulesService } from './services/schedules.service';
 import { RoomUsageService } from './services/room-usage.service';
@@ -30,8 +30,9 @@ export class RoomServiceController {
   // ROOMS ROUTES
   //=========================================================================
 
-  @Get('rooms')
-  async findAllRooms(
+  @Get('rooms/dashboard-view')
+  @Roles('ADMIN', 'TEACHER')
+  async getRoomsDashboardView(
     @Request() req,
     @Query('page') page = '1',
     @Query('limit') limit = '10',
@@ -40,11 +41,27 @@ export class RoomServiceController {
     @Query('building') building?: string,
     @Query('search') search?: string
   ) {
-    this.logger.log(`Request to get all rooms from ${req.user.sub}`);
-    return this.roomsService.findAll({
+    this.logger.log(`Request to get rooms for dashboard view from ${req.user.sub}`);
+    return this.roomsService.findAllForDashboard({
       page: parseInt(page),
       limit: parseInt(limit),
       filters: { status, type, building, search }
+    });
+  }
+
+  @Public()
+  @Get('rooms/client-view')
+  async getRoomsClientView(
+    @Query('status') status = 'AVAILABLE',
+    @Query('building') building?: string
+  ) {
+    this.logger.log(`Request to get rooms for client view with status: ${status}`);
+    return this.roomsService.findAllForClient({
+      filters: { 
+        status, 
+        building,
+        isActive: true // Only show active rooms for clients
+      }
     });
   }
 
@@ -52,6 +69,12 @@ export class RoomServiceController {
   async findOneRoom(@Param('id', ParseIntPipe) id: number, @Request() req) {
     this.logger.log(`Request to get room ${id} from ${req.user.sub}`);
     return this.roomsService.findOne(id);
+  }
+
+  @Public()
+  @Get('rooms/:id/public')
+  async getPublicRoomDetails(@Param('id', ParseIntPipe) id: number) {
+    return this.roomsService.findOnePublic(id);
   }
 
   @Post('rooms')
@@ -236,13 +259,14 @@ export class RoomServiceController {
       limit: parseInt(limit)
     });
   }
+  
 
   //=========================================================================
   // ROOM USAGE ROUTES
   //=========================================================================
 
   @Get('room-usages')
-  @Roles('ADMIN', 'TEACHER')  // Đổi từ STAFF thành TEACHER
+  @Roles('ADMIN', 'TEACHER')
   async findAllRoomUsages(
     @Request() req,
     @Query('page') page = '1',
@@ -276,13 +300,13 @@ export class RoomServiceController {
   @Post('room-usages')
   async startRoomUsage(@Body() createRoomUsageDto: CreateRoomUsageDto, @Request() req) {
     this.logger.log(`Request to start room usage from ${req.user.sub}`);
-    return this.roomUsageService.startUsage(createRoomUsageDto, req.user);  // Đã đổi từ create thành startUsage
+    return this.roomUsageService.startUsage(createRoomUsageDto, req.user);
   }
 
   @Put('room-usages/:id/end')
   async endRoomUsage(@Param('id', ParseIntPipe) id: number, @Request() req) {
     this.logger.log(`Request to end room usage ${id} from ${req.user.sub}`);
-    return this.roomUsageService.endUsage(id, req.user);  // Đã đổi từ end thành endUsage
+    return this.roomUsageService.endUsage(id, req.user);
   }
 
   @Get('rooms/:id/usage-history')
@@ -295,7 +319,7 @@ export class RoomServiceController {
     @Query('endDate') endDate?: string
   ) {
     this.logger.log(`Request to get usage history for room ${id} from ${req.user.sub}`);
-    return this.roomUsageService.getRoomUsageHistory(id, {  // Đã đổi từ getRoomHistory thành getRoomUsageHistory
+    return this.roomUsageService.getRoomUsageHistory(id, {
       page: parseInt(page),
       limit: parseInt(limit),
       startDate,

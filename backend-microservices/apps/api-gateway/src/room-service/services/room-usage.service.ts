@@ -96,18 +96,16 @@ export class RoomUsageService {
     );
   }
 
-  async markRoomForMaintenance(roomId: number, data: {
-    reason: string;
-    startTime: string;
-    endTime: string;
-  }, user: any) {
+  async markRoomForMaintenance(roomId: number, maintenanceData: any, user: any) {
     this.logger.log(`Marking room ${roomId} for maintenance`);
     return firstValueFrom(
       this.roomClient.send(ROOM_USAGE_PATTERNS.MARK_MAINTENANCE, {
         roomId,
-        ...data,
-        userId: user.sub,
-        userRole: user.role
+        maintenanceData,
+        currentUser: {
+          sub: user.sub,
+          role: user.role
+        }
       })
     );
   }

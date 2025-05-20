@@ -5,7 +5,8 @@ import { COMPUTER_SERVICE_CLIENT } from '../constant';
 import { 
   CreateComputerDto, 
   UpdateComputerDto, 
-  GetComputersFilterDto 
+  GetComputersFilterDto, 
+  UpdateComputerStatusDto
 } from '../dto';
 import { COMPUTER_PATTERNS } from '@app/contracts/computer-service/constants';
 
@@ -17,10 +18,23 @@ export class ComputersService {
     @Inject(COMPUTER_SERVICE_CLIENT) private computerClient: ClientProxy
   ) {}
 
-  async findAll(filterDto: GetComputersFilterDto) {
-    this.logger.log(`Finding all computers with filters: ${JSON.stringify(filterDto)}`);
+  async findAll(params: {
+    page: number;
+    limit: number;
+    filters?: any;
+    user: any;
+  }) {
+    const { page, limit, filters, user } = params;
+    
+    this.logger.log(`Finding all computers with filters: ${JSON.stringify(filters)}`);
+    
     return firstValueFrom(
-      this.computerClient.send(COMPUTER_PATTERNS.FIND_ALL_COMPUTERS, filterDto)
+      this.computerClient.send(COMPUTER_PATTERNS.FIND_ALL_COMPUTERS, {
+        page,
+        limit,
+        ...filters,
+        _metadata: { user }
+      })
     );
   }
 
@@ -47,7 +61,7 @@ export class ComputersService {
       this.computerClient.send(COMPUTER_PATTERNS.UPDATE_COMPUTER, {
         id,
         ...updateComputerDto,
-        updatedBy: user.sub
+        _metadata: { user }
       })
     );
   }
@@ -62,13 +76,12 @@ export class ComputersService {
     );
   }
 
-  async updateStatus(id: number, status: string, user: any) {
-    this.logger.log(`Updating status of computer ${id} to ${status}`);
+  async updateStatus(id: number, statusDto: UpdateComputerStatusDto, user: any) {
     return firstValueFrom(
       this.computerClient.send(COMPUTER_PATTERNS.UPDATE_STATUS, {
         id,
-        status,
-        updatedBy: user.sub
+        status: statusDto.status,
+        _metadata: { user }
       })
     );
   }
@@ -79,6 +92,32 @@ export class ComputersService {
       this.computerClient.send(COMPUTER_PATTERNS.FIND_BY_ROOM, {
         roomId,
         ...filterDto
+      })
+    );
+  }
+
+  async getRoomComputersForClient(params: {
+    roomId: number;
+    user?: any;
+  }) {
+    const { roomId, user } = params;
+    
+    // Validate roomId is provided
+    if (!roomId) {
+      this.logger.warn('Client view request missing required roomId parameter');
+      return {
+        success: false,
+        message: 'Room ID is required to view computers',
+        statusCode: 400
+      };
+    }
+    
+    this.logger.log(`Finding all computers in room ${roomId} for client view (all statuses)`);
+    
+    return firstValueFrom(
+      this.computerClient.send(COMPUTER_PATTERNS.GET_ROOM_COMPUTERS_CLIENT, {
+        roomId: +roomId,
+        currentUser: user
       })
     );
   }

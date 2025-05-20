@@ -21,7 +21,8 @@
     "prisma:generate": "cd libs/prisma && npx prisma generate",
     "prisma:migrate": "cd libs/prisma && npx prisma migrate dev",
     "prisma:deploy": "cd libs/prisma && npx prisma migrate deploy",
-    "prisma:studio": "cd libs/prisma && npx prisma studio"
+    "prisma:studio": "cd libs/prisma && npx prisma studio",
+    "prisma:seed": "cd libs/prisma && npx prisma db seed"
   },
   "dependencies": {
     "@faker-js/faker": "^9.6.0",
@@ -33,6 +34,8 @@
     "@nestjs/microservices": "^11.0.13",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-socket.io": "^11.0.20",
+    "@nestjs/websockets": "^11.0.20",
     "@prisma/client": "^6.5.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
@@ -42,6 +45,7 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "socket.io": "^4.8.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -75,6 +79,9 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "jest": {
     "moduleFileExtensions": [

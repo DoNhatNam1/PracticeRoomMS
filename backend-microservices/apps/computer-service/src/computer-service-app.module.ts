@@ -5,6 +5,8 @@ import { PrismaModule } from '@app/prisma/prisma.module';
 import * as Joi from 'joi';
 import { NatsClientModule } from './nats-client/nats-client.module';
 import { ActivityLogComputerModule } from './activity-log-computer/activity-log-computer.module';
+import { ComputerUsageModule } from './computer-usage/computer-usage.module';
+import { FileTransferModule } from './file-transfer/file-transfer.module';
 
 @Module({
   imports: [
@@ -18,7 +20,9 @@ import { ActivityLogComputerModule } from './activity-log-computer/activity-log-
     ComputersModule,
     NatsClientModule,
     PrismaModule,
-    ActivityLogComputerModule
+    ActivityLogComputerModule,
+    ComputerUsageModule,
+    FileTransferModule
   ],
   controllers: [],
   providers: [],

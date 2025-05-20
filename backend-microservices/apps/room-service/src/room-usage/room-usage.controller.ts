@@ -1,7 +1,7 @@
 import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { ROOM_USAGE_EVENTS, ROOM_USAGE_PATTERNS } from '@app/contracts/room-service/room-usage/constants';
 import { RoomUsageService } from './room-usage.service';
-import { ROOM_USAGE_EVENTS } from '@app/contracts/room-service/room-usage/constants';
 
 @Controller()
 export class RoomUsageController {
@@ -40,5 +40,19 @@ export class RoomUsageController {
       startDate: startDate ? new Date(startDate) : undefined,
       endDate: endDate ? new Date(endDate) : undefined,
     });
+  }
+
+  /**
+   * Đánh dấu phòng cần bảo trì
+   */
+  @MessagePattern(ROOM_USAGE_PATTERNS.MARK_MAINTENANCE)
+  async markMaintenance(@Payload() data: any) {
+    const { roomId, maintenanceData, currentUser } = data;
+    this.logger.log(`Marking room ${roomId} for maintenance`);
+    return this.roomUsageService.markForMaintenance(
+      roomId, 
+      maintenanceData, 
+      currentUser
+    );
   }
 }

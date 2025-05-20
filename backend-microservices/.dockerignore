@@ -19,10 +19,6 @@ yarn-error.log
 **/dist
 **/build
 
-# Environment files
-**/.env
-**/.env.*
-!**/.env.example
 
 # Logs
 **/logs

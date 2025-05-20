@@ -1,7 +1,7 @@
 import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, EventPattern, Payload } from '@nestjs/microservices';
 import { ActivityLogUserService } from './activity-log-user.service';
-import { ACTIVITY_EVENTS, ACTIVITY_PATTERNS } from '@app/contracts/user-service/constants';
+import { ACTIVITY_USER_EVENTS as ACTIVITY_EVENTS, ACTIVITY_USER_PATTERNS as ACTIVITY_PATTERNS } from '@app/contracts/user-service/constants';
 
 @Controller()
 export class ActivityLogUserController {
@@ -19,9 +19,9 @@ export class ActivityLogUserController {
     this.logger.log(`User ${userId} logged in from ${ipAddress}`);
 
     await this.activityLogService.logActivity(
-      'USER_LOGGED_IN',
-      {
-        userId,
+      userId,              // First parameter: userId
+      'USER_LOGGED_IN',    // Second parameter: action
+      {                    // Third parameter: details
         email,
         role,
         ipAddress,
@@ -42,9 +42,9 @@ export class ActivityLogUserController {
     this.logger.log(`User ${userId} logged out after ${sessionDuration} seconds`);
 
     await this.activityLogService.logActivity(
-      'USER_LOGGED_OUT',
-      {
-        userId,
+      userId,              // First parameter: userId
+      'USER_LOGGED_OUT',   // Second parameter: action
+      {                    // Third parameter: details
         email,
         sessionDuration,
         entityType: 'USER',
@@ -63,9 +63,9 @@ export class ActivityLogUserController {
     this.logger.log(`User ${userId} created by ${createdBy || 'system'}`);
 
     await this.activityLogService.logActivity(
-      'USER_CREATED',
-      {
-        userId,
+      userId,              // First parameter: userId
+      'USER_CREATED',      // Second parameter: action
+      {                    // Third parameter: details
         email,
         role,
         createdBy,
@@ -85,9 +85,9 @@ export class ActivityLogUserController {
     this.logger.log(`User ${userId} updated by ${updatedBy}`);
 
     await this.activityLogService.logActivity(
-      'USER_UPDATED',
-      {
-        userId,
+      userId,              // First parameter: userId
+      'USER_UPDATED',      // Second parameter: action
+      {                    // Third parameter: details
         updatedFields: Object.keys(updatedFields),
         updatedBy,
         entityType: 'USER',
@@ -106,9 +106,9 @@ export class ActivityLogUserController {
     this.logger.log(`Password changed for user ${userId}`);
 
     await this.activityLogService.logActivity(
-      'PASSWORD_CHANGED',
-      {
-        userId,
+      userId,              // First parameter: userId
+      'PASSWORD_CHANGED',  // Second parameter: action
+      {                    // Third parameter: details
         email,
         requestedBy: requestedBy || userId,
         entityType: 'USER',
@@ -127,9 +127,9 @@ export class ActivityLogUserController {
     this.logger.log(`Account for user ${userId} ${active ? 'activated' : 'deactivated'} by ${changedBy}`);
 
     await this.activityLogService.logActivity(
-      active ? 'ACCOUNT_ACTIVATED' : 'ACCOUNT_DEACTIVATED',
-      {
-        userId,
+      userId,                                      // First parameter: userId
+      active ? 'ACCOUNT_ACTIVATED' : 'ACCOUNT_DEACTIVATED',  // Second parameter: action
+      {                                            // Third parameter: details
         email,
         changedBy,
         reason,
@@ -149,9 +149,9 @@ export class ActivityLogUserController {
     this.logger.log(`Role for user ${userId} changed from ${oldRole} to ${newRole} by ${changedBy}`);
 
     await this.activityLogService.logActivity(
-      'ROLE_CHANGED',
-      {
-        userId,
+      userId,              // First parameter: userId
+      'ROLE_CHANGED',      // Second parameter: action
+      {                    // Third parameter: details
         email,
         oldRole,
         newRole,

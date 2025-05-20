@@ -10,16 +10,1727 @@ Content-Type: application/json
   "password": "Password32!"
 }
 
+### Login as TEACHER
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "newteacher@example.com",
+  "password": "Password32!",
+  "rememberMe": true
+}
+
 ### Save Admin token
 @adminToken = {{loginAdmin.response.body.data.accessToken}}
 
 ### Get all rooms
-GET {{baseUrl}}/rooms?page=1&limit=10&status=AVAILABLE
+GET {{baseUrl}}/rooms/dashboard-view?page=1&limit=10
 Authorization: Bearer {{adminToken}}
 
+
+### Get all rooms clientside (no token required)
+GET {{baseUrl}}/rooms/client-view
+
+### Dữ liệu trả về thành công của get all rooms
+[
+  {
+    "id": 18,
+    "name": "Ensemble Room A102",
+    "capacity": 48,
+    "isActive": true,
+    "status": "AVAILABLE",
+    "createdAt": "2025-04-22T10:58:19.339Z",
+    "updatedAt": "2025-04-22T10:58:19.339Z",
+    "computers": [
+    ],
+    "usages": []
+  },
+  {
+    "id": 17,
+    "name": "Piano Studio B501",
+    "capacity": 28,
+    "isActive": true,
+    "status": "AVAILABLE",
+    "createdAt": "2025-04-22T10:58:18.789Z",
+    "updatedAt": "2025-04-22T10:58:18.789Z",
+    "computers": [
+      {
+        "id": 476,
+        "name": "PC-17-1",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 477,
+        "name": "PC-17-2",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 478,
+        "name": "PC-17-3",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 479,
+        "name": "PC-17-4",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 480,
+        "name": "PC-17-5",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 481,
+        "name": "PC-17-6",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 482,
+        "name": "PC-17-7",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 483,
+        "name": "PC-17-8",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 484,
+        "name": "PC-17-9",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 485,
+        "name": "PC-17-10",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 486,
+        "name": "PC-17-11",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 487,
+        "name": "PC-17-12",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 488,
+        "name": "PC-17-13",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 489,
+        "name": "PC-17-14",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 490,
+        "name": "PC-17-15",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 491,
+        "name": "PC-17-16",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 492,
+        "name": "PC-17-17",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 493,
+        "name": "PC-17-18",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 494,
+        "name": "PC-17-19",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 495,
+        "name": "PC-17-20",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 496,
+        "name": "PC-17-21",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 497,
+        "name": "PC-17-22",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 498,
+        "name": "PC-17-23",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 499,
+        "name": "PC-17-24",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 500,
+        "name": "PC-17-25",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 501,
+        "name": "PC-17-26",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 502,
+        "name": "PC-17-27",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 503,
+        "name": "PC-17-28",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 504,
+        "name": "PC-17-29",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 505,
+        "name": "PC-17-30",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 506,
+        "name": "PC-17-31",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 507,
+        "name": "PC-17-32",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 508,
+        "name": "PC-17-33",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 509,
+        "name": "PC-17-34",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 510,
+        "name": "PC-17-35",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 511,
+        "name": "PC-17-36",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 512,
+        "name": "PC-17-37",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 513,
+        "name": "PC-17-38",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 514,
+        "name": "PC-17-39",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 515,
+        "name": "PC-17-40",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 516,
+        "name": "PC-17-41",
+        "status": "OPERATIONAL"
+      }
+    ],
+    "usages": []
+  },
+  {
+    "id": 20,
+    "name": "Practice Room B404",
+    "capacity": 22,
+    "isActive": true,
+    "status": "AVAILABLE",
+    "createdAt": "2025-04-22T10:58:19.886Z",
+    "updatedAt": "2025-04-22T10:58:19.886Z",
+    "computers": [
+      {
+        "id": 597,
+        "name": "PC-20-1",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 598,
+        "name": "PC-20-2",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 599,
+        "name": "PC-20-3",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 600,
+        "name": "PC-20-4",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 601,
+        "name": "PC-20-5",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 602,
+        "name": "PC-20-6",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 603,
+        "name": "PC-20-7",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 604,
+        "name": "PC-20-8",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 605,
+        "name": "PC-20-9",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 606,
+        "name": "PC-20-10",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 607,
+        "name": "PC-20-11",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 608,
+        "name": "PC-20-12",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 609,
+        "name": "PC-20-13",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 610,
+        "name": "PC-20-14",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 611,
+        "name": "PC-20-15",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 612,
+        "name": "PC-20-16",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 613,
+        "name": "PC-20-17",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 614,
+        "name": "PC-20-18",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 615,
+        "name": "PC-20-19",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 616,
+        "name": "PC-20-20",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 617,
+        "name": "PC-20-21",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 618,
+        "name": "PC-20-22",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 619,
+        "name": "PC-20-23",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 620,
+        "name": "PC-20-24",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 621,
+        "name": "PC-20-25",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 622,
+        "name": "PC-20-26",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 623,
+        "name": "PC-20-27",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 624,
+        "name": "PC-20-28",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 625,
+        "name": "PC-20-29",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 626,
+        "name": "PC-20-30",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 627,
+        "name": "PC-20-31",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 628,
+        "name": "PC-20-32",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 629,
+        "name": "PC-20-33",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 630,
+        "name": "PC-20-34",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 631,
+        "name": "PC-20-35",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 632,
+        "name": "PC-20-36",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 633,
+        "name": "PC-20-37",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 634,
+        "name": "PC-20-38",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 635,
+        "name": "PC-20-39",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 636,
+        "name": "PC-20-40",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 637,
+        "name": "PC-20-41",
+        "status": "OPERATIONAL"
+      }
+    ],
+    "usages": []
+  },
+  {
+    "id": 19,
+    "name": "Recording Studio B203",
+    "capacity": 46,
+    "isActive": true,
+    "status": "AVAILABLE",
+    "createdAt": "2025-04-22T10:58:19.610Z",
+    "updatedAt": "2025-04-22T10:58:19.610Z",
+    "computers": [
+      {
+        "id": 558,
+        "name": "PC-19-1",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 559,
+        "name": "PC-19-2",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 560,
+        "name": "PC-19-3",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 561,
+        "name": "PC-19-4",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 562,
+        "name": "PC-19-5",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 563,
+        "name": "PC-19-6",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 564,
+        "name": "PC-19-7",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 565,
+        "name": "PC-19-8",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 566,
+        "name": "PC-19-9",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 567,
+        "name": "PC-19-10",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 568,
+        "name": "PC-19-11",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 569,
+        "name": "PC-19-12",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 570,
+        "name": "PC-19-13",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 571,
+        "name": "PC-19-14",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 572,
+        "name": "PC-19-15",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 573,
+        "name": "PC-19-16",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 574,
+        "name": "PC-19-17",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 575,
+        "name": "PC-19-18",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 576,
+        "name": "PC-19-19",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 577,
+        "name": "PC-19-20",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 578,
+        "name": "PC-19-21",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 579,
+        "name": "PC-19-22",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 580,
+        "name": "PC-19-23",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 581,
+        "name": "PC-19-24",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 582,
+        "name": "PC-19-25",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 583,
+        "name": "PC-19-26",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 584,
+        "name": "PC-19-27",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 585,
+        "name": "PC-19-28",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 586,
+        "name": "PC-19-29",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 587,
+        "name": "PC-19-30",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 588,
+        "name": "PC-19-31",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 589,
+        "name": "PC-19-32",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 590,
+        "name": "PC-19-33",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 591,
+        "name": "PC-19-34",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 592,
+        "name": "PC-19-35",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 593,
+        "name": "PC-19-36",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 594,
+        "name": "PC-19-37",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 595,
+        "name": "PC-19-38",
+        "status": "OPERATIONAL"
+      },
+      {
+        "id": 596,
+        "name": "PC-19-39",
+        "status": "OPERATIONAL"
+      }
+    ],
+    "usages": []
+  }
+]
+
 ### Get room by ID
-GET {{baseUrl}}/rooms/1
+GET {{baseUrl}}/rooms/19
 Authorization: Bearer {{adminToken}}
+
+### Dữ liệu trả về thành công của get room by ID
+{
+  "id": 17,
+  "name": "Piano Studio B501",
+  "capacity": 28,
+  "isActive": true,
+  "status": "AVAILABLE",
+  "createdAt": "2025-04-22T10:58:18.789Z",
+  "updatedAt": "2025-04-22T10:58:18.789Z",
+  "computers": [
+    {
+      "id": 476,
+      "name": "PC-17-1",
+      "ipAddress": "192.168.17.10",
+      "macAddress": "58:cf:a8:b2:38:d6",
+      "specs": {
+        "os": "macOS Monterey",
+        "gpu": "Integrated",
+        "ram": "32GB Unified",
+        "audio": "Native Instruments Komplete Audio 6",
+        "monitor": "27 inch Apple Studio Display",
+        "storage": "1TB SSD",
+        "software": [
+          "Logic Pro X",
+          "GarageBand",
+          "MuseScore",
+          "MainStage"
+        ],
+        "processor": "Apple M1 Pro"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:20.157Z",
+      "updatedAt": "2025-04-22T10:58:20.157Z"
+    },
+    {
+      "id": 477,
+      "name": "PC-17-2",
+      "ipAddress": "192.168.17.11",
+      "macAddress": "7a:51:62:34:1a:7b",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:20.700Z",
+      "updatedAt": "2025-04-22T10:58:20.700Z"
+    },
+    {
+      "id": 478,
+      "name": "PC-17-3",
+      "ipAddress": "192.168.17.12",
+      "macAddress": "d3:11:a0:e1:db:85",
+      "specs": {
+        "os": "macOS Monterey",
+        "gpu": "Integrated",
+        "ram": "32GB Unified",
+        "audio": "Native Instruments Komplete Audio 6",
+        "monitor": "27 inch Apple Studio Display",
+        "storage": "1TB SSD",
+        "software": [
+          "Logic Pro X",
+          "GarageBand",
+          "MuseScore",
+          "MainStage"
+        ],
+        "processor": "Apple M1 Pro"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:20.988Z",
+      "updatedAt": "2025-04-22T10:58:20.988Z"
+    },
+    {
+      "id": 479,
+      "name": "PC-17-4",
+      "ipAddress": "192.168.17.13",
+      "macAddress": "0b:26:ee:04:1d:b9",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3090",
+        "ram": "128GB DDR5",
+        "audio": "RME Babyface Pro FS",
+        "monitor": "34 inch Curved Ultrawide",
+        "storage": "4TB NVMe SSD",
+        "software": [
+          "Cubase Pro",
+          "Reason 12",
+          "Dorico",
+          "Studio One"
+        ],
+        "processor": "Intel Core i9-12900K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:21.276Z",
+      "updatedAt": "2025-04-22T10:58:21.276Z"
+    },
+    {
+      "id": 480,
+      "name": "PC-17-5",
+      "ipAddress": "192.168.17.14",
+      "macAddress": "33:d3:e8:1d:84:0d",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3080",
+        "ram": "64GB DDR4",
+        "audio": "Universal Audio Apollo Twin",
+        "monitor": "32 inch LG UltraFine",
+        "storage": "2TB NVMe SSD",
+        "software": [
+          "Pro Tools",
+          "Logic Pro X",
+          "Finale",
+          "Cubase Pro"
+        ],
+        "processor": "AMD Ryzen 9 5900X"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:21.550Z",
+      "updatedAt": "2025-04-22T10:58:21.550Z"
+    },
+    {
+      "id": 481,
+      "name": "PC-17-6",
+      "ipAddress": "192.168.17.15",
+      "macAddress": "44:e9:bb:10:e8:e8",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3080",
+        "ram": "64GB DDR4",
+        "audio": "Universal Audio Apollo Twin",
+        "monitor": "32 inch LG UltraFine",
+        "storage": "2TB NVMe SSD",
+        "software": [
+          "Pro Tools",
+          "Logic Pro X",
+          "Finale",
+          "Cubase Pro"
+        ],
+        "processor": "AMD Ryzen 9 5900X"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:21.823Z",
+      "updatedAt": "2025-04-22T10:58:21.823Z"
+    },
+    {
+      "id": 482,
+      "name": "PC-17-7",
+      "ipAddress": "192.168.17.16",
+      "macAddress": "c7:99:fe:f4:62:44",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:22.094Z",
+      "updatedAt": "2025-04-22T10:58:22.094Z"
+    },
+    {
+      "id": 483,
+      "name": "PC-17-8",
+      "ipAddress": "192.168.17.17",
+      "macAddress": "21:b8:90:d9:de:98",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3090",
+        "ram": "128GB DDR5",
+        "audio": "RME Babyface Pro FS",
+        "monitor": "34 inch Curved Ultrawide",
+        "storage": "4TB NVMe SSD",
+        "software": [
+          "Cubase Pro",
+          "Reason 12",
+          "Dorico",
+          "Studio One"
+        ],
+        "processor": "Intel Core i9-12900K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:22.364Z",
+      "updatedAt": "2025-04-22T10:58:22.364Z"
+    },
+    {
+      "id": 484,
+      "name": "PC-17-9",
+      "ipAddress": "192.168.17.18",
+      "macAddress": "c0:7a:b7:09:15:f6",
+      "specs": {
+        "os": "macOS Monterey",
+        "gpu": "Integrated",
+        "ram": "32GB Unified",
+        "audio": "Native Instruments Komplete Audio 6",
+        "monitor": "27 inch Apple Studio Display",
+        "storage": "1TB SSD",
+        "software": [
+          "Logic Pro X",
+          "GarageBand",
+          "MuseScore",
+          "MainStage"
+        ],
+        "processor": "Apple M1 Pro"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:22.636Z",
+      "updatedAt": "2025-04-22T10:58:22.636Z"
+    },
+    {
+      "id": 485,
+      "name": "PC-17-10",
+      "ipAddress": "192.168.17.19",
+      "macAddress": "3d:25:90:47:71:da",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:23.182Z",
+      "updatedAt": "2025-04-22T10:58:23.182Z"
+    },
+    {
+      "id": 486,
+      "name": "PC-17-11",
+      "ipAddress": "192.168.17.20",
+      "macAddress": "db:59:3e:5e:17:c4",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3080",
+        "ram": "64GB DDR4",
+        "audio": "Universal Audio Apollo Twin",
+        "monitor": "32 inch LG UltraFine",
+        "storage": "2TB NVMe SSD",
+        "software": [
+          "Pro Tools",
+          "Logic Pro X",
+          "Finale",
+          "Cubase Pro"
+        ],
+        "processor": "AMD Ryzen 9 5900X"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:23.459Z",
+      "updatedAt": "2025-04-22T10:58:23.459Z"
+    },
+    {
+      "id": 487,
+      "name": "PC-17-12",
+      "ipAddress": "192.168.17.21",
+      "macAddress": "9b:78:9f:8d:2a:7d",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3080",
+        "ram": "64GB DDR4",
+        "audio": "Universal Audio Apollo Twin",
+        "monitor": "32 inch LG UltraFine",
+        "storage": "2TB NVMe SSD",
+        "software": [
+          "Pro Tools",
+          "Logic Pro X",
+          "Finale",
+          "Cubase Pro"
+        ],
+        "processor": "AMD Ryzen 9 5900X"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:23.731Z",
+      "updatedAt": "2025-04-22T10:58:23.731Z"
+    },
+    {
+      "id": 488,
+      "name": "PC-17-13",
+      "ipAddress": "192.168.17.22",
+      "macAddress": "c9:7b:ac:ed:a9:ba",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:24.004Z",
+      "updatedAt": "2025-04-22T10:58:24.004Z"
+    },
+    {
+      "id": 489,
+      "name": "PC-17-14",
+      "ipAddress": "192.168.17.23",
+      "macAddress": "2a:6a:64:21:51:13",
+      "specs": {
+        "os": "macOS Monterey",
+        "gpu": "Integrated",
+        "ram": "32GB Unified",
+        "audio": "Native Instruments Komplete Audio 6",
+        "monitor": "27 inch Apple Studio Display",
+        "storage": "1TB SSD",
+        "software": [
+          "Logic Pro X",
+          "GarageBand",
+          "MuseScore",
+          "MainStage"
+        ],
+        "processor": "Apple M1 Pro"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:24.275Z",
+      "updatedAt": "2025-04-22T10:58:24.275Z"
+    },
+    {
+      "id": 490,
+      "name": "PC-17-15",
+      "ipAddress": "192.168.17.24",
+      "macAddress": "89:2d:ac:d3:8e:82",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:24.547Z",
+      "updatedAt": "2025-04-22T10:58:24.547Z"
+    },
+    {
+      "id": 491,
+      "name": "PC-17-16",
+      "ipAddress": "192.168.17.25",
+      "macAddress": "c9:0c:de:c3:ef:4f",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:24.818Z",
+      "updatedAt": "2025-04-22T10:58:24.818Z"
+    },
+    {
+      "id": 492,
+      "name": "PC-17-17",
+      "ipAddress": "192.168.17.26",
+      "macAddress": "0e:ed:9e:f8:35:6e",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3090",
+        "ram": "128GB DDR5",
+        "audio": "RME Babyface Pro FS",
+        "monitor": "34 inch Curved Ultrawide",
+        "storage": "4TB NVMe SSD",
+        "software": [
+          "Cubase Pro",
+          "Reason 12",
+          "Dorico",
+          "Studio One"
+        ],
+        "processor": "Intel Core i9-12900K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:25.089Z",
+      "updatedAt": "2025-04-22T10:58:25.089Z"
+    },
+    {
+      "id": 493,
+      "name": "PC-17-18",
+      "ipAddress": "192.168.17.27",
+      "macAddress": "bc:e5:70:dc:95:df",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:25.359Z",
+      "updatedAt": "2025-04-22T10:58:25.359Z"
+    },
+    {
+      "id": 494,
+      "name": "PC-17-19",
+      "ipAddress": "192.168.17.28",
+      "macAddress": "f8:eb:0e:5b:eb:07",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3090",
+        "ram": "128GB DDR5",
+        "audio": "RME Babyface Pro FS",
+        "monitor": "34 inch Curved Ultrawide",
+        "storage": "4TB NVMe SSD",
+        "software": [
+          "Cubase Pro",
+          "Reason 12",
+          "Dorico",
+          "Studio One"
+        ],
+        "processor": "Intel Core i9-12900K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:25.629Z",
+      "updatedAt": "2025-04-22T10:58:25.629Z"
+    },
+    {
+      "id": 495,
+      "name": "PC-17-20",
+      "ipAddress": "192.168.17.29",
+      "macAddress": "5d:44:8a:0e:21:b3",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:25.900Z",
+      "updatedAt": "2025-04-22T10:58:25.900Z"
+    },
+    {
+      "id": 496,
+      "name": "PC-17-21",
+      "ipAddress": "192.168.17.30",
+      "macAddress": "ad:f2:af:a9:a1:52",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:26.170Z",
+      "updatedAt": "2025-04-22T10:58:26.170Z"
+    },
+    {
+      "id": 497,
+      "name": "PC-17-22",
+      "ipAddress": "192.168.17.31",
+      "macAddress": "e3:51:70:42:8c:8a",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:26.443Z",
+      "updatedAt": "2025-04-22T10:58:26.443Z"
+    },
+    {
+      "id": 498,
+      "name": "PC-17-23",
+      "ipAddress": "192.168.17.32",
+      "macAddress": "f2:44:8e:0b:76:61",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3080",
+        "ram": "64GB DDR4",
+        "audio": "Universal Audio Apollo Twin",
+        "monitor": "32 inch LG UltraFine",
+        "storage": "2TB NVMe SSD",
+        "software": [
+          "Pro Tools",
+          "Logic Pro X",
+          "Finale",
+          "Cubase Pro"
+        ],
+        "processor": "AMD Ryzen 9 5900X"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:26.713Z",
+      "updatedAt": "2025-04-22T10:58:26.713Z"
+    },
+    {
+      "id": 499,
+      "name": "PC-17-24",
+      "ipAddress": "192.168.17.33",
+      "macAddress": "c6:f6:02:45:84:ae",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:26.991Z",
+      "updatedAt": "2025-04-22T10:58:26.991Z"
+    },
+    {
+      "id": 500,
+      "name": "PC-17-25",
+      "ipAddress": "192.168.17.34",
+      "macAddress": "6e:5c:e3:8b:bb:06",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3090",
+        "ram": "128GB DDR5",
+        "audio": "RME Babyface Pro FS",
+        "monitor": "34 inch Curved Ultrawide",
+        "storage": "4TB NVMe SSD",
+        "software": [
+          "Cubase Pro",
+          "Reason 12",
+          "Dorico",
+          "Studio One"
+        ],
+        "processor": "Intel Core i9-12900K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:27.262Z",
+      "updatedAt": "2025-04-22T10:58:27.262Z"
+    },
+    {
+      "id": 501,
+      "name": "PC-17-26",
+      "ipAddress": "192.168.17.35",
+      "macAddress": "51:30:5d:e4:35:a2",
+      "specs": {
+        "os": "macOS Monterey",
+        "gpu": "Integrated",
+        "ram": "32GB Unified",
+        "audio": "Native Instruments Komplete Audio 6",
+        "monitor": "27 inch Apple Studio Display",
+        "storage": "1TB SSD",
+        "software": [
+          "Logic Pro X",
+          "GarageBand",
+          "MuseScore",
+          "MainStage"
+        ],
+        "processor": "Apple M1 Pro"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:27.533Z",
+      "updatedAt": "2025-04-22T10:58:27.533Z"
+    },
+    {
+      "id": 502,
+      "name": "PC-17-27",
+      "ipAddress": "192.168.17.36",
+      "macAddress": "5a:e4:af:8d:6b:97",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3090",
+        "ram": "128GB DDR5",
+        "audio": "RME Babyface Pro FS",
+        "monitor": "34 inch Curved Ultrawide",
+        "storage": "4TB NVMe SSD",
+        "software": [
+          "Cubase Pro",
+          "Reason 12",
+          "Dorico",
+          "Studio One"
+        ],
+        "processor": "Intel Core i9-12900K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:27.808Z",
+      "updatedAt": "2025-04-22T10:58:27.808Z"
+    },
+    {
+      "id": 503,
+      "name": "PC-17-28",
+      "ipAddress": "192.168.17.37",
+      "macAddress": "7b:28:b6:5d:ff:c6",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3090",
+        "ram": "128GB DDR5",
+        "audio": "RME Babyface Pro FS",
+        "monitor": "34 inch Curved Ultrawide",
+        "storage": "4TB NVMe SSD",
+        "software": [
+          "Cubase Pro",
+          "Reason 12",
+          "Dorico",
+          "Studio One"
+        ],
+        "processor": "Intel Core i9-12900K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:28.078Z",
+      "updatedAt": "2025-04-22T10:58:28.078Z"
+    },
+    {
+      "id": 504,
+      "name": "PC-17-29",
+      "ipAddress": "192.168.17.38",
+      "macAddress": "dd:0b:29:d3:8e:4f",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3080",
+        "ram": "64GB DDR4",
+        "audio": "Universal Audio Apollo Twin",
+        "monitor": "32 inch LG UltraFine",
+        "storage": "2TB NVMe SSD",
+        "software": [
+          "Pro Tools",
+          "Logic Pro X",
+          "Finale",
+          "Cubase Pro"
+        ],
+        "processor": "AMD Ryzen 9 5900X"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:28.348Z",
+      "updatedAt": "2025-04-22T10:58:28.348Z"
+    },
+    {
+      "id": 505,
+      "name": "PC-17-30",
+      "ipAddress": "192.168.17.39",
+      "macAddress": "1f:37:29:50:d7:f1",
+      "specs": {
+        "os": "macOS Monterey",
+        "gpu": "Integrated",
+        "ram": "32GB Unified",
+        "audio": "Native Instruments Komplete Audio 6",
+        "monitor": "27 inch Apple Studio Display",
+        "storage": "1TB SSD",
+        "software": [
+          "Logic Pro X",
+          "GarageBand",
+          "MuseScore",
+          "MainStage"
+        ],
+        "processor": "Apple M1 Pro"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:28.618Z",
+      "updatedAt": "2025-04-22T10:58:28.618Z"
+    },
+    {
+      "id": 506,
+      "name": "PC-17-31",
+      "ipAddress": "192.168.17.40",
+      "macAddress": "94:27:93:c3:1c:47",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3090",
+        "ram": "128GB DDR5",
+        "audio": "RME Babyface Pro FS",
+        "monitor": "34 inch Curved Ultrawide",
+        "storage": "4TB NVMe SSD",
+        "software": [
+          "Cubase Pro",
+          "Reason 12",
+          "Dorico",
+          "Studio One"
+        ],
+        "processor": "Intel Core i9-12900K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:28.889Z",
+      "updatedAt": "2025-04-22T10:58:28.889Z"
+    },
+    {
+      "id": 507,
+      "name": "PC-17-32",
+      "ipAddress": "192.168.17.41",
+      "macAddress": "67:3e:36:95:8a:f9",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3080",
+        "ram": "64GB DDR4",
+        "audio": "Universal Audio Apollo Twin",
+        "monitor": "32 inch LG UltraFine",
+        "storage": "2TB NVMe SSD",
+        "software": [
+          "Pro Tools",
+          "Logic Pro X",
+          "Finale",
+          "Cubase Pro"
+        ],
+        "processor": "AMD Ryzen 9 5900X"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:29.160Z",
+      "updatedAt": "2025-04-22T10:58:29.160Z"
+    },
+    {
+      "id": 508,
+      "name": "PC-17-33",
+      "ipAddress": "192.168.17.42",
+      "macAddress": "87:e9:37:85:b8:8f",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3080",
+        "ram": "64GB DDR4",
+        "audio": "Universal Audio Apollo Twin",
+        "monitor": "32 inch LG UltraFine",
+        "storage": "2TB NVMe SSD",
+        "software": [
+          "Pro Tools",
+          "Logic Pro X",
+          "Finale",
+          "Cubase Pro"
+        ],
+        "processor": "AMD Ryzen 9 5900X"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:29.443Z",
+      "updatedAt": "2025-04-22T10:58:29.443Z"
+    },
+    {
+      "id": 509,
+      "name": "PC-17-34",
+      "ipAddress": "192.168.17.43",
+      "macAddress": "71:81:48:35:3a:a5",
+      "specs": {
+        "os": "macOS Monterey",
+        "gpu": "Integrated",
+        "ram": "32GB Unified",
+        "audio": "Native Instruments Komplete Audio 6",
+        "monitor": "27 inch Apple Studio Display",
+        "storage": "1TB SSD",
+        "software": [
+          "Logic Pro X",
+          "GarageBand",
+          "MuseScore",
+          "MainStage"
+        ],
+        "processor": "Apple M1 Pro"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:29.717Z",
+      "updatedAt": "2025-04-22T10:58:29.717Z"
+    },
+    {
+      "id": 510,
+      "name": "PC-17-35",
+      "ipAddress": "192.168.17.44",
+      "macAddress": "02:1c:a0:2e:d4:7f",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3080",
+        "ram": "64GB DDR4",
+        "audio": "Universal Audio Apollo Twin",
+        "monitor": "32 inch LG UltraFine",
+        "storage": "2TB NVMe SSD",
+        "software": [
+          "Pro Tools",
+          "Logic Pro X",
+          "Finale",
+          "Cubase Pro"
+        ],
+        "processor": "AMD Ryzen 9 5900X"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:29.988Z",
+      "updatedAt": "2025-04-22T10:58:29.988Z"
+    },
+    {
+      "id": 511,
+      "name": "PC-17-36",
+      "ipAddress": "192.168.17.45",
+      "macAddress": "ae:f3:43:35:0d:e2",
+      "specs": {
+        "os": "Windows 10 Pro",
+        "gpu": "NVIDIA RTX 3060",
+        "ram": "32GB DDR4",
+        "audio": "Focusrite Scarlett 2i2",
+        "monitor": "27 inch Dell UltraSharp",
+        "storage": "1TB SSD + 2TB HDD",
+        "software": [
+          "Ableton Live 11",
+          "FL Studio 20",
+          "Sibelius",
+          "ProTools"
+        ],
+        "processor": "Intel Core i7-11700K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:30.259Z",
+      "updatedAt": "2025-04-22T10:58:30.259Z"
+    },
+    {
+      "id": 512,
+      "name": "PC-17-37",
+      "ipAddress": "192.168.17.46",
+      "macAddress": "8f:ab:09:1f:58:21",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3090",
+        "ram": "128GB DDR5",
+        "audio": "RME Babyface Pro FS",
+        "monitor": "34 inch Curved Ultrawide",
+        "storage": "4TB NVMe SSD",
+        "software": [
+          "Cubase Pro",
+          "Reason 12",
+          "Dorico",
+          "Studio One"
+        ],
+        "processor": "Intel Core i9-12900K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:30.532Z",
+      "updatedAt": "2025-04-22T10:58:30.532Z"
+    },
+    {
+      "id": 513,
+      "name": "PC-17-38",
+      "ipAddress": "192.168.17.47",
+      "macAddress": "01:b4:22:7e:ed:a2",
+      "specs": {
+        "os": "macOS Monterey",
+        "gpu": "Integrated",
+        "ram": "32GB Unified",
+        "audio": "Native Instruments Komplete Audio 6",
+        "monitor": "27 inch Apple Studio Display",
+        "storage": "1TB SSD",
+        "software": [
+          "Logic Pro X",
+          "GarageBand",
+          "MuseScore",
+          "MainStage"
+        ],
+        "processor": "Apple M1 Pro"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:30.803Z",
+      "updatedAt": "2025-04-22T10:58:30.803Z"
+    },
+    {
+      "id": 514,
+      "name": "PC-17-39",
+      "ipAddress": "192.168.17.48",
+      "macAddress": "13:33:d8:5d:3c:2a",
+      "specs": {
+        "os": "Windows 11 Pro",
+        "gpu": "NVIDIA RTX 3090",
+        "ram": "128GB DDR5",
+        "audio": "RME Babyface Pro FS",
+        "monitor": "34 inch Curved Ultrawide",
+        "storage": "4TB NVMe SSD",
+        "software": [
+          "Cubase Pro",
+          "Reason 12",
+          "Dorico",
+          "Studio One"
+        ],
+        "processor": "Intel Core i9-12900K"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:31.075Z",
+      "updatedAt": "2025-04-22T10:58:31.075Z"
+    },
+    {
+      "id": 515,
+      "name": "PC-17-40",
+      "ipAddress": "192.168.17.49",
+      "macAddress": "a9:0e:d7:6a:24:8c",
+      "specs": {
+        "os": "macOS Monterey",
+        "gpu": "Integrated",
+        "ram": "32GB Unified",
+        "audio": "Native Instruments Komplete Audio 6",
+        "monitor": "27 inch Apple Studio Display",
+        "storage": "1TB SSD",
+        "software": [
+          "Logic Pro X",
+          "GarageBand",
+          "MuseScore",
+          "MainStage"
+        ],
+        "processor": "Apple M1 Pro"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:31.345Z",
+      "updatedAt": "2025-04-22T10:58:31.345Z"
+    },
+    {
+      "id": 516,
+      "name": "PC-17-41",
+      "ipAddress": "192.168.17.50",
+      "macAddress": "27:cd:bd:85:db:74",
+      "specs": {
+        "os": "macOS Monterey",
+        "gpu": "Integrated",
+        "ram": "32GB Unified",
+        "audio": "Native Instruments Komplete Audio 6",
+        "monitor": "27 inch Apple Studio Display",
+        "storage": "1TB SSD",
+        "software": [
+          "Logic Pro X",
+          "GarageBand",
+          "MuseScore",
+          "MainStage"
+        ],
+        "processor": "Apple M1 Pro"
+      },
+      "roomId": 17,
+      "status": "OPERATIONAL",
+      "createdAt": "2025-04-22T10:58:31.615Z",
+      "updatedAt": "2025-04-22T10:58:31.615Z"
+    }
+  ],
+  "usages": []
+}
 
 ### Create new room (Admin only)
 POST {{baseUrl}}/rooms
@@ -27,27 +1738,52 @@ Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
 {
-  "name": "Lab 102",
-  "floor": 1,
-  "building": "A",
+  "name": "Lab 102TEST",
   "capacity": 30,
   "status": "AVAILABLE",
   "equipment": ["Projector", "Computers", "Whiteboards"]
 }
 
+### Dữ liệu trả về thành công của tạo phòng mới
+{
+  "id": 21,
+  "name": "Lab 102TEST",
+  "location": "",
+  "capacity": 30,
+  "description": "",
+  "isActive": true,
+  "status": "AVAILABLE",
+  "createdAt": "2025-04-22T12:08:51.604Z",
+  "updatedAt": "2025-04-22T12:08:51.604Z"
+}
+
+
 ### Update room (Admin only)
-PUT {{baseUrl}}/rooms/4
+PUT {{baseUrl}}/rooms/22
 Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
 {
-  "name": "Lab 104 Updated",
+  "name": "Lab 102TEST Updated",
   "capacity": 35,
   "equipment": ["Projector", "Computers", "Whiteboards", "Audio System"]
 }
 
+### Dữ liệu trả về thành công của cập nhật phòng
+{
+  "id": 21,
+  "name": "Lab 102TEST Updated",
+  "location": "",
+  "capacity": 30,
+  "description": "",
+  "isActive": true,
+  "status": "AVAILABLE",
+  "createdAt": "2025-04-22T12:08:51.604Z",
+  "updatedAt": "2025-04-22T12:11:01.516Z"
+}
+
 ### Update room status (Admin or Teacher)
-PATCH {{baseUrl}}/rooms/4/status
+PATCH {{baseUrl}}/rooms/22/status
 Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
@@ -55,29 +1791,146 @@ Authorization: Bearer {{adminToken}}
   "status": "MAINTENANCE"
 }
 
+### Dữ liệu trả về thành công của cập nhật trạng thái phòng
+{
+  "success": true,
+  "data": {
+    "id": 21,
+    "name": "Lab 102TEST Updated",
+    "location": "",
+    "capacity": 30,
+    "description": "",
+    "isActive": true,
+    "status": "AVAILABLE",
+    "createdAt": "2025-04-22T12:08:51.604Z",
+    "updatedAt": "2025-04-22T12:11:30.555Z"
+  }
+}
+
 ### Delete room (Admin only)
-DELETE {{baseUrl}}/rooms/1
+DELETE {{baseUrl}}/rooms/21
 Authorization: Bearer {{adminToken}}
+
+## Dữ liệu trả về thành công của xóa phòng
+{
+  "message": "Room with ID 21 removed successfully"
+}
 
 ### Get room activity history
-GET {{baseUrl}}/rooms/4/activity-history?page=1&limit=10
+GET {{baseUrl}}/rooms/22/activity-history?page=1&limit=10
 Authorization: Bearer {{adminToken}}
 
-### Get room usage statistics
-GET {{baseUrl}}/rooms/1/usage-stats?startDate=2023-01-01&endDate=2023-12-31
-Authorization: Bearer {{adminToken}}
-
-### Get room schedules
-GET {{baseUrl}}/rooms/1/schedules?startDate=2023-01-01&endDate=2023-12-31
-Authorization: Bearer {{adminToken}}
+### Dữ liệu trả về thành công của lịch sử hoạt động phòng
+{
+  "data": [
+    {
+      "id": 262,
+      "action": "UPDATE_ROOM_STATUS",
+      "details": {
+        "entityId": 22,
+        "newStatus": "MAINTENANCE",
+        "entityType": "room",
+        "previousStatus": "AVAILABLE"
+      },
+      "createdAt": "2025-04-22T12:21:20.992Z",
+      "actorId": 550,
+      "visibleToId": null,
+      "actor": {
+        "id": 550,
+        "name": "System Administrator",
+        "email": "admin@example.com",
+        "role": "ADMIN"
+      }
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1
+  }
+}
 
 ### Get all schedules
 GET {{baseUrl}}/schedules?page=1&limit=10
 Authorization: Bearer {{adminToken}}
 
+### Dữ liệu trả về thành công của tất cả lịch học
+{
+  "success": true,
+  "message": "Schedules retrieved successfully",
+  "data": [
+    {
+      "id": 6,
+      "roomId": 18,
+      "title": "SOmething random",
+      "startTime": "2025-04-22T12:24:08.294Z",
+      "endTime": "2025-04-22T00:00:00.000Z",
+      "repeat": "MONTHLY",
+      "status": "PENDING",
+      "createdBy": 550,
+      "createdAt": "2025-04-22T12:24:08.294Z",
+      "updatedAt": "2025-04-22T12:24:08.294Z",
+      "room": {
+        "id": 18,
+        "name": "Ensemble Room A102",
+        "location": null,
+        "capacity": 48
+      },
+      "user": {
+        "id": 550,
+        "name": "System Administrator",
+        "email": "admin@example.com",
+        "role": "ADMIN"
+      }
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1
+  }
+}
+
 ### Get schedule by ID
-GET {{baseUrl}}/schedules/1
+GET {{baseUrl}}/schedules/6
 Authorization: Bearer {{adminToken}}
+
+### Dữ liệu trả thành công của lịch học theo ID
+{
+  "success": true,
+  "message": "Schedule found",
+  "data": {
+    "id": 6,
+    "roomId": 18,
+    "title": "SOmething random",
+    "startTime": "2025-04-22T12:24:08.294Z",
+    "endTime": "2025-04-22T00:00:00.000Z",
+    "repeat": "MONTHLY",
+    "status": "PENDING",
+    "createdBy": 550,
+    "createdAt": "2025-04-22T12:24:08.294Z",
+    "updatedAt": "2025-04-22T12:24:08.294Z",
+    "room": {
+      "id": 18,
+      "name": "Ensemble Room A102",
+      "location": null,
+      "capacity": 48,
+      "description": null,
+      "isActive": true,
+      "status": "AVAILABLE",
+      "createdAt": "2025-04-22T10:58:19.339Z",
+      "updatedAt": "2025-04-22T10:58:19.339Z"
+    },
+    "user": {
+      "id": 550,
+      "name": "System Administrator",
+      "email": "admin@example.com",
+      "role": "ADMIN"
+    }
+  }
+}
 
 ### Create new schedule
 POST {{baseUrl}}/schedules
@@ -85,15 +1938,47 @@ Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
 {
-  "roomId": 1,
-  "title": "Computer Programming Class",
-  "startTime": "2023-06-15T09:00:00Z",
-  "endTime": "2023-06-15T11:00:00Z",
+  "roomId": 20,
+  "title": "Computer Programming Class 2",
+  "startTime": "2025-06-15T09:00:00Z",
+  "endTime": "2025-06-15T11:00:00Z",
   "repeat": "WEEKLY"
 }
 
+### Dữ liệu trả về của tạo lịch học mới
+{
+  "id": 8,
+  "roomId": 20,
+  "title": "Computer Programming Class 2",
+  "startTime": "2025-06-15T09:00:00.000Z",
+  "endTime": "2025-06-15T11:00:00.000Z",
+  "repeat": "WEEKLY",
+  "status": "APPROVED",
+  "createdBy": 550,
+  "createdAt": "2025-04-22T12:27:25.018Z",
+  "updatedAt": "2025-04-22T12:27:25.018Z",
+  "user": {
+    "id": 550,
+    "name": "System Administrator",
+    "email": "admin@example.com",
+    "role": "ADMIN",
+    "createdById": null
+  },
+  "room": {
+    "id": 20,
+    "name": "Practice Room B404",
+    "location": null,
+    "capacity": 22,
+    "description": null,
+    "isActive": true,
+    "status": "AVAILABLE",
+    "createdAt": "2025-04-22T10:58:19.886Z",
+    "updatedAt": "2025-04-22T10:58:19.886Z"
+  }
+}
+
 ### Update schedule
-PUT {{baseUrl}}/schedules/1
+PUT {{baseUrl}}/schedules/8
 Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
@@ -103,37 +1988,48 @@ Authorization: Bearer {{adminToken}}
   "endTime": "2023-06-15T12:00:00Z"
 }
 
-### Delete schedule
-DELETE {{baseUrl}}/schedules/2
-Authorization: Bearer {{adminToken}}
-
-### Approve schedule (Admin or Teacher)
-PUT {{baseUrl}}/schedules/1/approve
-Authorization: Bearer {{adminToken}}
-
-### Reject schedule (Admin or Teacher)
-PUT {{baseUrl}}/schedules/3/reject
-Content-Type: application/json
-Authorization: Bearer {{adminToken}}
-
+### Dữ liệu trả về của cập nhật lịch học
 {
-  "reason": "Time slot already reserved for another class"
+  "success": true,
+  "message": "Schedule updated successfully",
+  "data": {
+    "id": 8,
+    "roomId": 20,
+    "title": "Updated Computer Programming Class",
+    "startTime": "2023-06-15T10:00:00.000Z",
+    "endTime": "2023-06-15T12:00:00.000Z",
+    "repeat": "WEEKLY",
+    "status": "APPROVED",
+    "createdBy": 550,
+    "createdAt": "2025-04-22T12:27:25.018Z",
+    "updatedAt": "2025-04-22T12:28:14.544Z",
+    "room": {
+      "id": 20,
+      "name": "Practice Room B404",
+      "location": null,
+      "capacity": 22
+    },
+    "user": {
+      "id": 550,
+      "name": "System Administrator",
+      "email": "admin@example.com",
+      "role": "ADMIN"
+    }
+  }
 }
 
-### Check schedule conflicts
-POST {{baseUrl}}/schedules/check-conflicts
-Content-Type: application/json
+### Delete schedule
+DELETE {{baseUrl}}/schedules/8
 Authorization: Bearer {{adminToken}}
 
+### Dữ liệu trả về của xóa lịch học
 {
-  "roomId": 1,
-  "startTime": "2023-06-16T09:00:00Z",
-  "endTime": "2023-06-16T11:00:00Z",
-  "excludeScheduleId": 5
+  "success": true,
+  "message": "Schedule cancelled successfully"
 }
 
 ### Mark room for maintenance
-POST {{baseUrl}}/rooms/1/maintenance
+POST {{baseUrl}}/rooms/22/maintenance
 Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
@@ -141,4 +2037,21 @@ Authorization: Bearer {{adminToken}}
   "reason": "Computer hardware upgrades",
   "startTime": "2023-07-01T08:00:00Z",
   "endTime": "2023-07-05T18:00:00Z"
+}
+
+### Dữ liệu trả về của đánh dấu phòng bảo trì
+{
+  "success": true,
+  "message": "Room marked for maintenance successfully",
+  "data": {
+    "id": 1133,
+    "roomId": 22,
+    "userId": 550,
+    "startTime": "2023-07-01T08:00:00.000Z",
+    "endTime": "2023-07-05T18:00:00.000Z",
+    "purpose": "Computer hardware upgrades",
+    "createdAt": "2025-04-22T12:30:43.456Z",
+    "updatedAt": "2025-04-22T12:30:43.456Z",
+    "scheduleId": null
+  }
 }

@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
+RUN npm run prisma:generate
 RUN npm run build api-gateway
 
 FROM node:20-alpine AS production
@@ -17,6 +18,10 @@ RUN npm ci --omit=dev
 
 COPY --from=build /app/dist/apps/api-gateway ./dist
 COPY --from=build /app/node_modules ./node_modules
+
+RUN mkdir -p /app/uploads && \
+    chown -R node:node /app && \
+    chmod -R 755 /app/uploads
 
 USER node
 

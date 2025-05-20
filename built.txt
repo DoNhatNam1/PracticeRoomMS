@@ -1,0 +1,17 @@
+# Build frontend
+docker build -t localhost:5000/my-frontend-image:latest ./frontend
+docker push localhost:5000/my-frontend-image:latest
+
+# Build api-gateway
+docker build -t localhost:5000/my-api-gateway-image:latest -f ./apps/api-gateway/Dockerfile ./
+docker push localhost:5000/my-api-gateway-image:latest
+
+# Build các services khác
+docker build -t localhost:5000/my-user-service-image:latest -f ./apps/user-service/Dockerfile ./
+docker push localhost:5000/my-user-service-image:latest (xong)
+
+docker build -t localhost:5000/my-room-service-image:latest -f ./apps/room-service/Dockerfile ./
+docker push localhost:5000/my-room-service-image:latest
+
+docker build -t localhost:5000/my-computer-service-image:latest -f ./apps/computer-service/Dockerfile ./
+docker push localhost:5000/my-computer-service-image:latest

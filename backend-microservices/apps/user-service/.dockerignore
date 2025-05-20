@@ -22,11 +22,6 @@ Dockerfile*
 docker-compose*
 .dockerignore
 
-# Environment
-.env
-**/.env
-.env.*
-!.env.example
 
 # IDE
 .idea

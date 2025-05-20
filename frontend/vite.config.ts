@@ -17,7 +17,8 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'http://api-gateway:3000',
+        target: 'http://api-gateway:3100',
+        // target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
       }

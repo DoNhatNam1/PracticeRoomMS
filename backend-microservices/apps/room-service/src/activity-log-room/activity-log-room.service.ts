@@ -71,12 +71,22 @@ export class ActivityLogRoomService {
     const { page = 1, limit = 10, startDate, endDate } = options || {};
     const skip = (page - 1) * limit;
     
-    // Tạo điều kiện tìm kiếm dựa trên roomId trong details
+    // Use only the JSON field conditions since roomId doesn't exist
     const roomFilter = {
-      details: {
-        path: ['roomId'],
-        equals: roomId
-      }
+      AND: [
+        {
+          details: {
+            path: ['entityType'],
+            equals: 'room',
+          },
+        },
+        {
+          details: {
+            path: ['entityId'],
+            equals: roomId,
+          },
+        }
+      ]
     };
     
     // Điều kiện lọc theo thời gian

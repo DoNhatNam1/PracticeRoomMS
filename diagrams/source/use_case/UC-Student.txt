@@ -1,0 +1,50 @@
++------------------+-----------------------------------------------------------------------+
+| Mã Use Case      | UC-Student                                                            |
++------------------+-----------------------------------------------------------------------+
+| Tên Use Case     | Sử dụng Phòng Thực hành và Làm Bài                                    |
++------------------+-----------------------------------------------------------------------+
+| Mô tả            | Use Case này mô tả các chức năng của Sinh viên trong hệ thống, bao gồm|
+|                  | sử dụng phòng thực hành, làm bài, sử dụng tài nguyên và báo cáo sự cố |
++------------------+-----------------------------------------------------------------------+
+| Tác nhân         | Sinh viên                                                              |
++------------------+-----------------------------------------------------------------------+
+| Điều kiện        | Sinh viên đã đăng nhập vào hệ thống với tài khoản sinh viên           |
+| tiên quyết       |                                                                       |
++------------------+-----------------------------------------------------------------------+
+| Điều kiện        | Thành công: Sử dụng thành công phòng thực hành và hoàn thành bài tập  |
+| kết thúc         | Thất bại: Hiển thị thông báo lỗi phù hợp                              |
++------------------+-----------------------------------------------------------------------+
+| Luồng sự kiện    |     | Sinh viên                          | Hệ thống                   |
+| chính            | 1   | Đăng nhập vào hệ thống             |                            |
+|                  | 2   |                                    | Xác thực thành công và hiển|
+|                  |     |                                    | thị dashboard              |
+|                  | 3   | Chọn chức năng (Sử dụng phòng thực |                            |
+|                  |     | hành, Làm bài thực hành, Sử dụng   |                            |
+|                  |     | tài nguyên máy tính, Báo cáo sự cố)|                            |
+|                  | 4   |                                    | Hiển thị giao diện tương   |
+|                  |     |                                    | ứng với chức năng đã chọn  |
+|                  | 5   | Thực hiện thao tác cụ thể (chọn    |                            |
+|                  |     | phòng, làm bài, nộp bài, v.v.)     |                            |
+|                  | 6   |                                    | Xử lý yêu cầu và cập nhật  |
+|                  |     |                                    | hệ thống                   |
+|                  | 7   |                                    | Hiển thị thông báo kết quả |
+|                  | 8   | Tiếp tục sử dụng hệ thống hoặc     |                            |
+|                  |     | đăng xuất                          |                            |
++------------------+-----------------------------------------------------------------------+
+| Luồng sự kiện    |     | Sinh viên                          | Hệ thống                   |
+| ngoại lệ         | 1.1 | Nhập thông tin đăng nhập không     |                            |
+|                  |     | chính xác                          |                            |
+|                  | 1.2 |                                    | Hiển thị thông báo lỗi và  |
+|                  |     |                                    | yêu cầu đăng nhập lại      |
+|                  | 3.1 | Chọn bài thực hành không thuộc lớp |                            |
+|                  |     | học của sinh viên                  |                            |
+|                  | 3.2 |                                    | Hiển thị thông báo từ chối |
+|                  |     |                                    | truy cập                   |
+|                  | 5.1 | Chọn máy tính đang được sử dụng    |                            |
+|                  |     | hoặc trong trạng thái bảo trì      |                            |
+|                  | 5.2 |                                    | Hiển thị thông báo không   |
+|                  |     |                                    | khả dụng và gợi ý máy khác |
+|                  | 6.1 |                                    | Gặp lỗi khi xử lý yêu cầu  |
+|                  | 6.2 |                                    | Hiển thị thông báo lỗi và  |
+|                  |     |                                    | hướng dẫn khắc phục        |
++------------------+-----------------------------------------------------------------------+

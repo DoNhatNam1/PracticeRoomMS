@@ -1,134 +1,160 @@
-import { Outlet, useParams, useNavigate } from 'react-router-dom';
-import { 
-  AppShell, Text, Group, Avatar, ThemeIcon, UnstyledButton, 
-  Stack, Divider
-} from '@mantine/core';
-import { 
-  IconDashboard, IconUsers, IconCalendarEvent, IconDeviceDesktop, 
-  IconDoor, IconUser, IconLogout
-} from '@tabler/icons-react';
-import { useAuthStore } from '../../stores/authStore';
-import { useEffect, useState } from 'react';
-import { getRooms } from '../../api/rooms';
-import { Room } from '../../types';
-import './TeacherLayout.css';
+import { Outlet, useParams, useNavigate, Link } from "react-router-dom";
+import { Toaster } from "sonner";
+import { useAuthStore } from "@/stores/authStore";
+import {
+  Users,
+  LogOut,
+  Settings,
+  BookOpen,
+  LayoutDashboard,
+  Monitor,
+  DoorOpen,
+  ClipboardList
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { getRoomById } from "@/api/rooms";
+import { Room } from "@/types/room-service/rooms";
+import { Badge } from "@/components/ui/badge";
 
 export default function TeacherLayout() {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [room, setRoom] = useState<Room | null>(null);
+
+  useEffect(() => {
+    if (roomId) {
+      getRoomById(parseInt(roomId))
+        .then(response => {
+          if (response.success) {
+            setRoom(response.data);
+          }
+        })
+        .catch(error => {
+          console.error('Failed to fetch room:', error);
+        });
+    }
+  }, [roomId]);
+
   const handleLogout = () => {
     logout();
     navigate('/role-selection');
   };
 
-
-  useEffect(() => {
-    if (roomId) {
-      getRooms({ limit: 100 })
-        .then(response => {
-          if (response.success) {
-            const roomData = response.data.items.find(r => r.id === parseInt(roomId));
-            if (roomData) {
-              setRoom(roomData);
-            }
-          }
-        })
-        .catch(error => console.error('Failed to load room:', error));
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'AVAILABLE': return 'bg-green-100 text-green-800';
+      case 'IN_USE': return 'bg-blue-100 text-blue-800';
+      case 'MAINTENANCE': return 'bg-amber-100 text-amber-800';
+      case 'CLOSED': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
-  }, [roomId]);
+  };
 
-  const menuItems = [
-    { icon: <IconDashboard size={20} />, label: 'Dashboard', path: `/teacher/${roomId}` },
-    { icon: <IconUsers size={20} />, label: 'My Students', path: `/teacher/${roomId}/students` },
-    { icon: <IconCalendarEvent size={20} />, label: 'Schedules', path: `/teacher/${roomId}/schedules` },
-    { icon: <IconDeviceDesktop size={20} />, label: 'Computers', path: `/teacher/${roomId}/computers` },
-    { icon: <IconDoor size={20} />, label: 'Room Status', path: `/teacher/${roomId}/room-status` },
-    { icon: <IconUser size={20} />, label: 'Profile', path: `/teacher/${roomId}/profile` },
-  ];
-  
   return (
-    <AppShell
-      padding="md"
-      navbar={{ 
-        width: 250, 
-        breakpoint: 'sm',
-      }}
-      header={{ 
-        height: 60 
-      }}
-    >
-      <AppShell.Header p="xs">
-        <Group h="100%" px={20} justify="space-between">
-          <Text fw={700} size="lg">Practice Room - Teacher Mode</Text>
-          
-          <Group>
-            <Text fw={500}>{user?.name || 'Teacher'}</Text>
-            <Avatar color="green" radius="xl">
-              {user?.name?.charAt(0) || 'T'}
-            </Avatar>
-          </Group>
-        </Group>
-      </AppShell.Header>
-
-      <AppShell.Navbar p="xs">
-        <Stack h="100%" justify="space-between">
-          <Stack>
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-sm dark:bg-gray-800">
+        <div className="flex flex-col h-full">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-bold">Teacher Portal</h2>
+            <p className="text-sm text-muted-foreground">
+              {user?.name || "Teacher"}
+            </p>
             {room && (
-              <>
-                <Group p="xs">
-                  <ThemeIcon size={30} radius="xl" color="blue">
-                    <IconDoor size={20} />
-                  </ThemeIcon>
-                  <div>
-                    <Text size="xs" c="dimmed">Current Room</Text>
-                    <Text fw={500}>{room.name}</Text>
-                  </div>
-                </Group>
-                <Divider my="xs" />
-              </>
+              <div className="flex items-center gap-2 mt-2">
+                <DoorOpen className="w-4 h-4" />
+                <Badge className={getStatusColor(room.status)}>
+                  Room: {room.name}
+                </Badge>
+              </div>
             )}
-            
-            <Stack gap={0}>
-              {menuItems.map((item, index) => (
-                <UnstyledButton
-                  key={index}
-                  onClick={() => navigate(item.path)}
-                  py="xs"
-                  px="md"
-                  className="menu-item"
-                >
-                  <Group>
-                    <ThemeIcon size={30} variant="light">
-                      {item.icon}
-                    </ThemeIcon>
-                    <Text size="sm">{item.label}</Text>
-                  </Group>
-                </UnstyledButton>
-              ))}
-            </Stack>
-          </Stack>
-          
-          <UnstyledButton
-            onClick={handleLogout}
-            py="xs"
-            px="md"
-            className="logout-button"
-          >
-            <Group>
-              <ThemeIcon size={30} variant="light" color="red">
-                <IconLogout size={20} />
-              </ThemeIcon>
-              <Text size="sm" c="red">Logout</Text>
-            </Group>
-          </UnstyledButton>
-        </Stack>
-      </AppShell.Navbar>
+          </div>
+          <nav className="flex-1 p-4 space-y-1">
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to={`/teacher/dashboard/${roomId}`}>
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Dashboard
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to={`/teacher/students/${roomId}`}>
+                <Users className="w-4 h-4 mr-2" />
+                Students
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to={`/teacher/computers/${roomId}`}>
+                <Monitor className="w-4 h-4 mr-2" />
+                Computers
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to={`/teacher/lessons/${roomId}`}>
+                <BookOpen className="w-4 h-4 mr-2" />
+                Lessons
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to={`/teacher/attendance/${roomId}`}>
+                <ClipboardList className="w-4 h-4 mr-2" />
+                Attendance
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to={`/teacher/settings/${roomId}`}>
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Link>
+            </Button>
+          </nav>
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              variant="ghost"
+              className="justify-start w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Log out
+            </Button>
+          </div>
+        </div>
+      </div>
 
-      <AppShell.Main>
-        <Outlet />
-      </AppShell.Main>
-    </AppShell>
+      {/* Content */}
+      <div className="flex flex-col flex-1">
+        <main className="flex-1 p-6">
+          <Outlet />
+        </main>
+      </div>
+
+      {/* Toaster for notifications */}
+      <Toaster />
+    </div>
   );
 }

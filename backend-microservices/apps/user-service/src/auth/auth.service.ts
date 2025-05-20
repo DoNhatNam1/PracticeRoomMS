@@ -38,12 +38,16 @@ export class AuthService {
 
     try {
       // Log attempt
-      await this.activityLogService.logActivity('REGISTER_ATTEMPT', {
-        email,
-        name,
-        role,
-        department
-      });
+      await this.activityLogService.logActivity(
+        null, // No user ID yet
+        'REGISTER_ATTEMPT', 
+        {
+          email,
+          name,
+          role,
+          department
+        }
+      );
 
       // Kiểm tra email đã tồn tại chưa
       const existingUser = await this.prisma.user.findFirst({
@@ -52,10 +56,14 @@ export class AuthService {
 
       if (existingUser) {
         // Log failure
-        await this.activityLogService.logActivity('REGISTER_FAILED', {
-          email,
-          reason: 'Email already exists'
-        });
+        await this.activityLogService.logActivity(
+          null, // No valid user being created
+          'REGISTER_FAILED',
+          {
+            email,
+            reason: 'Email already exists'
+          }
+        );
 
         return {
           success: false,
@@ -81,11 +89,14 @@ export class AuthService {
       });
 
       // Log success
-      await this.activityLogService.logActivity('REGISTER_SUCCESS', {
-        userId: newUser.id,
-        email,
-        role: newUser.role
-      });
+      await this.activityLogService.logActivity(
+        newUser.id,
+        'REGISTER_SUCCESS',
+        {
+          email,
+          role: newUser.role
+        }
+      );
 
       // Tạo token
       const tokens = this.generateTokens(newUser);
@@ -106,10 +117,14 @@ export class AuthService {
       };
     } catch (error) {
       // Log error
-      await this.activityLogService.logActivity('REGISTER_ERROR', {
-        email,
-        error: error.message
-      });
+      await this.activityLogService.logActivity(
+        null,
+        'REGISTER_ERROR',
+        {
+          email,
+          error: error.message
+        }
+      );
 
       this.logger.error(`Đăng ký thất bại: ${error.message}`, error.stack);
       return {
@@ -128,10 +143,14 @@ export class AuthService {
 
     try {
       // Log attempt
-      await this.activityLogService.logActivity('LOGIN_ATTEMPT', {
-        email,
-        rememberMe
-      });
+      await this.activityLogService.logActivity(
+        null, // No user ID yet
+        'LOGIN_ATTEMPT',
+        {
+          email,
+          rememberMe
+        }
+      );
 
       // Tìm user theo email
       const user = await this.prisma.user.findUnique({ where: { email } });
@@ -139,10 +158,14 @@ export class AuthService {
       // Kiểm tra user tồn tại
       if (!user) {
         // Log login failure
-        await this.activityLogService.logActivity('LOGIN_FAILED', {
-          email,
-          reason: 'User not found'
-        });
+        await this.activityLogService.logActivity(
+          null,
+          'LOGIN_FAILED',
+          {
+            email,
+            reason: 'User not found'
+          }
+        );
 
         return {
           success: false,
@@ -154,11 +177,14 @@ export class AuthService {
       // Kiểm tra trạng thái tài khoản
       if (!user.isActive) {
         // Log login blocked
-        await this.activityLogService.logActivity('LOGIN_BLOCKED', {
-          email,
-          userId: user.id,
-          reason: 'Account disabled'
-        });
+        await this.activityLogService.logActivity(
+          user.id,
+          'LOGIN_BLOCKED',
+          {
+            email,
+            reason: 'Account disabled'
+          }
+        );
 
         return {
           success: false,
@@ -172,11 +198,14 @@ export class AuthService {
 
       if (!isPasswordValid) {
         // Log login wrong password
-        await this.activityLogService.logActivity('LOGIN_FAILED', {
-          email,
-          userId: user.id,
-          reason: 'Invalid password'
-        });
+        await this.activityLogService.logActivity(
+          user.id,
+          'LOGIN_FAILED',
+          {
+            email,
+            reason: 'Invalid password'
+          }
+        );
 
         return {
           success: false,
@@ -194,12 +223,34 @@ export class AuthService {
         data: { updatedAt: new Date() }
       });
 
-      // Log login success
-      await this.activityLogService.logActivity('LOGIN_SUCCESS', {
-        email,
-        userId: user.id,
-        rememberMe
+      // Get user with createdBy info for visibility control
+      const userWithCreator = await this.prisma.user.findUnique({
+        where: { id: user.id },
+        select: { id: true, role: true, createdById: true }
       });
+
+      // Determine who should see this activity based on role
+      let visibleToId: number | null = null;
+      if (userWithCreator) {  // Add null check here
+        if (userWithCreator.role === Role.TEACHER) {
+          // Teacher's activities visible to admin who created them
+          visibleToId = userWithCreator.createdById;
+        } else if (userWithCreator.role === Role.STUDENT) {
+          // Student's activities visible to teacher who created them
+          visibleToId = userWithCreator.createdById;
+        }
+      }
+
+      // Log login with proper visibility
+      await this.activityLogService.logActivity(
+        user.id,
+        'LOGIN_SUCCESS',
+        {
+          email,
+          rememberMe
+        },
+        visibleToId
+      );
 
       return {
         success: true,
@@ -217,10 +268,14 @@ export class AuthService {
       };
     } catch (error) {
       // Log login error
-      await this.activityLogService.logActivity('LOGIN_ERROR', {
-        email,
-        error: error.message
-      });
+      await this.activityLogService.logActivity(
+        null,
+        'LOGIN_ERROR',
+        {
+          email,
+          error: error.message
+        }
+      );
 
       this.logger.error(`Đăng nhập thất bại: ${error.message}`, error.stack);
       return {
@@ -239,9 +294,13 @@ export class AuthService {
 
     try {
       // Log attempt
-      await this.activityLogService.logActivity('REFRESH_TOKEN_ATTEMPT', {
-        tokenHint: refreshToken.substring(0, 10) + '...' // Chỉ log một phần của token
-      });
+      await this.activityLogService.logActivity(
+        null, // No user ID yet
+        'REFRESH_TOKEN_ATTEMPT',
+        {
+          tokenHint: refreshToken.substring(0, 10) + '...' // Chỉ log một phần của token
+        }
+      );
 
       // Xác thực refresh token
       let payload;
@@ -251,10 +310,14 @@ export class AuthService {
         });
       } catch (error) {
         // Log failure
-        await this.activityLogService.logActivity('REFRESH_TOKEN_FAILED', {
-          reason: 'Invalid token',
-          error: error.message
-        });
+        await this.activityLogService.logActivity(
+          null,
+          'REFRESH_TOKEN_FAILED',
+          {
+            reason: 'Invalid token',
+            error: error.message
+          }
+        );
 
         return {
           success: false,
@@ -270,10 +333,13 @@ export class AuthService {
 
       if (!user) {
         // Log failure
-        await this.activityLogService.logActivity('REFRESH_TOKEN_FAILED', {
-          userId: payload.sub,
-          reason: 'User not found'
-        });
+        await this.activityLogService.logActivity(
+          payload.sub,
+          'REFRESH_TOKEN_FAILED',
+          {
+            reason: 'User not found'
+          }
+        );
 
         return {
           success: false,
@@ -286,10 +352,13 @@ export class AuthService {
       const tokens = this.generateTokens(user, true);
 
       // Log success
-      await this.activityLogService.logActivity('REFRESH_TOKEN_SUCCESS', {
-        userId: user.id,
-        email: user.email
-      });
+      await this.activityLogService.logActivity(
+        user.id,
+        'REFRESH_TOKEN_SUCCESS',
+        {
+          email: user.email
+        }
+      );
 
       return {
         success: true,
@@ -307,9 +376,13 @@ export class AuthService {
       };
     } catch (error) {
       // Log error
-      await this.activityLogService.logActivity('REFRESH_TOKEN_ERROR', {
-        error: error.message
-      });
+      await this.activityLogService.logActivity(
+        null,
+        'REFRESH_TOKEN_ERROR',
+        {
+          error: error.message
+        }
+      );
 
       this.logger.error(`Refresh token thất bại: ${error.message}`, error.stack);
       return {
@@ -329,17 +402,22 @@ export class AuthService {
 
     try {
       // Log attempt
-      await this.activityLogService.logActivity('CHANGE_PASSWORD_ATTEMPT', {
-        userId
-      });
+      await this.activityLogService.logActivity(
+        userId,
+        'CHANGE_PASSWORD_ATTEMPT',
+        {}
+      );
 
       // Kiểm tra mật khẩu mới và xác nhận khớp nhau
       if (newPassword !== newPasswordConfirm) {
         // Log failure
-        await this.activityLogService.logActivity('CHANGE_PASSWORD_FAILED', {
+        await this.activityLogService.logActivity(
           userId,
-          reason: 'Passwords do not match'
-        });
+          'CHANGE_PASSWORD_FAILED',
+          {
+            reason: 'Passwords do not match'
+          }
+        );
 
         return {
           success: false,
@@ -355,10 +433,13 @@ export class AuthService {
 
       if (!user) {
         // Log failure
-        await this.activityLogService.logActivity('CHANGE_PASSWORD_FAILED', {
+        await this.activityLogService.logActivity(
           userId,
-          reason: 'User not found'
-        });
+          'CHANGE_PASSWORD_FAILED',
+          {
+            reason: 'User not found'
+          }
+        );
 
         return {
           success: false,
@@ -372,11 +453,14 @@ export class AuthService {
 
       if (!isCurrentPasswordValid) {
         // Log failure
-        await this.activityLogService.logActivity('CHANGE_PASSWORD_FAILED', {
+        await this.activityLogService.logActivity(
           userId,
-          email: user.email,
-          reason: 'Current password incorrect'
-        });
+          'CHANGE_PASSWORD_FAILED',
+          {
+            email: user.email,
+            reason: 'Current password incorrect'
+          }
+        );
 
         return {
           success: false,
@@ -395,10 +479,13 @@ export class AuthService {
       });
 
       // Log success
-      await this.activityLogService.logActivity('CHANGE_PASSWORD_SUCCESS', {
+      await this.activityLogService.logActivity(
         userId,
-        email: user.email
-      });
+        'CHANGE_PASSWORD_SUCCESS',
+        {
+          email: user.email
+        }
+      );
 
       return {
         success: true,
@@ -407,10 +494,13 @@ export class AuthService {
       };
     } catch (error) {
       // Log error
-      await this.activityLogService.logActivity('CHANGE_PASSWORD_ERROR', {
+      await this.activityLogService.logActivity(
         userId,
-        error: error.message
-      });
+        'CHANGE_PASSWORD_ERROR',
+        {
+          error: error.message
+        }
+      );
 
       this.logger.error(`Đổi mật khẩu thất bại: ${error.message}`, error.stack);
       return {
@@ -434,17 +524,23 @@ export class AuthService {
       });
 
       // Log attempt
-      await this.activityLogService.logActivity('LOGOUT_ATTEMPT', {
+      await this.activityLogService.logActivity(
         userId,
-        email: user?.email
-      });
+        'LOGOUT_ATTEMPT',
+        {
+          email: user?.email
+        }
+      );
 
       if (!user) {
         // Log failure
-        await this.activityLogService.logActivity('LOGOUT_FAILED', {
+        await this.activityLogService.logActivity(
           userId,
-          reason: 'User not found'
-        });
+          'LOGOUT_FAILED',
+          {
+            reason: 'User not found'
+          }
+        );
 
         return {
           success: false,
@@ -464,10 +560,13 @@ export class AuthService {
       }
 
       // Log success
-      await this.activityLogService.logActivity('LOGOUT_SUCCESS', {
+      await this.activityLogService.logActivity(
         userId,
-        email: user.email
-      });
+        'LOGOUT_SUCCESS',
+        {
+          email: user.email
+        }
+      );
 
       return {
         success: true,
@@ -476,10 +575,13 @@ export class AuthService {
       };
     } catch (error) {
       // Log error
-      await this.activityLogService.logActivity('LOGOUT_ERROR', {
+      await this.activityLogService.logActivity(
         userId,
-        error: error.message
-      });
+        'LOGOUT_ERROR',
+        {
+          error: error.message
+        }
+      );
 
       this.logger.error(`Đăng xuất thất bại: ${error.message}`, error.stack);
       return {

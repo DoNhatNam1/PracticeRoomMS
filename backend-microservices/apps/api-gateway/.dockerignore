@@ -15,12 +15,6 @@ build
 .github
 .gitlab-ci.yml
 
-# ENV files
-.env
-**/.env
-.env.*
-!.env.example
-
 # IDE
 .idea
 .vscode

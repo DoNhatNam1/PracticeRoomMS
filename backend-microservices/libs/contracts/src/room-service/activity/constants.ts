@@ -1,4 +1,4 @@
-export const ACTIVITY_PATTERNS = {
+export const ACTIVITY_ROOM_PATTERNS = {
   GET_ROOM_ACTIVITY: 'activity.getRoomActivity',
   GET_USER_ROOM_ACTIVITIES: 'activity.getUserRoomActivities',
   GET_ACTIVITY_HISTORY: 'activity.getActivityHistory',
@@ -6,7 +6,7 @@ export const ACTIVITY_PATTERNS = {
   LOG_ACTIVITY: 'activity.logActivity',
 };
 
-export const ACTIVITY_EVENTS = {
+export const ACTIVITY_ROOM_EVENTS = {
   ACTIVITY_LOGGED: 'activity.logged',
   ROOM_USED: 'activity.roomUsed',
   SCHEDULE_VIEWED: 'activity.scheduleViewed',

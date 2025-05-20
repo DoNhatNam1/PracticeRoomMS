@@ -1,105 +1,120 @@
-import { Outlet } from 'react-router-dom';
-import { AppShell, Text, Group, Avatar, ThemeIcon, UnstyledButton, Stack } from '@mantine/core';
-import { useNavigate } from 'react-router-dom';
-import { 
-  IconDashboard, IconUsers, IconDoor, IconDeviceDesktop, 
-  IconCalendarEvent, IconFileAnalytics, IconUser, IconLogout
-} from '@tabler/icons-react';
-import { useAuthStore } from '../../stores/authStore';
-import './AdminLayout.css';
+import { Link, Outlet } from "react-router-dom";
+import { Toaster } from "@/components/ui/sonner"
+import { useAuthStore } from "@/stores/authStore";
+import {
+  CalendarDays,
+  LayoutDashboard,
+  Users,
+  LogOut,
+  Settings,
+  Laptop,
+  DoorOpen,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function AdminLayout() {
-  const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  
+
   const handleLogout = () => {
     logout();
-    navigate('/role-selection');
+    // Redirect will happen via protected route
   };
-  
-  const menuItems = [
-    { icon: <IconDashboard size={20} />, label: 'Dashboard', path: '/admin' },
-    { icon: <IconUsers size={20} />, label: 'Users', path: '/admin/users' },
-    { icon: <IconDoor size={20} />, label: 'Rooms', path: '/admin/rooms' },
-    { icon: <IconDeviceDesktop size={20} />, label: 'Computers', path: '/admin/computers' },
-    { icon: <IconCalendarEvent size={20} />, label: 'Schedules', path: '/admin/schedules' },
-    { icon: <IconFileAnalytics size={20} />, label: 'System Logs', path: '/admin/logs' },
-    { icon: <IconUser size={20} />, label: 'Profile', path: '/admin/profile' },
-  ];
-  
+
   return (
-    <AppShell
-      padding="md"
-      navbar={{ 
-        width: 250, 
-        breakpoint: 'sm',
-      }}
-      header={{ 
-        height: 60 
-      }}
-    >
-      <AppShell.Header p="xs">
-        <Group h="100%" px={20} justify="space-between">
-          <Text fw={700} size="lg">Practice Room Management System</Text>
-          
-          <Group>
-            <Text fw={500}>{user?.name || 'Admin User'}</Text>
-            <Avatar color="blue" radius="xl">
-              {user?.name?.charAt(0) || 'A'}
-            </Avatar>
-          </Group>
-        </Group>
-      </AppShell.Header>
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-sm dark:bg-gray-800">
+        <div className="flex flex-col h-full">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-bold">Admin Portal</h2>
+            <p className="text-sm text-muted-foreground">
+              {user?.name || "Administrator"}
+            </p>
+          </div>
+          <nav className="flex-1 p-4 space-y-1">
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to="/admin/dashboard">
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Dashboard
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to="/admin/rooms">
+                <DoorOpen className="w-4 h-4 mr-2" />
+                Rooms
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to="/admin/computers">
+                <Laptop className="w-4 h-4 mr-2" />
+                Computers
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to="/admin/users">
+                <Users className="w-4 h-4 mr-2" />
+                Users
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to="/admin/schedules">
+                <CalendarDays className="w-4 h-4 mr-2" />
+                Schedule
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start w-full"
+              asChild
+            >
+              <Link to="/admin/settings">
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Link>
+            </Button>
+          </nav>
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              variant="ghost"
+              className="justify-start w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Log out
+            </Button>
+          </div>
+        </div>
+      </div>
 
-      <AppShell.Navbar p="xs">
-        <Stack h="100%" justify="space-between">
-          <Stack gap={0}>
-            {menuItems.map((item, index) => (
-              <UnstyledButton
-                key={index}
-                className="admin-menu-item"
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '4px',
-                  marginBottom: 5,
-                }}
-                onClick={() => navigate(item.path)}
-              >
-                <Group>
-                  <ThemeIcon size={30} variant="light">
-                    {item.icon}
-                  </ThemeIcon>
-                  <Text size="sm">{item.label}</Text>
-                </Group>
-              </UnstyledButton>
-            ))}
-          </Stack>
-          
-          <UnstyledButton
-            className="admin-logout-button"
-            style={{
-              display: 'block',
-              width: '100%',
-              padding: '10px 12px',
-              borderRadius: '4px',
-            }}
-            onClick={handleLogout}
-          >
-            <Group>
-              <ThemeIcon size={30} variant="light" color="red">
-                <IconLogout size={20} />
-              </ThemeIcon>
-              <Text size="sm" c="red">Logout</Text>
-            </Group>
-          </UnstyledButton>
-        </Stack>
-      </AppShell.Navbar>
+      {/* Content */}
+      <div className="flex flex-col flex-1">
+        <main className="flex-1 p-6">
+          <Outlet />
+        </main>
+      </div>
 
-      <AppShell.Main>
-        <Outlet />
-      </AppShell.Main>
-    </AppShell>
+      {/* Toaster for notifications */}
+      <Toaster />
+    </div>
   );
 }

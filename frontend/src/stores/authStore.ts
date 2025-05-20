@@ -1,42 +1,54 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User } from '../types';
+
+interface User {
+  id: number;
+  email: string;
+  name: string;
+  role: string;
+}
 
 interface AuthState {
-  token: string | null;
   user: User | null;
-  isLoggedIn: boolean;
-  login: (token: string, user: User) => void;
-  logout: () => void;
+  token: string | null;
+  refreshToken: string | null;
+  isAuthenticated: boolean;
+  
+  setUser: (user: User | null) => void;
   setToken: (token: string) => void;
-  setUser: (user: User) => void;
+  setRefreshToken: (token: string) => void;
+  login: (user: User, token: string, refreshToken: string) => void;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      token: null,
       user: null,
-      isLoggedIn: false,
-      
-      login: (token, user) => set({
-        token,
-        user,
-        isLoggedIn: true,
-      }),
-      
-      logout: () => set({
-        token: null,
-        user: null,
-        isLoggedIn: false,
-      }),
-      
-      setToken: (token) => set({ token }),
+      token: null,
+      refreshToken: null,
+      isAuthenticated: false,
       
       setUser: (user) => set({ user }),
+      setToken: (token) => set({ token }),
+      setRefreshToken: (refreshToken) => set({ refreshToken }),
+      
+      login: (user, token, refreshToken) => set({ 
+        user, 
+        token, 
+        refreshToken,
+        isAuthenticated: true 
+      }),
+      
+      logout: () => set({ 
+        user: null, 
+        token: null, 
+        refreshToken: null,
+        isAuthenticated: false 
+      }),
     }),
     {
-      name: 'auth-storage', // storage key name
+      name: 'auth-storage',
     }
   )
 );

@@ -1,7 +1,7 @@
 import { Controller, Logger } from '@nestjs/common';
-import { MessagePattern, EventPattern } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { SchedulesService } from './schedules.service';
-import { SCHEDULES_PATTERNS } from '@app/contracts/room-service/schedules/constants';
+import { SCHEDULES_PATTERNS } from '@app/contracts/room-service';
 
 @Controller()
 export class SchedulesController {
@@ -9,15 +9,24 @@ export class SchedulesController {
 
   constructor(private readonly schedulesService: SchedulesService) {}
 
-  /**
-   * Tạo lịch phòng học mới
-   * - Input: roomId, title, startTime, endTime, userId, userRole, repeat (optional)
-   * - Output: Lịch phòng đã được tạo
-   */
+  @MessagePattern(SCHEDULES_PATTERNS.FIND_ALL)
+  async findAll(@Payload() payload: any) {
+    this.logger.log(`Finding all schedules with params: ${JSON.stringify(payload)}`);
+    const { page = 1, limit = 10, currentUser } = payload;
+    return this.schedulesService.findAll(page, limit, currentUser);
+  }
+
+  @MessagePattern(SCHEDULES_PATTERNS.FIND_ONE)
+  async findOne(@Payload() payload: any) {
+    const { id, currentUser } = payload;
+    this.logger.log(`Finding schedule with ID: ${id}`);
+    return this.schedulesService.findOne(id, currentUser);
+  }
+
   @MessagePattern(SCHEDULES_PATTERNS.CREATE)
-  async create(data: any) {
-    this.logger.log(`Creating schedule: ${JSON.stringify(data)}`);
-    return this.schedulesService.create(data);
+  async create(@Payload() payload: any) {
+    this.logger.log(`Creating schedule: ${JSON.stringify(payload)}`);
+    return this.schedulesService.create(payload);
   }
 
   /**
@@ -57,11 +66,11 @@ export class SchedulesController {
    */
   @MessagePattern(SCHEDULES_PATTERNS.CANCEL)
   async cancel(data: any) {
-    this.logger.log(`Cancelling schedule ${data.scheduleId}`);
+    this.logger.log(`Cancelling schedule ${data.id}`); 
     return this.schedulesService.cancelSchedule({
-      scheduleId: data.scheduleId,
-      userId: data.userId,
-      userRole: data.userRole,
+      scheduleId: data.id,
+      userId: data.userId,  
+      userRole: data.userRole 
     });
   }
 
@@ -81,5 +90,16 @@ export class SchedulesController {
       endTime: new Date(data.endTime),
       excludeScheduleId: data.excludeScheduleId,
     });
+  }
+
+  @MessagePattern(SCHEDULES_PATTERNS.UPDATE)
+  async update(@Payload() payload: any) {
+    const { id, updateScheduleDto, currentUser } = payload;
+    
+    // Add debugging logs
+    this.logger.debug(`Update schedule payload: ${JSON.stringify(payload)}`);
+    this.logger.debug(`Current user from payload: ${JSON.stringify(currentUser)}`);
+    
+    return this.schedulesService.update(id, updateScheduleDto, currentUser);
   }
 }

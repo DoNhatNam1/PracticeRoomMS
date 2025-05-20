@@ -39,10 +39,13 @@ export class ProfileService {
       }
 
       // Log hoạt động xem profile
-      await this.activityLogService.logActivity('VIEW_PROFILE', {
-        userId,
-        action: 'PROFILE_VIEWED'
-      });
+      await this.activityLogService.logActivity(
+        userId,           // userId - first parameter
+        'VIEW_PROFILE',   // action - second parameter
+        {                 // details - third parameter
+          action: 'PROFILE_VIEWED'
+        }
+      );
 
       return {
         success: true,
@@ -98,11 +101,13 @@ export class ProfileService {
       });
 
       // Ghi log hoạt động với cú pháp mới
-      await this.activityLogService.logActivity('UPDATE_PROFILE', {
-        userId,
-        changes: allowedFields,
-        action: 'PROFILE_UPDATED'
-      });
+      await this.activityLogService.logActivity(
+        userId,             // userId - first parameter
+        'UPDATE_PROFILE',   // action - second parameter
+        {                   // details - third parameter
+          changes: allowedFields
+        }
+      );
 
       return {
         success: true,

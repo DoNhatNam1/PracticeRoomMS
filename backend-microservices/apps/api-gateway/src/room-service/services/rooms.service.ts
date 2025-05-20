@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { ROOM_SERVICE_CLIENT } from '../constant';
@@ -13,21 +13,73 @@ export class RoomsService {
     @Inject(ROOM_SERVICE_CLIENT) private roomClient: ClientProxy
   ) {}
 
-  async findAll(params: {
+  /**
+   * Find all rooms for dashboard view (admin/teacher)
+   * Includes full details, pagination, and comprehensive filtering
+   */
+  async findAllForDashboard(params: {
     page: number;
     limit: number;
-    filters?: any;
+    filters?: {
+      status?: string;
+      type?: string;
+      building?: string;
+      search?: string;
+      isActive?: boolean;
+    };
   }) {
-    this.logger.log(`Finding all rooms with params: ${JSON.stringify(params)}`);
-    return firstValueFrom(
-      this.roomClient.send(ROOMS_PATTERNS.FIND_ALL, params)
-    );
+    try {
+      const { page, limit, filters = {} } = params;
+      
+      // Use ROOM_PATTERNS constant instead of hardcoded command
+      const result = await firstValueFrom(
+        this.roomClient.send(ROOMS_PATTERNS.FIND_ALL_DASHBOARD, { page, limit, filters })
+      );
+      
+      return result;
+    } catch (error) {
+      this.logger.error(`Error finding rooms for dashboard: ${error.message}`);
+      throw new InternalServerErrorException('Failed to retrieve rooms');
+    }
+  }
+
+  /**
+   * Find all rooms for client view
+   * Shows limited information, no pagination, focuses on availability
+   */
+  async findAllForClient(params: {
+    filters?: {
+      status?: string;
+      building?: string;
+      isActive?: boolean;
+    };
+  }) {
+    try {
+      const { filters = {} } = params;
+      
+      // Use ROOM_PATTERNS constant instead of hardcoded command
+      const result = await firstValueFrom(
+        this.roomClient.send(ROOMS_PATTERNS.FIND_ALL_CLIENT, { filters })
+      );
+      
+      return result;
+    } catch (error) {
+      this.logger.error(`Error finding rooms for client view: ${error.message}`);
+      throw new InternalServerErrorException('Failed to retrieve rooms');
+    }
   }
 
   async findOne(id: number) {
     this.logger.log(`Finding room with id: ${id}`);
     return firstValueFrom(
       this.roomClient.send(ROOMS_PATTERNS.FIND_ONE, { id })
+    );
+  }
+
+  async findOnePublic(id: number) {
+    this.logger.log(`Finding public info for room with id: ${id}`);
+    return firstValueFrom(
+      this.roomClient.send(ROOMS_PATTERNS.FIND_ONE_PUBLIC, { id })
     );
   }
 
